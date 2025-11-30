@@ -1,60 +1,43 @@
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send } from 'lucide-react';
 
-// --- Ministry Logo (Image Implementation) ---
+// --- Ministry Logo (Image Only Implementation) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
-  const textColor = whiteText ? 'text-white' : 'text-[#D23B78] dark:text-[#eb4884]'; 
   
-  // CAMBIO: Ahora apunta a un archivo local. 
-  // Asegúrate de guardar tu imagen como "escudo.png" en la misma carpeta que el index.html
+  // Apunta al archivo local escudo.png que has cargado en la raíz
   const LOGO_URL = "./escudo.png";
 
   if (variant === 'horizontal') {
       return (
-        <div className={`flex items-center gap-3 ${className}`}>
-            <div className="w-10 shrink-0">
+        <div className={`flex items-center ${className}`}>
+            {/* Ajustamos la altura para que se vea bien en la barra de navegación */}
+            <div className="h-12">
                  <img 
                     src={LOGO_URL} 
-                    alt="Escudo de Colombia" 
-                    className="w-full h-auto object-contain drop-shadow-sm"
+                    alt="Ministerio de Igualdad y Equidad" 
+                    className="h-full w-auto object-contain"
                     onError={(e) => {
-                        e.currentTarget.style.display = 'none'; // Ocultar si no se encuentra la imagen
+                        e.currentTarget.style.display = 'none'; 
                     }}
                  />
-            </div>
-            <div className="h-10 w-[1px] bg-gray-300 dark:bg-slate-600"></div>
-            <div className="flex flex-col justify-center">
-                <span className={`text-3xl font-bold leading-none tracking-tight ${textColor} font-sans`}>Igualdad</span>
-                <div className="flex w-full h-1.5 mt-0.5 rounded-full overflow-hidden">
-                    <div className="h-full w-1/2 bg-[#FCD116]"></div>
-                    <div className="h-full w-1/4 bg-[#003893]"></div>
-                    <div className="h-full w-1/4 bg-[#CE1126]"></div>
-                </div>
             </div>
         </div>
       );
   }
 
-  // Vertical Variant
+  // Vertical Variant (Login, Sidebar, Certificate)
   return (
     <div className={`flex flex-col items-center ${className}`}>
+        {/* Tamaño un poco más grande para las vistas principales */}
         <img 
             src={LOGO_URL} 
-            alt="Escudo de Colombia" 
-            className="w-24 h-auto mb-3 object-contain drop-shadow-sm"
+            alt="Ministerio de Igualdad y Equidad" 
+            className="w-auto h-32 object-contain"
             onError={(e) => {
-                // Fallback visual si la imagen no está cargada aún
+                // Fallback visual por si falla la carga local
                 e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
             }}
         />
-        <div className={`text-6xl font-bold tracking-tight ${textColor} font-sans`}>
-            Igualdad
-        </div>
-         <div className="flex w-32 h-2 mt-3 rounded-full overflow-hidden shadow-sm">
-            <div className="h-full w-1/2 bg-[#FCD116]"></div>
-            <div className="h-full w-1/4 bg-[#003893]"></div>
-            <div className="h-full w-1/4 bg-[#CE1126]"></div>
-        </div>
     </div>
   );
 };
@@ -105,7 +88,6 @@ export const Accordion: React.FC<{ title: string; children: React.ReactNode; def
 };
 
 // --- Feedback Form (REMOVED as requested to save space) ---
-// Kept interface if needed later, but component is gone from exports to avoid usage.
 export const FeedbackForm: React.FC<{ moduleName: string }> = ({ moduleName }) => {
     return null; 
 };
