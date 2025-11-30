@@ -10,7 +10,7 @@ import { ToolsModule } from './modules/Tools';
 import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
-import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck } from 'lucide-react';
+import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2 } from 'lucide-react';
 
 const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
     <div className="p-8 text-center">
@@ -25,7 +25,9 @@ function App() {
   const [currentModule, setCurrentModule] = useState<ModuleId>('dashboard');
   const [darkMode, setDarkMode] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
-  const [progress, setProgress] = useState<ProgressMap>({
+  
+  // Default empty state
+  const emptyProgress: ProgressMap = {
     dashboard: { completed: true, score: 0 },
     strategic: { completed: false, score: 0 },
     mipg: { completed: false, score: 0 },
@@ -35,12 +37,16 @@ function App() {
     library: { completed: true, score: 0 },
     assistant: { completed: true, score: 0 },
     tools: { completed: true, score: 0 },
-  });
+  };
 
-  // Load user and progress from local storage
+  const [progress, setProgress] = useState<ProgressMap>(emptyProgress);
+
+  // Load user and progress from SESSION storage (clears on browser close)
   useEffect(() => {
-    const savedUser = localStorage.getItem('oci_user');
-    const savedProgress = localStorage.getItem('oci_progress');
+    // CAMBIO: Usamos sessionStorage en lugar de localStorage
+    const savedUser = sessionStorage.getItem('oci_user');
+    const savedProgress = sessionStorage.getItem('oci_progress');
+    
     if (savedUser) setUser(JSON.parse(savedUser));
     if (savedProgress) setProgress(JSON.parse(savedProgress));
   }, []);
@@ -57,19 +63,27 @@ function App() {
   const handleLogin = (name: string, role: string, email: string) => {
     const newUser = { name, role, email };
     setUser(newUser);
-    localStorage.setItem('oci_user', JSON.stringify(newUser));
+    sessionStorage.setItem('oci_user', JSON.stringify(newUser));
   };
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('oci_user');
+    sessionStorage.removeItem('oci_user');
+    // Optional: Clear progress on logout too if desired, currently sticking to session rule
     setCurrentModule('dashboard');
   };
 
   const handleModuleComplete = (moduleId: ModuleId, score: number) => {
     const newProgress = { ...progress, [moduleId]: { completed: true, score } };
     setProgress(newProgress);
-    localStorage.setItem('oci_progress', JSON.stringify(newProgress));
+    sessionStorage.setItem('oci_progress', JSON.stringify(newProgress));
+  };
+
+  const handleResetProgress = () => {
+    if(confirm('¿Estás seguro de reiniciar todo el progreso? Esto borrará tus avances actuales.')) {
+        setProgress(emptyProgress);
+        sessionStorage.setItem('oci_progress', JSON.stringify(emptyProgress));
+    }
   };
 
   const toggleTheme = () => setDarkMode(!darkMode);
@@ -81,7 +95,7 @@ function App() {
   const renderModule = () => {
     switch (currentModule) {
       case 'dashboard':
-        return <DashboardView progress={progress} onChange={setCurrentModule} user={user} onShowCertificate={() => setShowCertificate(true)} />;
+        return <DashboardView progress={progress} onChange={setCurrentModule} user={user} onShowCertificate={() => setShowCertificate(true)} onReset={handleResetProgress} />;
       case 'strategic':
         return <StrategicModule onComplete={(s) => handleModuleComplete('strategic', s)} />;
       case 'mipg':
@@ -167,7 +181,7 @@ const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }
                     </button>
                 </form>
                 <p className="text-xs text-center text-slate-400 mt-6">
-                    Sus datos se utilizarán para la generación de la constancia de culminación.
+                    Sus datos se borrarán automáticamente al cerrar el navegador (Modo Seguro).
                 </p>
             </div>
         </div>
@@ -175,7 +189,7 @@ const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }
 }
 
 // --- Dashboard View ---
-const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) => void, user: User, onShowCertificate: () => void }> = ({ progress, onChange, user, onShowCertificate }) => {
+const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) => void, user: User, onShowCertificate: () => void, onReset: () => void }> = ({ progress, onChange, user, onShowCertificate, onReset }) => {
     const coreModules: ModuleId[] = ['strategic', 'mipg', 'standards', 'forensic'];
     const completedCount = coreModules.filter(id => progress[id]?.completed).length;
     const totalModules = coreModules.length;
@@ -259,19 +273,14 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                         </div>
                     )}
 
-                    {/* Latest News Widget */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800">
-                        <h3 className="text-blue-900 dark:text-blue-200 font-bold mb-3 text-sm uppercase tracking-wide">Novedades Normativas</h3>
-                        <ul className="space-y-3">
-                            <li className="text-sm text-blue-800 dark:text-blue-300 pb-2 border-b border-blue-200 dark:border-blue-800">
-                                <span className="font-bold block">Circular 005 - 2024</span>
-                                Lineamientos cierre fiscal vigencia 2024.
-                            </li>
-                            <li className="text-sm text-blue-800 dark:text-blue-300">
-                                <span className="font-bold block">Decreto 1600 - Auditoría</span>
-                                Recordatorio de cumplimiento auditorías forenses.
-                            </li>
-                        </ul>
+                    {/* Utils & Reset */}
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-slate-700">
+                        <h3 className="font-bold text-slate-800 dark:text-white mb-3 text-sm uppercase tracking-wide">Opciones</h3>
+                        <div className="flex flex-col gap-2">
+                            <button onClick={onReset} className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-bold transition-colors">
+                                <Trash2 size={16} /> Reiniciar todo el progreso
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

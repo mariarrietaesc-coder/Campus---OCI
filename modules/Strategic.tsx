@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
-import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft } from 'lucide-react';
+import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft, Menu } from 'lucide-react';
 
 // --- DATA: Programas y Proyectos ---
 const PROGRAMAS_DATA = [
@@ -159,22 +159,44 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
   
   return (
     <div className="space-y-6 animate-fade-in pb-24">
-        {/* Detail Header with Progress Bar */}
+        {/* Detail Header with Enhanced Navigation */}
         <div className="sticky top-0 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur z-30 pt-4 pb-2 border-b border-gray-200 dark:border-slate-700 mb-6">
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => setActiveTab('menu')} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300">
-                        <Grid size={20} />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    {/* Back to Menu Button */}
+                    <button 
+                        onClick={() => setActiveTab('menu')} 
+                        className="flex items-center gap-2 p-2 px-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-brand-600 transition-colors shadow-sm"
+                        title="Volver al Menú"
+                    >
+                        <Grid size={18} />
+                        <span className="text-sm font-bold hidden sm:inline">Menú</span>
                     </button>
-                    <div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Módulo 1 / Tema {currentSectionIndex + 1} de {sections.length}</div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            {activeSection?.icon && <activeSection.icon size={20} className="text-brand-500"/>}
-                            {activeSection?.label}
-                        </h2>
+
+                    {/* Quick Jump Dropdown */}
+                    <div className="relative group flex-1 md:flex-none">
+                        <select 
+                            value={activeTab} 
+                            onChange={(e) => {
+                                setActiveTab(e.target.value);
+                                window.scrollTo(0,0);
+                            }}
+                            className="appearance-none w-full md:w-64 pl-9 pr-8 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none cursor-pointer shadow-sm"
+                        >
+                            {sections.map(s => (
+                                <option key={s.id} value={s.id}>{s.label}</option>
+                            ))}
+                        </select>
+                        <div className="absolute left-3 top-2.5 text-brand-600 dark:text-brand-400 pointer-events-none">
+                            {activeSection?.icon && <activeSection.icon size={16} />}
+                        </div>
+                        <ChevronDown size={16} className="absolute right-3 top-2.5 text-slate-400 pointer-events-none" />
                     </div>
                 </div>
-                <MinistryLogo variant="horizontal" className="scale-75 hidden md:flex" />
+                
+                <div className="hidden md:flex items-center text-xs text-slate-400">
+                    Módulo 1 &bull; Tema {currentSectionIndex + 1} de {sections.length}
+                </div>
             </div>
             
             {/* Progress Bar */}
