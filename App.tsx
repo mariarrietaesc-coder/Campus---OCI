@@ -7,9 +7,10 @@ import { ForensicModule } from './modules/Forensic';
 import { AssistantModule } from './modules/Assistant';
 import { LibraryModule } from './modules/Library';
 import { ToolsModule } from './modules/Tools';
+import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
-import { Award, CheckCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck } from 'lucide-react';
 
 const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
     <div className="p-8 text-center">
@@ -23,6 +24,7 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [currentModule, setCurrentModule] = useState<ModuleId>('dashboard');
   const [darkMode, setDarkMode] = useState(false);
+  const [showCertificate, setShowCertificate] = useState(false);
   const [progress, setProgress] = useState<ProgressMap>({
     dashboard: { completed: true, score: 0 },
     strategic: { completed: false, score: 0 },
@@ -79,7 +81,7 @@ function App() {
   const renderModule = () => {
     switch (currentModule) {
       case 'dashboard':
-        return <DashboardView progress={progress} onChange={setCurrentModule} user={user} />;
+        return <DashboardView progress={progress} onChange={setCurrentModule} user={user} onShowCertificate={() => setShowCertificate(true)} />;
       case 'strategic':
         return <StrategicModule onComplete={(s) => handleModuleComplete('strategic', s)} />;
       case 'mipg':
@@ -102,17 +104,27 @@ function App() {
   };
 
   return (
-    <Layout 
-      currentModule={currentModule} 
-      onModuleChange={setCurrentModule} 
-      progress={progress} 
-      user={user} 
-      onLogout={handleLogout}
-      darkMode={darkMode}
-      toggleTheme={toggleTheme}
-    >
-      {renderModule()}
-    </Layout>
+    <>
+        <Layout 
+        currentModule={currentModule} 
+        onModuleChange={setCurrentModule} 
+        progress={progress} 
+        user={user} 
+        onLogout={handleLogout}
+        darkMode={darkMode}
+        toggleTheme={toggleTheme}
+        >
+        {renderModule()}
+        </Layout>
+        
+        {showCertificate && (
+            <Certificate 
+                user={user} 
+                date={new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}
+                onClose={() => setShowCertificate(false)}
+            />
+        )}
+    </>
   );
 }
 
@@ -155,7 +167,7 @@ const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }
                     </button>
                 </form>
                 <p className="text-xs text-center text-slate-400 mt-6">
-                    Sus datos se utilizarán para la generación del certificado de formación.
+                    Sus datos se utilizarán para la generación de la constancia de culminación.
                 </p>
             </div>
         </div>
@@ -163,7 +175,7 @@ const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }
 }
 
 // --- Dashboard View ---
-const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) => void, user: User }> = ({ progress, onChange, user }) => {
+const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) => void, user: User, onShowCertificate: () => void }> = ({ progress, onChange, user, onShowCertificate }) => {
     const coreModules: ModuleId[] = ['strategic', 'mipg', 'standards', 'forensic'];
     const completedCount = coreModules.filter(id => progress[id]?.completed).length;
     const totalModules = coreModules.length;
@@ -183,7 +195,7 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                 
                 <div className="mt-8 max-w-md mx-auto">
                     <div className="flex justify-between text-sm font-bold mb-2">
-                        <span className="text-brand-700 dark:text-brand-400">Progreso de Certificación</span>
+                        <span className="text-brand-700 dark:text-brand-400">Progreso de Formación</span>
                         <span className="text-brand-700 dark:text-brand-400">{percentage}%</span>
                     </div>
                     <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -193,8 +205,11 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                         ></div>
                     </div>
                     {isFinished && (
-                        <button className="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-green-200 dark:shadow-none animate-bounce">
-                            Descargar Certificado de Formación
+                        <button 
+                            onClick={onShowCertificate}
+                            className="mt-6 flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-green-200 dark:shadow-none animate-bounce transition-all"
+                        >
+                            <FileCheck size={20} /> Generar Constancia de Culminación
                         </button>
                     )}
                 </div>
