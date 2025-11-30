@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Accordion, Quiz } from '../components/UI';
+import { Card, Badge, Accordion, Quiz, FeedbackForm } from '../components/UI';
 import { Target, Users, Map, Lightbulb } from 'lucide-react';
 
 export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
@@ -7,18 +7,18 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
     <div className="space-y-8 animate-fade-in">
       <div className="mb-6">
         <Badge type="brand">Módulo 1</Badge>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Plataforma Estratégica</h1>
-        <p className="text-lg text-slate-600 mt-2">Estructura, misión y portafolio programático del Ministerio de Igualdad y Equidad.</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Plataforma Estratégica</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Estructura, misión y portafolio programático del Ministerio de Igualdad y Equidad.</p>
       </div>
 
       {/* Contexto Educativo: ¿Por qué es importante? */}
-      <div className="bg-brand-50 rounded-xl p-5 border border-brand-100 flex gap-4 items-start">
-        <div className="bg-white p-2 rounded-full shadow-sm text-brand-600">
+      <div className="bg-brand-50 dark:bg-brand-900/20 rounded-xl p-5 border border-brand-100 dark:border-brand-800 flex gap-4 items-start">
+        <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm text-brand-600 dark:text-brand-400">
             <Lightbulb size={24} />
         </div>
         <div>
-            <h3 className="font-bold text-brand-800 text-sm uppercase tracking-wide mb-1">Contexto para el Auditor</h3>
-            <p className="text-brand-900 text-sm leading-relaxed">
+            <h3 className="font-bold text-brand-800 dark:text-brand-300 text-sm uppercase tracking-wide mb-1">Contexto para el Auditor</h3>
+            <p className="text-brand-900 dark:text-brand-200 text-sm leading-relaxed">
                 Entender la estrategia no es solo teoría. Como auditores, necesitamos conocer el "norte" de la entidad para identificar si los riesgos que evaluamos realmente amenazan el cumplimiento de la misión. Sin estrategia, no hay auditoría basada en riesgos efectiva.
             </p>
         </div>
@@ -26,25 +26,25 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
 
       {/* Mission/Vision Grid Visual */}
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border-t-4 border-t-brand-500 p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border-t-4 border-t-brand-500 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-brand-50 text-brand-600 rounded-lg">
+                <div className="p-3 bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 rounded-lg">
                     <Target size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-slate-800">Misión</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Misión</h3>
             </div>
-            <p className="text-slate-600 leading-relaxed text-sm">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
                 Formular, implementar y evaluar políticas para garantizar el derecho a la igualdad y la equidad, enfocándose en los "nadie" y en territorios históricamente excluidos.
             </p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border-t-4 border-t-blue-500 p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border-t-4 border-t-blue-500 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
                     <Map size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-slate-800">Visión</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Visión</h3>
             </div>
-            <p className="text-slate-600 leading-relaxed text-sm">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
                 Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones excluidas mediante la garantía de derechos.
             </p>
         </div>
@@ -52,25 +52,25 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
 
       {/* Visual Org Chart Tree */}
       <Card title="Estructura Organizacional">
-        <p className="mb-8 text-slate-600 text-sm">El Ministerio opera bajo un esquema descentralizado y poblacional.</p>
+        <p className="mb-8 text-slate-600 dark:text-slate-400 text-sm">El Ministerio opera bajo un esquema descentralizado y poblacional.</p>
         
         <div className="flex flex-col items-center w-full overflow-x-auto pb-4">
             {/* Level 1 */}
             <div className="border-2 border-brand-600 bg-brand-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg mb-8 relative">
                 Despacho de la Ministra
                 {/* Connector */}
-                <div className="absolute -bottom-8 left-1/2 w-0.5 h-8 bg-gray-300 -translate-x-1/2"></div>
+                <div className="absolute -bottom-8 left-1/2 w-0.5 h-8 bg-gray-300 dark:bg-gray-600 -translate-x-1/2"></div>
             </div>
 
             {/* Level 2: Support Offices */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative w-full max-w-3xl">
                 {/* Horizontal Bar */}
-                <div className="absolute -top-4 left-10 right-10 h-0.5 bg-gray-300"></div>
+                <div className="absolute -top-4 left-10 right-10 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
                 
                 {['Control Interno', 'Planeación', 'Jurídica', 'Relacionamiento'].map((off, i) => (
                     <div key={i} className="relative flex flex-col items-center">
-                        <div className="absolute -top-4 w-0.5 h-4 bg-gray-300"></div>
-                        <div className={`p-3 rounded-lg text-xs font-bold text-center w-full shadow-sm border ${off === 'Control Interno' ? 'bg-brand-50 border-brand-300 text-brand-800 ring-2 ring-brand-200' : 'bg-white border-gray-200 text-slate-600'}`}>
+                        <div className="absolute -top-4 w-0.5 h-4 bg-gray-300 dark:bg-gray-600"></div>
+                        <div className={`p-3 rounded-lg text-xs font-bold text-center w-full shadow-sm border ${off === 'Control Interno' ? 'bg-brand-50 dark:bg-brand-900/50 border-brand-300 dark:border-brand-600 text-brand-800 dark:text-brand-200 ring-2 ring-brand-200 dark:ring-brand-900' : 'bg-white dark:bg-slate-700 border-gray-200 dark:border-gray-600 text-slate-600 dark:text-slate-300'}`}>
                             {off}
                         </div>
                     </div>
@@ -78,7 +78,7 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
             </div>
 
             {/* Level 3: Viceministerios Title */}
-            <div className="mb-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center w-full border-t border-gray-100 pt-4">
+            <div className="mb-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center w-full border-t border-gray-100 dark:border-slate-700 pt-4">
                 Viceministerios (Misional)
             </div>
 
@@ -91,9 +91,9 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
                     "Diversidades",
                     "Pueblos Étnicos"
                 ].map((v, i) => (
-                    <div key={i} className="bg-gray-50 hover:bg-white p-4 rounded-xl border border-gray-200 text-center transition-colors">
+                    <div key={i} className="bg-gray-50 dark:bg-slate-700/50 hover:bg-white dark:hover:bg-slate-700 p-4 rounded-xl border border-gray-200 dark:border-slate-600 text-center transition-colors">
                         <Users size={20} className="mx-auto text-slate-400 mb-2" />
-                        <span className="text-sm font-semibold text-slate-700">{v}</span>
+                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{v}</span>
                     </div>
                 ))}
             </div>
@@ -108,6 +108,8 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
         ]}
         onComplete={onComplete}
       />
+      
+      <FeedbackForm moduleName="Plataforma Estratégica" />
     </div>
   );
 };

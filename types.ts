@@ -1,4 +1,10 @@
-export type ModuleId = 'dashboard' | 'strategic' | 'mipg' | 'competencies' | 'standards' | 'forensic';
+export type ModuleId = 'dashboard' | 'strategic' | 'mipg' | 'competencies' | 'standards' | 'forensic' | 'library' | 'assistant' | 'tools';
+
+export interface User {
+  name: string;
+  role: string;
+  email: string;
+}
 
 export interface ModuleConfig {
   id: ModuleId;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Accordion, Quiz } from '../components/UI';
+import { Card, Badge, Accordion, Quiz, FeedbackForm } from '../components/UI';
 import { Shield, Book, Globe } from 'lucide-react';
 
 export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
@@ -7,26 +7,26 @@ export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({
     <div className="space-y-8 animate-fade-in">
       <div className="mb-6">
         <Badge type="brand">Módulo 3</Badge>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Normas Globales 2024 (IIA)</h1>
-        <p className="text-lg text-slate-600 mt-2">Nuevo marco internacional para la práctica profesional de la auditoría interna.</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Normas Globales 2024 (IIA)</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Nuevo marco internacional para la práctica profesional de la auditoría interna.</p>
       </div>
 
       {/* Intro Cards */}
       <div className="grid md:grid-cols-3 gap-4">
          <Card className="text-center">
             <Globe className="mx-auto text-brand-500 mb-2" size={32}/>
-            <h3 className="font-bold text-lg">Globales</h3>
-            <p className="text-sm text-slate-500">Aplicables a cualquier función de auditoría.</p>
+            <h3 className="font-bold text-lg dark:text-white">Globales</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Aplicables a cualquier función de auditoría.</p>
          </Card>
          <Card className="text-center">
             <Shield className="mx-auto text-brand-500 mb-2" size={32}/>
-            <h3 className="font-bold text-lg">Obligatorias</h3>
-            <p className="text-sm text-slate-500">Principios y normas de cumplimiento.</p>
+            <h3 className="font-bold text-lg dark:text-white">Obligatorias</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Principios y normas de cumplimiento.</p>
          </Card>
          <Card className="text-center">
             <Book className="mx-auto text-brand-500 mb-2" size={32}/>
-            <h3 className="font-bold text-lg">Temáticas</h3>
-            <p className="text-sm text-slate-500">Requisitos específicos (Ciberseguridad, etc).</p>
+            <h3 className="font-bold text-lg dark:text-white">Temáticas</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Requisitos específicos (Ciberseguridad, etc).</p>
          </Card>
       </div>
 
@@ -82,6 +82,8 @@ export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({
         ]}
         onComplete={onComplete}
       />
+      
+      <FeedbackForm moduleName="Normas Globales IIA" />
     </div>
   );
 };
