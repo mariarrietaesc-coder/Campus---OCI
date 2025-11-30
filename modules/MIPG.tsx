@@ -1,74 +1,88 @@
 import React from 'react';
 import { Card, Badge, TimelineItem, Quiz } from '../components/UI';
+import { Users, Compass, Heart, BarChart, MessageSquare, Brain, Shield, CheckCircle2 } from 'lucide-react';
 
 export const MIPGModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
+  
+  const dimensions = [
+    { id: 1, title: "Talento Humano", icon: Users, color: "text-blue-500", bg: "bg-blue-50", desc: "El activo más importante." },
+    { id: 2, title: "Direccionamiento", icon: Compass, color: "text-indigo-500", bg: "bg-indigo-50", desc: "Planeación estratégica." },
+    { id: 3, title: "Gestión con Valores", icon: Heart, color: "text-rose-500", bg: "bg-rose-50", desc: "Integridad y ética." },
+    { id: 4, title: "Evaluación", icon: BarChart, color: "text-amber-500", bg: "bg-amber-50", desc: "Medición de resultados." },
+    { id: 5, title: "Información", icon: MessageSquare, color: "text-cyan-500", bg: "bg-cyan-50", desc: "Transparencia y datos." },
+    { id: 6, title: "Conocimiento", icon: Brain, color: "text-violet-500", bg: "bg-violet-50", desc: "Aprendizaje institucional." },
+    { id: 7, title: "Control Interno", icon: Shield, color: "text-brand-600", bg: "bg-brand-50", desc: "MECI y líneas de defensa." },
+  ];
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="mb-6">
         <Badge type="brand">Módulo 2</Badge>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">MIPG - Sistema Integrado de Gestión</h1>
-        <p className="text-lg text-slate-600 mt-2">Marco de referencia para dirigir, planear, ejecutar, hacer seguimiento, evaluar y controlar la gestión.</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">MIPG - Sistema Integrado</h1>
+        <p className="text-lg text-slate-600 mt-2">No es solo burocracia. Es el marco que nos permite operar de manera ordenada, ética y eficiente.</p>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-brand-100">
-        <h3 className="text-xl font-bold text-slate-800 mb-6 text-center">Las 7 Dimensiones del MIPG</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-                "1. Talento Humano",
-                "2. Direccionamiento Estratégico",
-                "3. Gestión con Valores",
-                "4. Evaluación de Resultados",
-                "5. Información y Comunicación",
-                "6. Gestión del Conocimiento",
-                "7. Control Interno"
-            ].map((d, i) => (
-                <div key={i} className={`p-4 rounded-xl border ${i === 6 ? 'bg-brand-50 border-brand-200 text-brand-800 font-bold' : 'bg-gray-50 border-gray-100 text-slate-600'}`}>
-                    {d}
+      {/* Visual Dimensions Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {dimensions.map((d) => {
+            const Icon = d.icon;
+            return (
+                <div key={d.id} className={`${d.id === 7 ? 'col-span-1 md:col-span-2 lg:col-span-4 xl:col-span-1 border-brand-200 ring-1 ring-brand-100' : 'border-gray-100'} bg-white p-5 rounded-2xl border shadow-sm hover:shadow-md transition-all group`}>
+                    <div className={`${d.bg} ${d.color} w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                        <Icon size={20} />
+                    </div>
+                    <h3 className="font-bold text-slate-800">{d.id}. {d.title}</h3>
+                    <p className="text-xs text-slate-500 mt-1">{d.desc}</p>
                 </div>
-            ))}
-        </div>
+            )
+        })}
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
-         <Card title="Hitos en el Ministerio">
-            <div className="mt-4">
-                <TimelineItem year="2023" title="Creación (Ley 2281)" description="Nace el Ministerio con la obligación de adoptar marcos de gestión pública." />
-                <TimelineItem year="2024" title="Resolución 1022" description="Adopción formal del MIPG y constitución del SIG-MIPG." />
-                <TimelineItem year="2025" title="Manual Operativo" description="Implementación de documentos internos (ES_A-MS-001)." />
+         <Card title="Líneas de Defensa (Modelo COSO)">
+            <p className="text-sm text-slate-500 mb-4">¿Quién hace qué en el control?</p>
+            <div className="space-y-4 relative">
+                {/* Connecting Line */}
+                <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-gray-200"></div>
+
+                <div className="relative pl-14">
+                    <div className="absolute left-2 top-0 w-8 h-8 bg-white border-2 border-slate-300 rounded-full flex items-center justify-center font-bold text-xs text-slate-500 z-10">E</div>
+                    <h4 className="font-bold text-slate-800 text-sm">Estratégica (Alta Dirección)</h4>
+                    <p className="text-xs text-slate-500">Define políticas y supervisa.</p>
+                </div>
+                
+                <div className="relative pl-14">
+                    <div className="absolute left-2 top-0 w-8 h-8 bg-blue-100 border-2 border-blue-500 rounded-full flex items-center justify-center font-bold text-xs text-blue-700 z-10">1</div>
+                    <h4 className="font-bold text-slate-800 text-sm">1ra Línea (Gerentes)</h4>
+                    <p className="text-xs text-slate-500">Autocontrol. "Yo ejecuto, yo controlo".</p>
+                </div>
+
+                <div className="relative pl-14">
+                    <div className="absolute left-2 top-0 w-8 h-8 bg-indigo-100 border-2 border-indigo-500 rounded-full flex items-center justify-center font-bold text-xs text-indigo-700 z-10">2</div>
+                    <h4 className="font-bold text-slate-800 text-sm">2da Línea (Planeación)</h4>
+                    <p className="text-xs text-slate-500">Monitoreo y gestión de riesgos.</p>
+                </div>
+
+                <div className="relative pl-14">
+                    <div className="absolute left-2 top-0 w-8 h-8 bg-brand-100 border-2 border-brand-500 rounded-full flex items-center justify-center font-bold text-xs text-brand-700 z-10">3</div>
+                    <h4 className="font-bold text-brand-800 text-sm">3ra Línea (OCI)</h4>
+                    <p className="text-xs text-slate-500">Aseguramiento independiente.</p>
+                </div>
             </div>
          </Card>
 
-         <Card title="Líneas de Defensa">
-            <div className="space-y-4">
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <span className="text-xs font-bold text-blue-600 uppercase">Estratégica</span>
-                    <p className="font-bold text-slate-800">Alta Dirección</p>
-                    <p className="text-sm text-slate-600">Define marco general y supervisa.</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 ml-4">
-                    <span className="text-xs font-bold text-gray-500 uppercase">1ra Línea</span>
-                    <p className="font-bold text-slate-800">Gerentes y Líderes</p>
-                    <p className="text-sm text-slate-600">Autocontrol en la operación diaria.</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 ml-4">
-                    <span className="text-xs font-bold text-gray-500 uppercase">2da Línea</span>
-                    <p className="font-bold text-slate-800">Planeación / Riesgos</p>
-                    <p className="text-sm text-slate-600">Autoevaluación y monitoreo transversal.</p>
-                </div>
-                <div className="p-4 bg-brand-50 rounded-xl border border-brand-200 ml-4">
-                    <span className="text-xs font-bold text-brand-600 uppercase">3ra Línea</span>
-                    <p className="font-bold text-slate-800">Oficina Control Interno</p>
-                    <p className="text-sm text-slate-600">Evaluación independiente y objetiva.</p>
-                </div>
-            </div>
+         <Card title="Hitos Normativos">
+             <TimelineItem year="2023" title="Ley 2281" description="Nacimiento del Ministerio." />
+             <TimelineItem year="2024" title="Resolución 1022" description="Adopción formal del MIPG." />
+             <TimelineItem year="2025" title="Implementación" description="Operación plena del sistema." />
          </Card>
       </div>
 
       <Quiz 
         questions={[
-            { id: 1, question: "¿Qué instrumento mide el desempeño institucional (MIPG)?", options: ["PAI", "FURAG", "SIGEP"], correctAnswer: 1 },
-            { id: 2, question: "¿Quién es responsable de la 3ra Línea de Defensa?", options: ["Planeación", "Todos los servidores", "Oficina de Control Interno"], correctAnswer: 2 },
-            { id: 3, question: "¿Qué dimensión es el corazón del MIPG?", options: ["Talento Humano", "Control Interno", "Gestión con Valores"], correctAnswer: 0 }
+            { id: 1, question: "¿Qué instrumento mide el desempeño institucional?", options: ["PAI", "FURAG", "SIGEP"], correctAnswer: 1 },
+            { id: 2, question: "¿Quién es la 3ra Línea de Defensa?", options: ["Alta Dirección", "Oficina de Planeación", "Oficina de Control Interno"], correctAnswer: 2 },
+            { id: 3, question: "¿Cuál dimensión se considera el 'corazón' del MIPG?", options: ["Talento Humano", "Control Interno", "Información"], correctAnswer: 0 }
         ]}
         onComplete={onComplete}
       />

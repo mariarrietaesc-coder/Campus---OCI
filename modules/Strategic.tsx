@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Badge, Accordion, Quiz } from '../components/UI';
-import { Target, Users, Map } from 'lucide-react';
+import { Target, Users, Map, Lightbulb } from 'lucide-react';
 
 export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
   return (
@@ -11,77 +11,100 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
         <p className="text-lg text-slate-600 mt-2">Estructura, misión y portafolio programático del Ministerio de Igualdad y Equidad.</p>
       </div>
 
-      {/* Mission/Vision Grid */}
+      {/* Contexto Educativo: ¿Por qué es importante? */}
+      <div className="bg-brand-50 rounded-xl p-5 border border-brand-100 flex gap-4 items-start">
+        <div className="bg-white p-2 rounded-full shadow-sm text-brand-600">
+            <Lightbulb size={24} />
+        </div>
+        <div>
+            <h3 className="font-bold text-brand-800 text-sm uppercase tracking-wide mb-1">Contexto para el Auditor</h3>
+            <p className="text-brand-900 text-sm leading-relaxed">
+                Entender la estrategia no es solo teoría. Como auditores, necesitamos conocer el "norte" de la entidad para identificar si los riesgos que evaluamos realmente amenazan el cumplimiento de la misión. Sin estrategia, no hay auditoría basada en riesgos efectiva.
+            </p>
+        </div>
+      </div>
+
+      {/* Mission/Vision Grid Visual */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="border-l-4 border-l-brand-500">
+        <div className="bg-white rounded-2xl shadow-sm border-t-4 border-t-brand-500 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-4">
-                <Target className="text-brand-600" size={24} />
-                <h3 className="text-xl font-bold">Misión</h3>
+                <div className="p-3 bg-brand-50 text-brand-600 rounded-lg">
+                    <Target size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800">Misión</h3>
             </div>
-            <p className="text-slate-600 leading-relaxed">
-                Formular, implementar, coordinar y evaluar políticas, planes, programas y proyectos para avanzar en la garantía del derecho a la igualdad y la equidad, con enfoque de derechos, de género, diferencial, étnico-antirracista, interseccional y territorial.
+            <p className="text-slate-600 leading-relaxed text-sm">
+                Formular, implementar y evaluar políticas para garantizar el derecho a la igualdad y la equidad, enfocándose en los "nadie" y en territorios históricamente excluidos.
             </p>
-        </Card>
-        <Card className="border-l-4 border-l-blue-500">
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border-t-4 border-t-blue-500 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-4">
-                <Map className="text-blue-600" size={24} />
-                <h3 className="text-xl font-bold">Visión</h3>
+                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                    <Map size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800">Visión</h3>
             </div>
-            <p className="text-slate-600 leading-relaxed">
-                Tiene raíces en la historia de Colombia como un hito permanente en la garantía de derechos que transforma, de forma concreta, la vida de poblaciones y territorios históricamente excluidos.
+            <p className="text-slate-600 leading-relaxed text-sm">
+                Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones excluidas mediante la garantía de derechos.
             </p>
-        </Card>
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-            { n: '5', l: 'Viceministerios' },
-            { n: '20', l: 'Direcciones Técnicas' },
-            { n: '24', l: 'Programas' },
-            { n: '8', l: 'Enfoques' }
-        ].map((s, i) => (
-            <div key={i} className="bg-white p-4 rounded-xl text-center border border-gray-100 shadow-sm">
-                <span className="block text-3xl font-extrabold text-brand-600">{s.n}</span>
-                <span className="text-xs font-bold text-slate-500 uppercase">{s.l}</span>
+      {/* Visual Org Chart Tree */}
+      <Card title="Estructura Organizacional">
+        <p className="mb-8 text-slate-600 text-sm">El Ministerio opera bajo un esquema descentralizado y poblacional.</p>
+        
+        <div className="flex flex-col items-center w-full overflow-x-auto pb-4">
+            {/* Level 1 */}
+            <div className="border-2 border-brand-600 bg-brand-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg mb-8 relative">
+                Despacho de la Ministra
+                {/* Connector */}
+                <div className="absolute -bottom-8 left-1/2 w-0.5 h-8 bg-gray-300 -translate-x-1/2"></div>
             </div>
-        ))}
-      </div>
 
-      <Card title="Estructura Organizacional (Simplificada)">
-        <p className="mb-4 text-slate-600">El Ministerio se organiza en un esquema descentralizado y poblacional.</p>
-        <div className="space-y-2">
-            <Accordion title="Despacho de la Ministra">
-                <ul className="list-disc pl-5 space-y-1">
-                    <li>Oficina de Control Interno (Tercera Línea)</li>
-                    <li>Oficina de Planeación</li>
-                    <li>Oficina Jurídica</li>
-                    <li>Oficina de Relacionamiento Ciudadano</li>
-                </ul>
-            </Accordion>
-            <Accordion title="Viceministerio de las Mujeres">
-                <p>Enfoque en prevención de violencias, autonomía económica y garantía de derechos.</p>
-            </Accordion>
-            <Accordion title="Viceministerio de la Juventud">
-                <p>Programa Jóvenes en Paz, Barrismo Social y Oportunidades.</p>
-            </Accordion>
-            <Accordion title="Viceministerio para Poblaciones y Territorios Excluidos">
-                <p>Superación de la pobreza, Cuidado y Población Migrante.</p>
-            </Accordion>
-            <Accordion title="Viceministerio de las Diversidades">
-                <p>Población LGBTIQ+ y Personas con Discapacidad.</p>
-            </Accordion>
-            <Accordion title="Viceministerio de Pueblos Étnicos">
-                <p>Comunidades Negras, Indígenas, Rrom y Campesinado.</p>
-            </Accordion>
+            {/* Level 2: Support Offices */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 relative w-full max-w-3xl">
+                {/* Horizontal Bar */}
+                <div className="absolute -top-4 left-10 right-10 h-0.5 bg-gray-300"></div>
+                
+                {['Control Interno', 'Planeación', 'Jurídica', 'Relacionamiento'].map((off, i) => (
+                    <div key={i} className="relative flex flex-col items-center">
+                        <div className="absolute -top-4 w-0.5 h-4 bg-gray-300"></div>
+                        <div className={`p-3 rounded-lg text-xs font-bold text-center w-full shadow-sm border ${off === 'Control Interno' ? 'bg-brand-50 border-brand-300 text-brand-800 ring-2 ring-brand-200' : 'bg-white border-gray-200 text-slate-600'}`}>
+                            {off}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Level 3: Viceministerios Title */}
+            <div className="mb-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center w-full border-t border-gray-100 pt-4">
+                Viceministerios (Misional)
+            </div>
+
+            {/* Level 4: Viceministerios Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+                {[
+                    "Mujeres",
+                    "Juventud",
+                    "Poblaciones Excluidas",
+                    "Diversidades",
+                    "Pueblos Étnicos"
+                ].map((v, i) => (
+                    <div key={i} className="bg-gray-50 hover:bg-white p-4 rounded-xl border border-gray-200 text-center transition-colors">
+                        <Users size={20} className="mx-auto text-slate-400 mb-2" />
+                        <span className="text-sm font-semibold text-slate-700">{v}</span>
+                    </div>
+                ))}
+            </div>
         </div>
       </Card>
 
       <Quiz 
         questions={[
-            { id: 1, question: "¿Cuál es el enfoque principal de la Misión del Ministerio?", options: ["Desarrollo de infraestructura vial", "Garantía del derecho a la igualdad y equidad", "Seguridad Nacional"], correctAnswer: 1 },
-            { id: 2, question: "¿Cuántos Viceministerios componen la estructura?", options: ["3", "5", "7"], correctAnswer: 1 },
-            { id: 3, question: "¿Qué oficina lidera la Tercera Línea de Defensa?", options: ["Planeación", "Jurídica", "Control Interno"], correctAnswer: 2 }
+            { id: 1, question: "¿Cuál es el enfoque principal de la Misión del Ministerio?", options: ["Infraestructura vial", "Garantía de igualdad y equidad", "Seguridad Nacional"], correctAnswer: 1 },
+            { id: 2, question: "¿Cuántos Viceministerios componen la estructura misional?", options: ["3", "5", "7"], correctAnswer: 1 },
+            { id: 3, question: "¿A qué nivel pertenece la Oficina de Control Interno?", options: ["Misional", "Apoyo / Estratégico", "Descentralizado"], correctAnswer: 1 }
         ]}
         onComplete={onComplete}
       />
