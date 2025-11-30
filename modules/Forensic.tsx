@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, Badge, Accordion, Quiz, FeedbackForm } from '../components/UI';
+import { Card, Badge, Accordion, Quiz } from '../components/UI';
 import { Search, AlertTriangle, FileText, Lock, Eye, BookOpen } from 'lucide-react';
 
 export const ForensicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
   const [showCaseResult, setShowCaseResult] = useState(false);
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pb-12">
       <div className="mb-6">
         <Badge type="brand">Módulo 4</Badge>
         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Auditoría Forense</h1>
@@ -120,8 +120,6 @@ export const ForensicModule: React.FC<{ onComplete: (s: number) => void }> = ({ 
         ]}
         onComplete={onComplete}
       />
-      
-      <FeedbackForm moduleName="Auditoría Forense" />
     </div>
   );
 };

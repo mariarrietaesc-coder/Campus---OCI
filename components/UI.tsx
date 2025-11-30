@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send } from 'lucide-react';
 
-// --- Ministry Logo ---
+// --- Ministry Logo (Image Implementation) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
-  const textColor = whiteText ? 'text-white' : 'text-[#d23b78] dark:text-[#eb4884]'; // Using specific brand pink
+  const textColor = whiteText ? 'text-white' : 'text-[#D23B78] dark:text-[#eb4884]'; 
   
+  // URL oficial del Escudo de Colombia (Wikimedia Commons - Alta calidad)
+  // NOTA PARA EL DESARROLLADOR: Si deseas usar un archivo local, sube tu imagen a la carpeta public/assets 
+  // y cambia esta línea por: const LOGO_URL = "/assets/escudo_colombia.png";
+  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
+
   if (variant === 'horizontal') {
       return (
         <div className={`flex items-center gap-3 ${className}`}>
-            <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/150px-Escudo_de_Colombia.svg.png" 
-                alt="Escudo de Colombia" 
-                className="w-8 h-auto object-contain opacity-90"
-            />
-            <div className="h-8 w-[1px] bg-gray-300 dark:bg-slate-600"></div>
+            <div className="w-10 shrink-0">
+                 <img 
+                    src={LOGO_URL} 
+                    alt="Escudo de Colombia" 
+                    className="w-full h-auto object-contain drop-shadow-sm"
+                 />
+            </div>
+            <div className="h-10 w-[1px] bg-gray-300 dark:bg-slate-600"></div>
             <div className="flex flex-col justify-center">
-                <span className={`text-2xl font-bold leading-none tracking-tight ${textColor} font-sans`}>Igualdad</span>
-                <div className="flex w-full h-1 mt-0.5 rounded-full overflow-hidden">
+                <span className={`text-3xl font-bold leading-none tracking-tight ${textColor} font-sans`}>Igualdad</span>
+                <div className="flex w-full h-1.5 mt-0.5 rounded-full overflow-hidden">
                     <div className="h-full w-1/2 bg-[#FCD116]"></div>
                     <div className="h-full w-1/4 bg-[#003893]"></div>
                     <div className="h-full w-1/4 bg-[#CE1126]"></div>
@@ -26,18 +33,18 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
       );
   }
 
-  // Vertical Variant (Login)
+  // Vertical Variant
   return (
     <div className={`flex flex-col items-center ${className}`}>
         <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/150px-Escudo_de_Colombia.svg.png" 
+            src={LOGO_URL} 
             alt="Escudo de Colombia" 
-            className="w-20 mb-3 opacity-90"
+            className="w-24 h-auto mb-3 object-contain drop-shadow-sm"
         />
-        <div className={`text-5xl font-bold tracking-tight ${textColor} font-sans`}>
+        <div className={`text-6xl font-bold tracking-tight ${textColor} font-sans`}>
             Igualdad
         </div>
-         <div className="flex w-24 h-1.5 mt-2 rounded-full overflow-hidden">
+         <div className="flex w-32 h-2 mt-3 rounded-full overflow-hidden shadow-sm">
             <div className="h-full w-1/2 bg-[#FCD116]"></div>
             <div className="h-full w-1/4 bg-[#003893]"></div>
             <div className="h-full w-1/4 bg-[#CE1126]"></div>
@@ -91,41 +98,10 @@ export const Accordion: React.FC<{ title: string; children: React.ReactNode; def
   );
 };
 
-// --- Feedback Form ---
+// --- Feedback Form (REMOVED as requested to save space) ---
+// Kept interface if needed later, but component is gone from exports to avoid usage.
 export const FeedbackForm: React.FC<{ moduleName: string }> = ({ moduleName }) => {
-    const [comment, setComment] = useState("");
-    
-    const handleSend = () => {
-        const subject = encodeURIComponent(`Duda/Comentario Módulo: ${moduleName}`);
-        const body = encodeURIComponent(comment);
-        window.location.href = `mailto:rgonzalez@minigualdad.gov.co?subject=${subject}&body=${body}`;
-    };
-
-    return (
-        <div className="mt-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-            <div className="flex items-center gap-3 mb-4">
-                <MessageCircle className="text-brand-600 dark:text-brand-400" size={24} />
-                <div>
-                    <h4 className="font-bold text-slate-800 dark:text-white">¿Tienes dudas sobre este tema?</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Envía tus comentarios directamente al experto temático.</p>
-                </div>
-            </div>
-            <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Escribe tu duda o comentario aquí..."
-                className="w-full p-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-sm focus:ring-2 focus:ring-brand-500 outline-none mb-3"
-                rows={3}
-            />
-            <button 
-                onClick={handleSend}
-                disabled={!comment.trim()}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-800 dark:bg-brand-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 dark:hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-                <Send size={16} /> Enviar al Correo
-            </button>
-        </div>
-    );
+    return null; 
 };
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, TimelineItem, Quiz, FeedbackForm } from '../components/UI';
+import { Card, Badge, TimelineItem, Quiz } from '../components/UI';
 import { Users, Compass, Heart, BarChart, MessageSquare, Brain, Shield } from 'lucide-react';
 
 export const MIPGModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
@@ -15,7 +15,7 @@ export const MIPGModule: React.FC<{ onComplete: (s: number) => void }> = ({ onCo
   ];
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pb-12">
       <div className="mb-6">
         <Badge type="brand">Módulo 2</Badge>
         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">MIPG - Sistema Integrado</h1>
@@ -86,8 +86,6 @@ export const MIPGModule: React.FC<{ onComplete: (s: number) => void }> = ({ onCo
         ]}
         onComplete={onComplete}
       />
-      
-      <FeedbackForm moduleName="MIPG y SIG" />
     </div>
   );
 };

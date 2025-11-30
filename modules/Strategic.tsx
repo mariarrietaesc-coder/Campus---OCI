@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Card, Badge, Quiz, FeedbackForm } from '../components/UI';
-import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info } from 'lucide-react';
+import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
+import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft } from 'lucide-react';
 
 // --- DATA: Programas y Proyectos ---
 const PROGRAMAS_DATA = [
@@ -46,18 +46,20 @@ const ORG_DATA: any = {
 
 // --- DATA: Timeline ---
 const TIMELINE_DATA = [
-    { id: 1, title: 'Ley 2281: Creación', year: 'Enero 2023', content: 'La ley crea el Ministerio de Igualdad y Equidad, define su objeto y competencias; es la base legal que luego desarrolla el Gobierno. (Referencia dentro del Decreto 1075, que explicita que actúa “en virtud de las facultades del artículo 189” y la Ley 2294/2023 del PND).' },
-    { id: 2, title: 'Ley 2294: PND 2022-26', year: 'Mayo 2023', content: 'El Plan Nacional de Desarrollo “Colombia potencia mundial de la vida” incorpora compromisos y macrometas sectoriales (Jóvenes en Paz, Mujeres autónomas, Una sociedad para el cuidado) que condicionan la planeación sectorial del Ministerio.' },
-    { id: 3, title: 'Decreto 1075: Estructura', year: 'Junio 2023', content: 'Define despachos, 5 viceministerios y 20 direcciones, oficinas y Secretaría General, y asigna funciones. El mismo decreto indica la sujeción al PND 2294/2023.' },
-    { id: 4, title: 'Decreto 1076: Planta (P1)', year: 'Junio 2023', content: 'Establece los componentes iniciales de la planta de personal del Ministerio. Es uno de los dos decretos de planta expedidos en 2023. (Mencionado en los considerandos de la Resolución 22 de 2023).' },
-    { id: 5, title: 'Resolución 003: Manual v1', year: 'Agosto 2023', content: 'Adopta la primera versión del Manual Específico de Funciones y Competencias Laborales del Ministerio, sirviendo como antecedente para futuras actualizaciones.' },
-    { id: 6, title: 'Resolución 668: Enfoques', year: 'Septiembre 2024', content: 'Institucionaliza los 8 enfoques (derechos, territorial, diferencial, étnico-racial/antirracista, género, interseccional, justicia ambiental y curso de vida) como el eje articulador de toda la política pública del sector.' },
-    { id: 7, title: 'Resolución 669: Estrategias', year: 'Septiembre 2024', content: 'Establece las 11 estrategias programáticas para materializar los objetivos del Ministerio y medir su impacto (alianzas público-populares, iniciativas productivas, etc.).' },
-    { id: 8, title: 'PEI v2: Aprobación', year: 'Octubre 2024', content: 'Formaliza la plataforma estratégica (misión, visión, objetivos) y el despliegue estratégico con dos objetivos estratégicos y uno operacional, alineados al PND y a los ODS.' }
+    { id: 1, title: 'Ley 2281: Creación', year: 'Ene 2023', content: 'La ley crea el Ministerio de Igualdad y Equidad, define su objeto y competencias; es la base legal que luego desarrolla el Gobierno. (Referencia dentro del Decreto 1075, que explicita que actúa “en virtud de las facultades del artículo 189” y la Ley 2294/2023 del PND).' },
+    { id: 2, title: 'Ley 2294: PND 2022-26', year: 'May 2023', content: 'El Plan Nacional de Desarrollo “Colombia potencia mundial de la vida” incorpora compromisos y macrometas sectoriales (Jóvenes en Paz, Mujeres autónomas, Una sociedad para el cuidado) que condicionan la planeación sectorial del Ministerio.' },
+    { id: 3, title: 'Decreto 1075: Estructura', year: 'Jun 2023', content: 'Define despachos, 5 viceministerios y 20 direcciones, oficinas y Secretaría General, y asigna funciones. El mismo decreto indica la sujeción al PND 2294/2023.' },
+    { id: 4, title: 'Decreto 1076: Planta (P1)', year: 'Jun 2023', content: 'Establece los componentes iniciales de la planta de personal del Ministerio. Es uno de los dos decretos de planta expedidos en 2023. (Mencionado en los considerandos de la Resolución 22 de 2023).' },
+    { id: 5, title: 'Resolución 003: Manual v1', year: 'Ago 2023', content: 'Adopta la primera versión del Manual Específico de Funciones y Competencias Laborales del Ministerio, sirviendo como antecedente para futuras actualizaciones.' },
+    { id: 6, title: 'Resolución 668: Enfoques', year: 'Sep 2024', content: 'Institucionaliza los 8 enfoques (derechos, territorial, diferencial, étnico-racial/antirracista, género, interseccional, justicia ambiental y curso de vida) como el eje articulador de toda la política pública del sector.' },
+    { id: 7, title: 'Resolución 669: Estrategias', year: 'Sep 2024', content: 'Establece las 11 estrategias programáticas para materializar los objetivos del Ministerio y medir su impacto (alianzas público-populares, iniciativas productivas, etc.).' },
+    { id: 8, title: 'PEI v2: Aprobación', year: 'Oct 2024', content: 'Formaliza la plataforma estratégica (misión, visión, objetivos) y el despliegue estratégico con dos objetivos estratégicos y uno operacional, alineados al PND y a los ODS.' }
 ];
 
 export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
-  const [activeTab, setActiveTab] = useState('intro');
+  const [activeTab, setActiveTab] = useState<'menu' | string>('menu');
+  
+  // Specific view states
   const [enfoqueSubTab, setEnfoqueSubTab] = useState('enfoques');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('Todo');
@@ -81,417 +83,386 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
     return result;
   }, [searchQuery, activeFilter]);
 
-  const tabs = [
-    { id: 'intro', label: 'Introducción', icon: Target },
-    { id: 'normative', label: 'Marco Normativo', icon: Scale },
-    { id: 'process', label: 'Procesos', icon: Layout },
-    { id: 'structure', label: 'Estructura Orgánica', icon: Users },
-    { id: 'approaches', label: 'Enfoques y Estrategias', icon: Map },
-    { id: 'programs', label: 'Programas y Proyectos', icon: FileText },
-    { id: 'quiz', label: 'Evaluación', icon: CheckCircle }
+  const sections = [
+    { id: 'intro', label: 'Introducción', icon: Target, desc: 'Misión, Visión y Objetivos' },
+    { id: 'normative', label: 'Normativa', icon: Scale, desc: 'Leyes y Decretos Clave' },
+    { id: 'process', label: 'Procesos', icon: Layout, desc: 'Mapa de Procesos (MIPG)' },
+    { id: 'structure', label: 'Estructura', icon: Users, desc: 'Organigrama interactivo' },
+    { id: 'approaches', label: 'Enfoques', icon: Map, desc: 'Enfoques Transversales' },
+    { id: 'programs', label: 'Programas', icon: FileText, desc: 'Portafolio de 24 Programas' },
+    { id: 'quiz', label: 'Evaluación', icon: CheckCircle, desc: 'Valida tus conocimientos' }
   ];
 
+  const currentSectionIndex = sections.findIndex(s => s.id === activeTab);
+  
+  const handleNext = () => {
+      if (currentSectionIndex < sections.length - 1) {
+          setActiveTab(sections[currentSectionIndex + 1].id);
+          window.scrollTo(0,0);
+      }
+  };
+
+  const handlePrev = () => {
+      if (currentSectionIndex > 0) {
+          setActiveTab(sections[currentSectionIndex - 1].id);
+          window.scrollTo(0,0);
+      }
+  };
+  
+  // Calculate progress percentage for the bar
+  const progressPercentage = activeTab === 'menu' ? 0 : Math.round(((currentSectionIndex + 1) / sections.length) * 100);
+
+  // --- RENDER MENU GRID ---
+  if (activeTab === 'menu') {
+      return (
+        <div className="space-y-6 animate-fade-in pb-12">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 border-b border-gray-100 dark:border-slate-800">
+                <div>
+                    <Badge type="brand">Módulo 1</Badge>
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Plataforma Estratégica</h1>
+                    <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Identidad, estructura y portafolio del Ministerio.</p>
+                </div>
+                <div className="hidden md:block">
+                    <MinistryLogo variant="horizontal" />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sections.map((section) => {
+                    const Icon = section.icon;
+                    return (
+                        <button 
+                            key={section.id}
+                            onClick={() => setActiveTab(section.id)}
+                            className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-lg transition-all text-left group"
+                        >
+                            <div className="w-12 h-12 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <Icon size={24} />
+                            </div>
+                            <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-1">{section.label}</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">{section.desc}</p>
+                        </button>
+                    )
+                })}
+            </div>
+            
+            <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex gap-3 text-blue-800 dark:text-blue-200 text-sm">
+                <Info className="shrink-0" />
+                <p>Completa cada una de las secciones anteriores para obtener una visión integral antes de realizar la evaluación final.</p>
+            </div>
+        </div>
+      );
+  }
+
+  // --- RENDER DETAIL VIEW ---
+  const activeSection = sections.find(s => s.id === activeTab);
+  
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
-      <div className="mb-4">
-        <Badge type="brand">Módulo 1</Badge>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Plataforma Estratégica</h1>
-        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Plataforma Estratégica, Estructura Organizacional y Portafolio Programático.</p>
-      </div>
+    <div className="space-y-6 animate-fade-in pb-24">
+        {/* Detail Header with Progress Bar */}
+        <div className="sticky top-0 bg-gray-50/95 dark:bg-slate-900/95 backdrop-blur z-30 pt-4 pb-2 border-b border-gray-200 dark:border-slate-700 mb-6">
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => setActiveTab('menu')} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300">
+                        <Grid size={20} />
+                    </button>
+                    <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Módulo 1 / Tema {currentSectionIndex + 1} de {sections.length}</div>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            {activeSection?.icon && <activeSection.icon size={20} className="text-brand-500"/>}
+                            {activeSection?.label}
+                        </h2>
+                    </div>
+                </div>
+                <MinistryLogo variant="horizontal" className="scale-75 hidden md:flex" />
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full h-1 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div 
+                    className="h-full bg-brand-500 transition-all duration-500 ease-out"
+                    style={{ width: `${progressPercentage}%` }}
+                ></div>
+            </div>
+        </div>
 
-      {/* Tabs Navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200 dark:border-slate-700 hide-scrollbar">
-        {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-                <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
-                        activeTab === tab.id 
-                        ? 'bg-brand-600 text-white shadow-md transform scale-105' 
-                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
-                    }`}
-                >
-                    <Icon size={16} /> {tab.label}
-                </button>
-            )
-        })}
-      </div>
+        {/* Content Area (Full Width) */}
+        <div className="min-h-[500px]">
+            {/* 1. INTRODUCCIÓN */}
+            {activeTab === 'intro' && (
+                <div className="grid md:grid-cols-2 gap-6 animate-fade-in">
+                        <Card title="¿Qué es el Ministerio?" className="bg-gradient-to-br from-white to-brand-50/50 dark:from-slate-800 dark:to-slate-800">
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                                Entidad del Gobierno nacional encargada de <b>diseñar, formular, adoptar, dirigir, coordinar y ejecutar políticas, planes y programas</b> para eliminar desigualdades, garantizar el derecho a la igualdad y articular la política de Estado en igualdad y equidad.
+                            </p>
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                                <div className="p-3 bg-white dark:bg-slate-700 rounded-xl border border-brand-100 dark:border-brand-900/30 shadow-sm">
+                                    <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">5</span>
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase">Viceministerios</span>
+                                </div>
+                                <div className="p-3 bg-white dark:bg-slate-700 rounded-xl border border-brand-100 dark:border-brand-900/30 shadow-sm">
+                                    <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">20</span>
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase">Direcciones</span>
+                                </div>
+                                <div className="p-3 bg-white dark:bg-slate-700 rounded-xl border border-brand-100 dark:border-brand-900/30 shadow-sm">
+                                    <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">24</span>
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase">Programas</span>
+                                </div>
+                            </div>
+                        </Card>
+                        <div className="space-y-6">
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Target size={80}/></div>
+                                <h3 className="text-lg font-bold text-brand-700 dark:text-brand-400 mb-2 relative z-10">Misión</h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 relative z-10">
+                                    Formular, implementar, coordinar y evaluar políticas, planes, programas y proyectos para avanzar en la garantía del derecho a la igualdad y la equidad, con enfoque de derechos, de género, diferencial, étnico-antirracista, interseccional y territorial.
+                                </p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><BookOpen size={80}/></div>
+                                <h3 className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2 relative z-10">Visión</h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 relative z-10">
+                                    Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones y territorios históricamente excluidos, haciendo tangible la igualdad y la equidad.
+                                </p>
+                            </div>
+                        </div>
+                </div>
+            )}
 
-      <div className="min-h-[400px]">
-        
-        {/* 1. INTRODUCCIÓN */}
-        {activeTab === 'intro' && (
-            <div className="space-y-6 animate-fade-in">
-                <div className="grid md:grid-cols-2 gap-6">
-                    <Card title="¿Qué es el Ministerio de Igualdad y Equidad?">
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-                            Entidad del Gobierno nacional encargada de <b>diseñar, formular, adoptar, dirigir, coordinar y ejecutar políticas, planes y programas</b> para eliminar desigualdades, garantizar el derecho a la igualdad y articular la política de Estado en igualdad y equidad.
-                        </p>
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                            <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
-                                <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">5</span>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase">Viceministerios</span>
+            {/* 2. NORMATIVA */}
+            {activeTab === 'normative' && (
+                <div className="animate-fade-in">
+                    <Card title="Línea de Tiempo y Normativa Clave">
+                        <p className="text-slate-500 mb-6 text-sm">Hitos normativos que marcan la creación y estructuración del Ministerio. Haz clic para ver detalles.</p>
+                        <div className="relative max-w-2xl mx-auto space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-brand-200 before:to-transparent">
+                            {TIMELINE_DATA.map((item, i) => (
+                                <div key={item.id} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group cursor-pointer`} onClick={() => setSelectedTimelineItem(item)}>
+                                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-brand-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 font-bold text-brand-600 text-xs hover:bg-brand-600 hover:text-white transition-colors">
+                                        {i + 1}
+                                    </div>
+                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-brand-200 transition-all">
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{item.year}</div>
+                                        <h3 className="font-bold text-slate-800 dark:text-white text-sm">{item.title}</h3>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+                    {selectedTimelineItem && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedTimelineItem(null)}>
+                            <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
+                                <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedTimelineItem(null)}><X /></button>
+                                <span className="text-xs font-bold bg-brand-100 text-brand-800 px-2 py-1 rounded uppercase">{selectedTimelineItem.year}</span>
+                                <h3 className="text-2xl font-bold mt-2 mb-4 text-slate-900 dark:text-white">{selectedTimelineItem.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{selectedTimelineItem.content}</p>
                             </div>
-                            <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
-                                <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">20</span>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase">Direcciones</span>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 3. PROCESOS */}
+            {activeTab === 'process' && (
+                <div className="animate-fade-in">
+                    <Card title="Esquema de Procesos (Interactivo)">
+                        <p className="text-sm text-slate-500 mb-6">Explore cómo funciona el Ministerio. Pase el cursor sobre cada componente para ver su función.</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="md:col-span-2 lg:col-span-3 bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800 p-4 rounded-xl text-center font-bold text-brand-800 dark:text-brand-300 relative group cursor-help">
+                                Enfoques Transversales
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 font-normal">
+                                    Cobija toda la actuación con los enfoques de Derecho, Territorial, Intersectorial, Diferencial, de Género, Étnico-Racial y Antirracista.
+                                </div>
                             </div>
-                            <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
-                                <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">24</span>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase">Programas</span>
+                            <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
+                                <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Estratégicos</div>
+                                {['Gestión de Saberes', 'Gestión Estratégica', 'Gestión de Proyectos', 'Relacionamiento Ciudadano', 'Comunicaciones', 'Cooperación Internacional', 'Gestión TICs'].map((p, i) => (
+                                    <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                        {p}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
+                                <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Misionales</div>
+                                {['Atención a Juventudes', 'Atención a Mujeres', 'Poblaciones y Territorios Excluidos', 'Pueblos Étnicos y Campesinos', 'Discapacidad y LGBTIQ+'].map((p, i) => (
+                                    <div key={i} className="p-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs font-medium text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                        {p}
+                                    </div>
+                                ))}
+                                <div className="p-3 bg-brand-600 text-white rounded-lg text-xs font-bold text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                    Articulación Intersectorial
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-lg hidden group-hover:block z-10">
+                                        Coordina acciones entre direcciones y entidades para una respuesta transformadora.
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
+                                <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos de Apoyo</div>
+                                {['Talento Humano', 'Gestión Contractual', 'Gestión Jurídica', 'Logística y Recursos', 'Gestión Documental', 'Gestión Financiera'].map((p, i) => (
+                                    <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                        {p}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </Card>
-                    <div className="space-y-6">
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                            <h3 className="text-lg font-bold text-brand-700 dark:text-brand-400 mb-2">Misión</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-300">
-                                Formular, implementar, coordinar y evaluar políticas, planes, programas y proyectos para avanzar en la garantía del derecho a la igualdad y la equidad, con enfoque de derechos, de género, diferencial, étnico-antirracista, interseccional y territorial.
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                            <h3 className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">Visión</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-300">
-                                Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones y territorios históricamente excluidos, haciendo tangible la igualdad y la equidad.
-                            </p>
-                        </div>
-                    </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {/* 2. MARCO NORMATIVO */}
-        {activeTab === 'normative' && (
-            <div className="animate-fade-in">
-                <Card title="Línea de Tiempo y Normativa Clave">
-                    <p className="text-slate-500 mb-6 text-sm">Hitos normativos que marcan la creación y estructuración del Ministerio. Haz clic para ver detalles.</p>
-                    <div className="relative max-w-2xl mx-auto space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-brand-200 before:to-transparent">
-                        {TIMELINE_DATA.map((item, i) => (
-                            <div key={item.id} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group cursor-pointer`} onClick={() => setSelectedTimelineItem(item)}>
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-brand-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 font-bold text-brand-600 text-xs hover:bg-brand-600 hover:text-white transition-colors">
-                                    {i + 1}
-                                </div>
-                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-brand-200 transition-all">
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{item.year}</div>
-                                    <h3 className="font-bold text-slate-800 dark:text-white text-sm">{item.title}</h3>
-                                </div>
+            {/* 4. ESTRUCTURA */}
+            {activeTab === 'structure' && (
+                <div className="animate-fade-in">
+                    <Card title="Estructura Orgánica (Decreto 1075)">
+                        <p className="text-sm text-slate-500 mb-8">Haga clic en una dependencia para ver sus funciones y componentes.</p>
+                        <div className="flex flex-col items-center gap-8 relative overflow-x-auto pb-4">
+                            <div className={`w-56 p-4 rounded-xl text-center font-bold text-sm cursor-pointer transition-all shadow-md border hover:-translate-y-1 ${selectedOrgNode === 'entidades' ? 'bg-slate-800 text-white ring-4 ring-slate-200' : 'bg-slate-200 text-slate-700 border-slate-300'}`} onClick={() => setSelectedOrgNode('entidades')}>Entidades Adscritas</div>
+                            <div className="w-px h-8 bg-slate-300"></div>
+                            <div className="flex flex-wrap justify-center gap-8 relative">
+                                <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-slate-300 -z-10"></div>
+                                <div className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'territoriales' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} onClick={() => setSelectedOrgNode('territoriales')}>Direcciones Territoriales</div>
+                                <div className={`w-56 p-5 rounded-xl text-center font-bold text-white shadow-xl cursor-pointer transition-all hover:-translate-y-1 z-10 ${selectedOrgNode === 'despacho' ? 'bg-slate-900 ring-4 ring-brand-200' : 'bg-brand-600'}`} onClick={() => setSelectedOrgNode('despacho')}>Despacho de la Ministra</div>
+                                <div className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'asesoras' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} onClick={() => setSelectedOrgNode('asesoras')}>Oficinas Asesoras</div>
                             </div>
-                        ))}
-                    </div>
-                </Card>
-
-                {/* Timeline Modal */}
-                {selectedTimelineItem && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedTimelineItem(null)}>
-                        <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
-                            <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedTimelineItem(null)}><X /></button>
-                            <span className="text-xs font-bold bg-brand-100 text-brand-800 px-2 py-1 rounded uppercase">{selectedTimelineItem.year}</span>
-                            <h3 className="text-2xl font-bold mt-2 mb-4 text-slate-900 dark:text-white">{selectedTimelineItem.title}</h3>
-                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{selectedTimelineItem.content}</p>
-                        </div>
-                    </div>
-                )}
-            </div>
-        )}
-
-        {/* 3. ESQUEMA DE PROCESOS */}
-        {activeTab === 'process' && (
-            <div className="animate-fade-in">
-                <Card title="Esquema de Procesos (Interactivo)">
-                    <p className="text-sm text-slate-500 mb-6">Explore cómo funciona el Ministerio. Pase el cursor sobre cada componente para ver su función.</p>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        {/* Header Full Width */}
-                        <div className="lg:col-span-3 bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800 p-4 rounded-xl text-center font-bold text-brand-800 dark:text-brand-300 relative group cursor-help">
-                            Enfoques Transversales
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 font-normal">
-                                Cobija toda la actuación con los enfoques de Derecho, Territorial, Intersectorial, Diferencial, de Género, Étnico-Racial y Antirracista.
+                            <div className="w-px h-8 bg-slate-300"></div>
+                            <div className="flex flex-wrap justify-center gap-3">
+                                {[{k: 'vm-mujeres', l: 'VM Mujeres'}, {k: 'vm-juventud', l: 'VM Juventud'}, {k: 'vm-poblaciones', l: 'VM Poblaciones'}, {k: 'vm-diversidades', l: 'VM Diversidades'}, {k: 'vm-etnicos', l: 'VM Pueblos Étnicos'}].map(vm => (
+                                    <div key={vm.k} className={`p-3 rounded-lg text-xs font-bold cursor-pointer transition-all border shadow-sm hover:-translate-y-1 ${selectedOrgNode === vm.k ? 'bg-slate-800 text-white' : 'bg-gray-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-gray-200'}`} onClick={() => setSelectedOrgNode(vm.k)}>{vm.l}</div>
+                                ))}
                             </div>
                         </div>
-
-                        {/* Column 1: Estratégicos */}
-                        <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
-                            <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Estratégicos</div>
-                            {['Gestión de Saberes', 'Gestión Estratégica', 'Gestión de Proyectos', 'Relacionamiento Ciudadano', 'Comunicaciones', 'Cooperación Internacional', 'Gestión TICs'].map((p, i) => (
-                                <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                    {p}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Column 2: Misionales */}
-                        <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
-                            <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Misionales</div>
-                            {['Atención a Juventudes', 'Atención a Mujeres', 'Poblaciones y Territorios Excluidos', 'Pueblos Étnicos y Campesinos', 'Discapacidad y LGBTIQ+'].map((p, i) => (
-                                <div key={i} className="p-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs font-medium text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                    {p}
-                                </div>
-                            ))}
-                            <div className="p-3 bg-brand-600 text-white rounded-lg text-xs font-bold text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                Articulación Intersectorial
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-lg hidden group-hover:block z-10">
-                                    Coordina acciones entre direcciones y entidades para una respuesta transformadora.
-                                </div>
+                    </Card>
+                    {selectedOrgNode && ORG_DATA[selectedOrgNode] && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedOrgNode(null)}>
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
+                                <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedOrgNode(null)}><X /></button>
+                                <h3 className="text-xl font-bold mb-2 text-brand-700 dark:text-brand-400 border-b pb-2">{ORG_DATA[selectedOrgNode].title}</h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{ORG_DATA[selectedOrgNode].description}</p>
+                                {ORG_DATA[selectedOrgNode].dependencies && (
+                                    <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-xl">
+                                        <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Componentes / Dependencias</h4>
+                                        <ul className="space-y-1">
+                                            {ORG_DATA[selectedOrgNode].dependencies.map((dep: string, idx: number) => (
+                                                <li key={idx} className="text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2"><ChevronRight size={12} className="mt-0.5 text-brand-500"/> {dep}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-
-                        {/* Column 3: Apoyo */}
-                        <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
-                            <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos de Apoyo</div>
-                            {['Talento Humano', 'Gestión Contractual', 'Gestión Jurídica', 'Logística y Recursos', 'Gestión Documental', 'Gestión Financiera'].map((p, i) => (
-                                <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                    {p}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Footer Wrappers */}
-                        <div className="lg:col-span-1 border border-brand-500 bg-brand-50 dark:bg-brand-900/30 text-brand-800 dark:text-brand-300 p-3 rounded-lg text-center text-xs font-bold relative group cursor-help">
-                            Aseguramiento y Control Interno (3ra Línea)
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl hidden group-hover:block z-20 font-normal text-left">
-                                <b>Tercera línea de defensa:</b> La OCI evalúa objetivamente los controles y realiza auditorías.
-                            </div>
-                        </div>
-                         <div className="lg:col-span-2 border border-gray-300 bg-gray-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 p-3 rounded-lg text-center text-xs font-bold group relative cursor-help">
-                            Control Interno Disciplinario
-                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl hidden group-hover:block z-20 font-normal text-left">
-                                Garantiza la aplicación del régimen disciplinario y previene la corrupción.
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-        )}
-
-        {/* 4. ESTRUCTURA ORGÁNICA */}
-        {activeTab === 'structure' && (
-            <div className="animate-fade-in">
-                <Card title="Estructura Orgánica (Decreto 1075)">
-                    <p className="text-sm text-slate-500 mb-8">Haga clic en una dependencia para ver sus funciones y componentes.</p>
-                    
-                    <div className="flex flex-col items-center gap-8 relative">
-                         {/* Level 0 */}
-                         <div 
-                            className={`w-56 p-4 rounded-xl text-center font-bold text-sm cursor-pointer transition-all shadow-md border hover:-translate-y-1 ${selectedOrgNode === 'entidades' ? 'bg-slate-800 text-white ring-4 ring-slate-200' : 'bg-slate-200 text-slate-700 border-slate-300'}`}
-                            onClick={() => setSelectedOrgNode('entidades')}
-                         >
-                             Entidades Adscritas
-                         </div>
-                         
-                         <div className="w-px h-8 bg-slate-300"></div>
-
-                         {/* Level 1 (Mid) */}
-                         <div className="flex flex-wrap justify-center gap-8 relative">
-                             {/* Connector Lines */}
-                             <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-300 -z-10"></div>
-
-                             <div 
-                                className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'territoriales' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`}
-                                onClick={() => setSelectedOrgNode('territoriales')}
-                             >
-                                 Direcciones Territoriales
-                             </div>
-                             
-                             <div 
-                                className={`w-56 p-5 rounded-xl text-center font-bold text-white shadow-xl cursor-pointer transition-all hover:-translate-y-1 z-10 ${selectedOrgNode === 'despacho' ? 'bg-slate-900 ring-4 ring-brand-200' : 'bg-brand-600'}`}
-                                onClick={() => setSelectedOrgNode('despacho')}
-                             >
-                                 Despacho de la Ministra
-                             </div>
-
-                             <div 
-                                className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'asesoras' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`}
-                                onClick={() => setSelectedOrgNode('asesoras')}
-                             >
-                                 Oficinas Asesoras
-                             </div>
-                         </div>
-
-                         <div className="w-px h-8 bg-slate-300"></div>
-                         
-                         {/* Level 2 (Viceministries) */}
-                         <div className="flex flex-wrap justify-center gap-3">
-                             {[
-                                {k: 'vm-mujeres', l: 'VM Mujeres'},
-                                {k: 'vm-juventud', l: 'VM Juventud'},
-                                {k: 'vm-poblaciones', l: 'VM Poblaciones'},
-                                {k: 'vm-diversidades', l: 'VM Diversidades'},
-                                {k: 'vm-etnicos', l: 'VM Pueblos Étnicos'}
-                             ].map(vm => (
-                                 <div 
-                                    key={vm.k}
-                                    className={`p-3 rounded-lg text-xs font-bold cursor-pointer transition-all border shadow-sm hover:-translate-y-1 ${selectedOrgNode === vm.k ? 'bg-slate-800 text-white' : 'bg-gray-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-gray-200'}`}
-                                    onClick={() => setSelectedOrgNode(vm.k)}
-                                 >
-                                     {vm.l}
-                                 </div>
-                             ))}
-                         </div>
-                    </div>
-                </Card>
-
-                {/* Org Chart Modal */}
-                {selectedOrgNode && ORG_DATA[selectedOrgNode] && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedOrgNode(null)}>
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
-                            <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedOrgNode(null)}><X /></button>
-                            <h3 className="text-xl font-bold mb-2 text-brand-700 dark:text-brand-400 border-b pb-2">{ORG_DATA[selectedOrgNode].title}</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{ORG_DATA[selectedOrgNode].description}</p>
-                            
-                            {ORG_DATA[selectedOrgNode].dependencies && (
-                                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-xl">
-                                    <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Componentes / Dependencias</h4>
-                                    <ul className="space-y-1">
-                                        {ORG_DATA[selectedOrgNode].dependencies.map((dep: string, idx: number) => (
-                                            <li key={idx} className="text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2">
-                                                <ChevronRight size={12} className="mt-0.5 text-brand-500"/> {dep}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-        )}
-
-        {/* 5. ENFOQUES Y ESTRATEGIAS */}
-        {activeTab === 'approaches' && (
-            <div className="animate-fade-in">
-                <Card>
-                    <div className="flex gap-2 mb-6 border-b border-gray-100 dark:border-slate-700 pb-4">
-                        <button onClick={() => setEnfoqueSubTab('enfoques')} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${enfoqueSubTab === 'enfoques' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-slate-600'}`}>Enfoques Transversales</button>
-                        <button onClick={() => setEnfoqueSubTab('estrategias')} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${enfoqueSubTab === 'estrategias' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-slate-600'}`}>Estrategias</button>
-                    </div>
-
-                    {enfoqueSubTab === 'enfoques' ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                            {[
-                                {n:'01', t:'Enfoque de Derechos', d:'Sitúa a las personas como titulares de derechos.'},
-                                {n:'02', t:'Enfoque Territorial', d:'Ecosistema social, geográfico y cultural.'},
-                                {n:'03', t:'Enfoque Diferencial', d:'Respuestas adaptadas a barreras específicas.'},
-                                {n:'04', t:'Enfoque Étnico-Racial', d:'Protege la diversidad y supera el racismo.'},
-                                {n:'05', t:'Enfoque de Género', d:'Elimina desigualdades de mujeres y LGBTIQ+.'},
-                                {n:'06', t:'Enfoque Interseccional', d:'Reconoce múltiples ejes de discriminación.'},
-                                {n:'07', t:'Justicia Ambiental', d:'Respuesta justa a la crisis climática.'},
-                                {n:'08', t:'Curso de Vida', d:'Desarrollo humano como continuo.'}
-                            ].map(item => (
-                                <div key={item.n} className="text-center p-2">
-                                    <div className="w-12 h-12 rounded-full bg-brand-500 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-lg ring-4 ring-brand-50 dark:ring-brand-900">{item.n}</div>
-                                    <h3 className="font-bold text-brand-700 dark:text-brand-400 text-sm mb-1">{item.t}</h3>
-                                    <p className="text-xs text-slate-500">{item.d}</p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[
-                                'Alianzas Público-Populares', 'Iniciativas Productivas', 'Infraestructura para Cerrar Brechas',
-                                'Espacios para la Juntanza', 'Cambio Cultural y Erradicación', 'Abordaje Psicosocial',
-                                'Transmisión de Saberes', 'Ecosistema Institucional', 'Gobernanza Interna',
-                                'Condiciones para Vida Digna', 'Restablecimiento de Derechos'
-                            ].map((e, i) => (
-                                <div key={i} className="p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-md transition-all">
-                                    <h3 className="font-bold text-slate-800 dark:text-white text-sm mb-1">{e}</h3>
-                                    <p className="text-xs text-slate-500">Estrategia transversal para el cierre de brechas.</p>
-                                </div>
-                            ))}
                         </div>
                     )}
-                </Card>
-            </div>
-        )}
+                </div>
+            )}
 
-        {/* 6. PROGRAMAS Y PROYECTOS */}
-        {activeTab === 'programs' && (
-            <div className="animate-fade-in">
-                <Card title="Portafolio Programático (24)">
-                    
-                    {/* Toolbar */}
-                    <div className="flex flex-col md:flex-row gap-4 mb-6">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-3 text-slate-400" size={18} />
-                            <input 
-                                type="text" 
-                                placeholder="Buscar por nombre, población..." 
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 outline-none text-sm"
-                            />
+            {/* 5. ENFOQUES */}
+            {activeTab === 'approaches' && (
+                <div className="animate-fade-in">
+                    <Card>
+                        <div className="flex gap-2 mb-6 border-b border-gray-100 dark:border-slate-700 pb-4">
+                            <button onClick={() => setEnfoqueSubTab('enfoques')} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${enfoqueSubTab === 'enfoques' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-slate-600'}`}>Enfoques Transversales</button>
+                            <button onClick={() => setEnfoqueSubTab('estrategias')} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${enfoqueSubTab === 'estrategias' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-slate-600'}`}>Estrategias</button>
                         </div>
-                        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
-                            {['Todo', 'Mujeres', 'Juventud', 'Pobreza', 'Diversidades', 'Étnicos', 'Saberes'].map(f => (
-                                <button 
-                                    key={f} 
-                                    onClick={() => setActiveFilter(f)}
-                                    className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${activeFilter === f ? 'bg-brand-600 text-white border-brand-600' : 'bg-white dark:bg-slate-800 text-slate-600 border-gray-200 dark:border-slate-600 hover:bg-gray-50'}`}
-                                >
-                                    {f}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Results Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {filteredPrograms.length > 0 ? filteredPrograms.map(p => (
-                            <div key={p.id} className="border border-gray-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 hover:border-brand-300 transition-all group">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-slate-800 dark:text-white">{p.nombre}</h3>
-                                    <span className="text-[10px] uppercase font-bold bg-gray-100 dark:bg-slate-700 text-slate-500 px-2 py-1 rounded">{p.viceministerio}</span>
-                                </div>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{p.breve}</p>
-                                
-                                <details className="group/details">
-                                    <summary className="text-xs font-bold text-brand-600 cursor-pointer flex items-center gap-1">
-                                        Más información <ChevronDown size={12} className="group-open/details:rotate-180 transition-transform"/>
-                                    </summary>
-                                    <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg text-xs space-y-2 animate-fade-in">
-                                        <p><b>Población:</b> {p.poblacion}</p>
-                                        <p><b>Dependencia:</b> {p.dependencia}</p>
-                                        <p><b>Estrategia:</b> {p.estrategia}</p>
-                                        <div className="flex flex-wrap gap-1 mt-1">
-                                            {p.tags.split(',').map(t => (
-                                                <span key={t} className="bg-white dark:bg-slate-600 px-1.5 py-0.5 rounded border border-gray-200 dark:border-slate-500 text-[10px] text-slate-500 dark:text-slate-300">#{t}</span>
-                                            ))}
-                                        </div>
+                        {enfoqueSubTab === 'enfoques' ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                {[{n:'01', t:'Enfoque de Derechos', d:'Sitúa a las personas como titulares de derechos.'}, {n:'02', t:'Enfoque Territorial', d:'Ecosistema social, geográfico y cultural.'}, {n:'03', t:'Enfoque Diferencial', d:'Respuestas adaptadas a barreras específicas.'}, {n:'04', t:'Enfoque Étnico-Racial', d:'Protege la diversidad y supera el racismo.'}, {n:'05', t:'Enfoque de Género', d:'Elimina desigualdades de mujeres y LGBTIQ+.'}, {n:'06', t:'Enfoque Interseccional', d:'Reconoce múltiples ejes de discriminación.'}, {n:'07', t:'Justicia Ambiental', d:'Respuesta justa a la crisis climática.'}, {n:'08', t:'Curso de Vida', d:'Desarrollo humano como continuo.'}].map(item => (
+                                    <div key={item.n} className="text-center p-2">
+                                        <div className="w-12 h-12 rounded-full bg-brand-500 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-lg ring-4 ring-brand-50 dark:ring-brand-900">{item.n}</div>
+                                        <h3 className="font-bold text-brand-700 dark:text-brand-400 text-sm mb-1">{item.t}</h3>
+                                        <p className="text-xs text-slate-500">{item.d}</p>
                                     </div>
-                                </details>
+                                ))}
                             </div>
-                        )) : (
-                            <div className="col-span-2 text-center py-12 text-slate-400">
-                                <Info className="mx-auto mb-2 opacity-50" size={32} />
-                                <p>No se encontraron programas.</p>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {['Alianzas Público-Populares', 'Iniciativas Productivas', 'Infraestructura para Cerrar Brechas', 'Espacios para la Juntanza', 'Cambio Cultural y Erradicación', 'Abordaje Psicosocial', 'Transmisión de Saberes', 'Ecosistema Institucional', 'Gobernanza Interna', 'Condiciones para Vida Digna', 'Restablecimiento de Derechos'].map((e, i) => (
+                                    <div key={i} className="p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-md transition-all">
+                                        <h3 className="font-bold text-slate-800 dark:text-white text-sm mb-1">{e}</h3>
+                                        <p className="text-xs text-slate-500">Estrategia transversal para el cierre de brechas.</p>
+                                    </div>
+                                ))}
                             </div>
                         )}
-                    </div>
-                </Card>
-            </div>
-        )}
-      </div>
+                    </Card>
+                </div>
+            )}
 
-      {/* 7. EVALUACIÓN DE CONOCIMIENTOS (Distinct Tab) */}
-      {activeTab === 'quiz' && (
-          <div className="animate-fade-in">
-              <Quiz 
-                questions={[
-                    { id: 1, question: "¿Cuál ley creó el Ministerio de Igualdad y Equidad?", options: ["Ley 100", "Ley 2281 de 2023", "Ley 87 de 1993"], correctAnswer: 1 },
-                    { id: 2, question: "¿Cuántos programas estratégicos conforman el portafolio actual?", options: ["10", "24", "32"], correctAnswer: 1 },
-                    { id: 3, question: "¿Qué decreto define la estructura orgánica del Ministerio?", options: ["Decreto 1075 de 2023", "Decreto 1499", "Decreto 1600"], correctAnswer: 0 },
-                    { id: 4, question: "¿Quién ejerce la tercera línea de defensa en el MIPG?", options: ["Planeación", "Control Interno", "Talento Humano"], correctAnswer: 1 },
-                    { id: 5, question: "¿Cuál es el enfoque que protege la diversidad y supera el racismo?", options: ["Interseccional", "Étnico-Racial", "Territorial"], correctAnswer: 1 }
-                ]}
-                onComplete={onComplete}
-              />
-          </div>
-      )}
-      
-      {activeTab !== 'quiz' && (
-          <FeedbackForm moduleName="Plataforma Estratégica" />
-      )}
+            {/* 6. PROGRAMAS */}
+            {activeTab === 'programs' && (
+                <div className="animate-fade-in">
+                    <Card title="Portafolio Programático (24)">
+                        <div className="flex flex-col md:flex-row gap-4 mb-6">
+                            <div className="flex-1 relative">
+                                <Search className="absolute left-3 top-3 text-slate-400" size={18} />
+                                <input type="text" placeholder="Buscar por nombre, población..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 outline-none text-sm"/>
+                            </div>
+                            <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                                {['Todo', 'Mujeres', 'Juventud', 'Pobreza', 'Diversidades', 'Étnicos', 'Saberes'].map(f => (
+                                    <button key={f} onClick={() => setActiveFilter(f)} className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${activeFilter === f ? 'bg-brand-600 text-white border-brand-600' : 'bg-white dark:bg-slate-800 text-slate-600 border-gray-200 dark:border-slate-600 hover:bg-gray-50'}`}>{f}</button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {filteredPrograms.length > 0 ? filteredPrograms.map(p => (
+                                <div key={p.id} className="border border-gray-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 hover:border-brand-300 transition-all group">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-bold text-slate-800 dark:text-white">{p.nombre}</h3>
+                                        <span className="text-[10px] uppercase font-bold bg-gray-100 dark:bg-slate-700 text-slate-500 px-2 py-1 rounded">{p.viceministerio}</span>
+                                    </div>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{p.breve}</p>
+                                    <details className="group/details">
+                                        <summary className="text-xs font-bold text-brand-600 cursor-pointer flex items-center gap-1">Más información <ChevronDown size={12} className="group-open/details:rotate-180 transition-transform"/></summary>
+                                        <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg text-xs space-y-2 animate-fade-in">
+                                            <p><b>Población:</b> {p.poblacion}</p>
+                                            <p><b>Dependencia:</b> {p.dependencia}</p>
+                                            <p><b>Estrategia:</b> {p.estrategia}</p>
+                                            <div className="flex flex-wrap gap-1 mt-1">{p.tags.split(',').map(t => (<span key={t} className="bg-white dark:bg-slate-600 px-1.5 py-0.5 rounded border border-gray-200 dark:border-slate-500 text-[10px] text-slate-500 dark:text-slate-300">#{t}</span>))}</div>
+                                        </div>
+                                    </details>
+                                </div>
+                            )) : (
+                                <div className="col-span-2 text-center py-12 text-slate-400"><Info className="mx-auto mb-2 opacity-50" size={32} /><p>No se encontraron programas.</p></div>
+                            )}
+                        </div>
+                    </Card>
+                </div>
+            )}
+
+            {/* 7. EVALUACIÓN */}
+            {activeTab === 'quiz' && (
+                <div className="animate-fade-in">
+                    <Quiz 
+                        questions={[
+                            { id: 1, question: "¿Cuál ley creó el Ministerio de Igualdad y Equidad?", options: ["Ley 100", "Ley 2281 de 2023", "Ley 87 de 1993"], correctAnswer: 1 },
+                            { id: 2, question: "¿Cuántos programas estratégicos conforman el portafolio actual?", options: ["10", "24", "32"], correctAnswer: 1 },
+                            { id: 3, question: "¿Qué decreto define la estructura orgánica del Ministerio?", options: ["Decreto 1075 de 2023", "Decreto 1499", "Decreto 1600"], correctAnswer: 0 },
+                            { id: 4, question: "¿Quién ejerce la tercera línea de defensa en el MIPG?", options: ["Planeación", "Control Interno", "Talento Humano"], correctAnswer: 1 },
+                            { id: 5, question: "¿Cuál es el enfoque que protege la diversidad y supera el racismo?", options: ["Interseccional", "Étnico-Racial", "Territorial"], correctAnswer: 1 }
+                        ]}
+                        onComplete={onComplete}
+                    />
+                </div>
+            )}
+        </div>
+        
+        {/* Navigation Footer */}
+        <div className="fixed bottom-6 left-0 right-0 flex justify-center z-20 pointer-events-none">
+            <div className="flex gap-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-2 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 pointer-events-auto">
+                <button 
+                    onClick={handlePrev} 
+                    disabled={currentSectionIndex <= 0}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                >
+                    <ArrowLeft size={16} /> Anterior
+                </button>
+                <div className="w-px bg-gray-300 dark:bg-slate-600"></div>
+                <button 
+                    onClick={handleNext}
+                    disabled={currentSectionIndex >= sections.length - 1}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+                >
+                    Siguiente <ArrowRight size={16} />
+                </button>
+            </div>
+        </div>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, Badge, Accordion, Quiz, FeedbackForm } from '../components/UI';
+import { Card, Badge, Accordion, Quiz } from '../components/UI';
 import { Shield, Book, Globe } from 'lucide-react';
 
 export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pb-12">
       <div className="mb-6">
         <Badge type="brand">Módulo 3</Badge>
         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Normas Globales 2024 (IIA)</h1>
@@ -82,8 +82,6 @@ export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({
         ]}
         onComplete={onComplete}
       />
-      
-      <FeedbackForm moduleName="Normas Globales IIA" />
     </div>
   );
 };
