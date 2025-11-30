@@ -1,34 +1,115 @@
-import React, { useState } from 'react';
-import { Card, Badge, Quiz, FeedbackForm, TimelineItem } from '../components/UI';
-import { Target, Map, Layout, Scale, Users, FileText, ChevronRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Card, Badge, Quiz, FeedbackForm } from '../components/UI';
+import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info } from 'lucide-react';
+
+// --- DATA: Programas y Proyectos ---
+const PROGRAMAS_DATA = [
+    {id:'agua-vida', nombre:'Agua es Vida', viceministerio:'Pobreza', dependencia:'Acceso Igualitario al Agua', poblacion:'Territorios marginados con baja cobertura de agua', estrategia:'Infraestructura para cerrar brechas', breve:'Acceso igualitario y digno al agua potable mediante soluciones pertinentes territorialmente.', tags:'agua,territorio,inclusion,servicios'}, 
+    {id:'hambre-cero', nombre:'Hambre Cero', viceministerio:'Pobreza', dependencia:'Superación de la Pobreza', poblacion:'Hogares en pobreza y extrema pobreza', estrategia:'Condiciones para vida digna', breve:'Asegurar alimentación adecuada y soberanía alimentaria con enfoque territorial.', tags:'alimentacion,pobreza,seguridad-alimentaria'}, 
+    {id:'personas-mayores', nombre:'Bienestar para Personas Mayores', viceministerio:'Pobreza', dependencia:'Personas Mayores', poblacion:'Personas mayores en exclusión', estrategia:'Abordaje psicosocial y bienestar', breve:'Cuidados, protección social y participación para un envejecimiento digno.', tags:'personas-mayores,cuidado,proteccion'}, 
+    {id:'habitantes-calle', nombre:'Construyendo Dignidad', viceministerio:'Pobreza', dependencia:'Personas en Situación de Calle', poblacion:'Habitantes de calle', estrategia:'Acompañamiento para restablecimiento de derechos', breve:'Abordaje integral y territorial con rutas de restablecimiento de derechos.', tags:'calle,restablecimiento,proteccion'}, 
+    {id:'cuidado', nombre:'Sistema de Cuidado en Territorios', viceministerio:'Pobreza', dependencia:'Cuidado', poblacion:'Personas cuidadoras y receptoras de cuidado', estrategia:'Ecosistema institucional del Sector Igualdad', breve:'Implementación territorial del cuidado como derecho y trabajo reconocido.', tags:'cuidado,corresponsabilidad,servicios'}, 
+    {id:'migracion', nombre:'Raíces en Movimiento', viceministerio:'Pobreza', dependencia:'Población Migrante', poblacion:'Población migrante, refugiada y retornada', estrategia:'Condiciones para vida digna', breve:'Respuesta humanitaria, integración socioeconómica y cohesión social para población migrante.', tags:'migracion,humanitaria,integracion'}, 
+    {id:'casas-dignidad', nombre:'Casas de la Dignidad', viceministerio:'Mujeres', dependencia:'Prevención y Atención de las Violencias', poblacion:'Mujeres víctimas de violencias', estrategia:'Acompañamiento para restablecimiento de derechos', breve:'Espacios seguros de acogida, atención y empoderamiento para mujeres y sus familias.', tags:'violencia-genero,proteccion,refugio'}, 
+    {id:'autonomia-eco', nombre:'Mujeres por la Autonomía Económica', viceministerio:'Mujeres', dependencia:'Autonomía Económica', poblacion:'Mujeres en condiciones de vulnerabilidad económica', estrategia:'Iniciativas productivas', breve:'Fomento de emprendimientos y acceso a mercados para la independencia económica de las mujeres.', tags:'emprendimiento,economia,empoderamiento'}, 
+    {id:'derechos-sexuales', nombre:'Mis Derechos, Mi Decisión', viceministerio:'Mujeres', dependencia:'Garantía de Derechos', poblacion:'Mujeres, adolescentes y niñas', estrategia:'Cambio cultural', breve:'Promoción y garantía de los derechos sexuales y reproductivos en todo el territorio nacional.', tags:'derechos-reproductivos,salud,pedagogia'}, 
+    {id:'masp', nombre:'Reconocimiento y Dignidad (MASP)', viceministerio:'Mujeres', dependencia:'Mujeres en Actividades Sexuales Pagas', poblacion:'Mujeres en actividades sexuales pagas', estrategia:'Condiciones para vida digna', breve:'Garantía de derechos, reducción de estigmas y alternativas de vida digna.', tags:'masp,derechos-humanos,inclusion-social'}, 
+    {id:'madres-cabeza', nombre:'Madres que Lideran', viceministerio:'Mujeres', dependencia:'Madres Cabeza de Familia', poblacion:'Madres cabeza de familia', estrategia:'Alianzas público-populares y comunitarias', breve:'Apoyo integral para el bienestar, autonomía y liderazgo de las madres cabeza de familia.', tags:'maternidad,liderazgo,cuidado'}, 
+    {id:'jovenes-paz', nombre:'Jóvenes en Paz', viceministerio:'Juventud', dependencia:'Jóvenes en Paz', poblacion:'Jóvenes en riesgo de violencia y exclusión', estrategia:'Acompañamiento para restablecimiento de derechos', breve:'Alternativas de vida y construcción de paz a través de educación, cultura y empleo.', tags:'paz,juventud,oportunidades'}, 
+    {id:'barrismo-social', nombre:'Fútbol y Convivencia', viceministerio:'Juventud', dependencia:'Barrismo Social', poblacion:'Jóvenes barristas', estrategia:'Espacios de juntanza', breve:'Transformación de las barras de fútbol en actores de convivencia y paz territorial.', tags:'barrismo,convivencia,deporte'}, 
+    {id:'oportunidades-joven', nombre:'Sacúdete por tus Derechos', viceministerio:'Juventud', dependencia:'Goce Efectivo de Derechos y Oportunidades', poblacion:'Jóvenes de 14 a 28 años', estrategia:'Iniciativas productivas', breve:'Plataforma de oportunidades en educación, empleo, emprendimiento y participación juvenil.', tags:'educacion,empleo,participacion'}, 
+    {id:'lgbtiq', nombre:'Orgullo Diverso', viceministerio:'Diversidades', dependencia:'Derechos de la Población LGBTIQ+', poblacion:'Población LGBTIQ+', estrategia:'Cambio cultural', breve:'Garantía de derechos, lucha contra la discriminación y visibilización de la diversidad sexual y de género.', tags:'lgbtiq,inclusion,derechos'}, 
+    {id:'discapacidad', nombre:'Colombia sin Barreras', viceministerio:'Diversidades', dependencia:'Derechos de Personas con Discapacidad', poblacion:'Personas con discapacidad', estrategia:'Infraestructura para cerrar brechas', breve:'Inclusión social, laboral y educativa a través de la eliminación de barreras físicas y sociales.', tags:'discapacidad,accesibilidad,inclusion'}, 
+    {id:'narp', nombre:'Herencia Viva (NARP)', viceministerio:'Étnicos', dependencia:'NARP', poblacion:'Comunidades Negras, Afrocolombianas, Raizales y Palenqueras', estrategia:'Reconocimiento y transmisión de saberes', breve:'Fortalecimiento de la identidad cultural, protección de territorios y lucha contra el racismo.', tags:'etnico,antirracismo,territorio,saberes'}, 
+    {id:'indigenas', nombre:'Saberes Ancestrales', viceministerio:'Étnicos', dependencia:'Pueblos Indígenas', poblacion:'Pueblos Indígenas', estrategia:'Reconocimiento y transmisión de saberes', breve:'Protección de la autonomía, la cultura y los derechos territoriales de los pueblos indígenas.', tags:'indigenas,saberes,autonomia'}, 
+    {id:'rrom', nombre:'Kumpania en Movimiento', viceministerio:'Étnicos', dependencia:'Pueblo Rrom', poblacion:'Pueblo Rrom (Gitanos)', estrategia:'Reconocimiento y transmisión de saberes', breve:'Preservación de la identidad cultural, nomadismo y garantía de derechos del pueblo Rrom.', tags:'rrom,cultura,derechos,saberes'}, 
+    {id:'campesinado', nombre:'Tierra y Territorio Campesino', viceministerio:'Étnicos', dependencia:'Campesinado', poblacion:'Población campesina', estrategia:'Condiciones para vida digna', breve:'Reconocimiento del campesinado como sujeto de derechos, acceso a tierra y producción sostenible.', tags:'campesinado,tierra,soberania-alimentaria'}, 
+    {id:'justicia-racial', nombre:'Justicia Étnica y Racial', viceministerio:'Étnicos', dependencia:'NARP', poblacion:'Pueblos y comunidades étnicas', estrategia:'Cambio cultural', breve:'Acciones afirmativas y de reparación histórica para combatir el racismo estructural.', tags:'antirracismo,reparacion,justicia'}, 
+    {id:'pactos-territoriales', nombre:'Pactos Territoriales por la Igualdad', viceministerio:'Pobreza', dependencia:'Superación de la Pobreza', poblacion:'Territorios PDET y ZOMAC', estrategia:'Alianzas público-populares y comunitarias', breve:'Articulación de inversiones y acciones para cerrar brechas de desigualdad en territorios excluidos.', tags:'territorio,paz,inversion'}, 
+    {id:'datos-igualdad', nombre:'Observatorio de la Igualdad', viceministerio:'Pobreza', dependencia:'Superación de la Pobreza', poblacion:'Academia, sociedad civil, entidades', estrategia:'Gobernanza interna', breve:'Generación y análisis de datos para orientar políticas públicas de igualdad y equidad.', tags:'datos,investigacion,politica-publica'}, 
+    {id:'cultura-paz', nombre:'Cultura para la Paz y la No Estigmatización', viceministerio:'Juventud', dependencia:'Jóvenes en Paz', poblacion:'Toda la población colombiana', estrategia:'Cambio cultural', breve:'Estrategias de comunicación y pedagogía para transformar imaginarios que perpetúan la desigualdad.', tags:'cultura,paz,pedagogia'}
+];
+
+// --- DATA: Organigrama ---
+const ORG_DATA: any = {
+      'entidades': { title: 'Entidades Adscritas y Vinculadas', description: 'Organismos que, aunque tienen autonomía, están vinculados al sector para coordinar políticas. El Ministerio ejerce como ente rector.', dependencies: ['Instituto Colombiano de Bienestar Familiar (ICBF)', 'Instituto Nacional para Sordos (INSOR)', 'Instituto Nacional para Ciegos (INCI)'] },
+      'territoriales': { title: 'Direcciones Territoriales', description: 'Funciones (Art. 17, D.1075): Apoyar la articulación y coordinación territorial, implementar estrategias para poblaciones marginadas y participar en la planeación y ejecución de políticas a nivel local.', dependencies: ['32 Direcciones Territoriales (una por departamento)'] },
+      'secretaria': { title: 'Secretaría General', description: 'Funciones (Art. 43, D.1075): Asistir a la Ministra en la administración del Ministerio, coordinar la gestión de recursos físicos, financieros y de talento humano, y liderar la implementación de políticas y procesos administrativos.', dependencies: ['Subdirección Administrativa y Financiera', 'Subdirección de Contratación', 'Subdirección de Talento Humano'] },
+      'despacho': { title: 'Despacho de la Ministra', description: 'Funciones (Art. 6, D.1075): Formular y dirigir las políticas del sector, coordinar la planeación estratégica, ejercer la representación legal y asegurar el cumplimiento de las funciones y competencias del Ministerio.', dependencies: ['Viceministerios', 'Secretaría General', 'Oficinas Asesoras', 'Direcciones Territoriales'] },
+      'asesoras': { title: 'Oficinas Asesoras', description: 'Funciones (Arts. 7 al 16, D.1075): Apoyan la gestión estratégica en áreas clave como planeación, jurídica, comunicaciones, TICs, control interno y cooperación, asegurando la coherencia y legalidad de las acciones del Ministerio.', dependencies: ['Oficina de Saberes y Conocimientos', 'Oficina de Proyectos', 'Oficina de TICs', 'Oficina de Comunicaciones', 'Oficina de Control Interno', 'Oficina de Control Disciplinario', 'Oficina de Planeación', 'Oficina Jurídica', 'Oficina de Alianzas Estratégicas', 'Oficina de Relacionamiento con la Ciudadanía'] },
+      'vm-mujeres': { title: 'Viceministerio de las Mujeres', description: 'Funciones (Art. 18, D.1075): Liderar la política pública para la promoción de los derechos de las mujeres en su diversidad, coordinar el Sistema Nacional de Mujeres y articular acciones para prevenir y atender las violencias de género.', dependencies: ['Dirección para la Prevención de Violencias', 'Dirección para la Autonomía Económica', 'Dirección para Garantía de Derechos', 'Dirección para Mujeres en Actividades Sexuales Pagas', 'Dirección para Madres Cabeza de Familia'] },
+      'vm-juventud': { title: 'Viceministerio de las Juventudes', description: 'Funciones (Art. 24, D.1075): Liderar la política pública para promover los derechos de la juventud, articular el programa "Jóvenes en Paz" y fomentar oportunidades para el desarrollo integral de los y las jóvenes del país.', dependencies: ['Dirección para el Goce Efectivo de los Derechos', 'Dirección de Barrismo Social', 'Dirección de Jóvenes en Paz'] },
+      'vm-poblaciones': { title: 'Viceministerio para Poblaciones y Territorios Excluidos', description: 'Funciones (Art. 28, D.1075): Liderar políticas para la superación de la pobreza y la exclusión de poblaciones vulnerables (migrantes, personas mayores, habitantes de calle) y dirigir el Sistema Nacional de Cuidado.', dependencies: ['Dirección para la Superación de la Pobreza', 'Dirección de Cuidado', 'Dirección para la Población Migrante', 'Dirección de Acceso Igualitario al Agua', 'Dirección para Personas en Situación de Calle', 'Dirección para Personas Mayores'] },
+      'vm-diversidades': { title: 'Viceministerio de las Diversidades', description: 'Funciones (Art. 35, D.1075): Liderar la política para la promoción de los derechos de las personas con discapacidad y la población LGBTIQ+, y coordinar acciones para prevenir y erradicar la discriminación.', dependencies: ['Dirección para la Garantía de Derechos de la Población LGBTIQ+', 'Dirección para la Garantía de Derechos de las Personas con Discapacidad'] },
+      'vm-etnicos': { title: 'Viceministerio de Pueblos Étnicos y Campesinos', description: 'Funciones (Art. 38, D.1075): Liderar la política para la promoción de los derechos de los pueblos y comunidades negras, afrodescendientes, raizales, palenqueras, indígenas, Rrom y campesinos.', dependencies: ['Dirección para Comunidades Negras, Afro, Raizales y Palenqueras', 'Dirección para Pueblos Indígenas', 'Dirección para el Pueblo Rrom', 'Dirección para el Campesinado'] }
+};
+
+// --- DATA: Timeline ---
+const TIMELINE_DATA = [
+    { id: 1, title: 'Ley 2281: Creación', year: 'Enero 2023', content: 'La ley crea el Ministerio de Igualdad y Equidad, define su objeto y competencias; es la base legal que luego desarrolla el Gobierno. (Referencia dentro del Decreto 1075, que explicita que actúa “en virtud de las facultades del artículo 189” y la Ley 2294/2023 del PND).' },
+    { id: 2, title: 'Ley 2294: PND 2022-26', year: 'Mayo 2023', content: 'El Plan Nacional de Desarrollo “Colombia potencia mundial de la vida” incorpora compromisos y macrometas sectoriales (Jóvenes en Paz, Mujeres autónomas, Una sociedad para el cuidado) que condicionan la planeación sectorial del Ministerio.' },
+    { id: 3, title: 'Decreto 1075: Estructura', year: 'Junio 2023', content: 'Define despachos, 5 viceministerios y 20 direcciones, oficinas y Secretaría General, y asigna funciones. El mismo decreto indica la sujeción al PND 2294/2023.' },
+    { id: 4, title: 'Decreto 1076: Planta (P1)', year: 'Junio 2023', content: 'Establece los componentes iniciales de la planta de personal del Ministerio. Es uno de los dos decretos de planta expedidos en 2023. (Mencionado en los considerandos de la Resolución 22 de 2023).' },
+    { id: 5, title: 'Resolución 003: Manual v1', year: 'Agosto 2023', content: 'Adopta la primera versión del Manual Específico de Funciones y Competencias Laborales del Ministerio, sirviendo como antecedente para futuras actualizaciones.' },
+    { id: 6, title: 'Resolución 668: Enfoques', year: 'Septiembre 2024', content: 'Institucionaliza los 8 enfoques (derechos, territorial, diferencial, étnico-racial/antirracista, género, interseccional, justicia ambiental y curso de vida) como el eje articulador de toda la política pública del sector.' },
+    { id: 7, title: 'Resolución 669: Estrategias', year: 'Septiembre 2024', content: 'Establece las 11 estrategias programáticas para materializar los objetivos del Ministerio y medir su impacto (alianzas público-populares, iniciativas productivas, etc.).' },
+    { id: 8, title: 'PEI v2: Aprobación', year: 'Octubre 2024', content: 'Formaliza la plataforma estratégica (misión, visión, objetivos) y el despliegue estratégico con dos objetivos estratégicos y uno operacional, alineados al PND y a los ODS.' }
+];
 
 export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
-  const [activeTab, setActiveTab] = useState<'identity' | 'structure' | 'normative' | 'programs'>('identity');
+  const [activeTab, setActiveTab] = useState('intro');
+  const [enfoqueSubTab, setEnfoqueSubTab] = useState('enfoques');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('Todo');
+  const [selectedOrgNode, setSelectedOrgNode] = useState<string | null>(null);
+  const [selectedTimelineItem, setSelectedTimelineItem] = useState<any>(null);
+
+  const filteredPrograms = useMemo(() => {
+    let result = PROGRAMAS_DATA;
+    if (activeFilter !== 'Todo') {
+        if (activeFilter === 'Saberes') result = result.filter(p => p.tags.includes('saberes'));
+        else result = result.filter(p => p.viceministerio === activeFilter || (activeFilter === 'Pobreza' && ['Pobreza'].includes(p.viceministerio)));
+    }
+    if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        result = result.filter(p => 
+            p.nombre.toLowerCase().includes(q) || 
+            p.poblacion.toLowerCase().includes(q) || 
+            p.tags.toLowerCase().includes(q)
+        );
+    }
+    return result;
+  }, [searchQuery, activeFilter]);
+
+  const tabs = [
+    { id: 'intro', label: 'Introducción', icon: Target },
+    { id: 'normative', label: 'Marco Normativo', icon: Scale },
+    { id: 'process', label: 'Procesos', icon: Layout },
+    { id: 'structure', label: 'Estructura Orgánica', icon: Users },
+    { id: 'approaches', label: 'Enfoques y Estrategias', icon: Map },
+    { id: 'programs', label: 'Programas y Proyectos', icon: FileText },
+    { id: 'quiz', label: 'Evaluación', icon: CheckCircle }
+  ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-12">
       <div className="mb-4">
         <Badge type="brand">Módulo 1</Badge>
         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Plataforma Estratégica</h1>
-        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Identidad, estructura y portafolio programático del Ministerio.</p>
+        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Plataforma Estratégica, Estructura Organizacional y Portafolio Programático.</p>
       </div>
 
-      {/* Internal Navigation Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200 dark:border-slate-700">
-        {[
-            { id: 'identity', label: 'Identidad', icon: Target },
-            { id: 'structure', label: 'Estructura', icon: Layout },
-            { id: 'normative', label: 'Normatividad', icon: Scale },
-            { id: 'programs', label: 'Programas (24)', icon: FileText },
-        ].map((tab) => {
+      {/* Tabs Navigation */}
+      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200 dark:border-slate-700 hide-scrollbar">
+        {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
                 <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
                         activeTab === tab.id 
-                        ? 'bg-brand-600 text-white shadow-md' 
+                        ? 'bg-brand-600 text-white shadow-md transform scale-105' 
                         : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                     }`}
                 >
@@ -40,96 +121,143 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
 
       <div className="min-h-[400px]">
         
-        {/* TAB 1: IDENTIDAD */}
-        {activeTab === 'identity' && (
+        {/* 1. INTRODUCCIÓN */}
+        {activeTab === 'intro' && (
             <div className="space-y-6 animate-fade-in">
-                <div className="bg-brand-50 dark:bg-brand-900/20 p-6 rounded-2xl border border-brand-100 dark:border-brand-800">
-                    <h3 className="text-brand-800 dark:text-brand-300 font-bold uppercase tracking-wide text-sm mb-2">Contexto</h3>
-                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                        El Ministerio de Igualdad y Equidad es la entidad encargada de diseñar, formular, adoptar, dirigir, coordinar y ejecutar las políticas, planes y programas para 
-                        <span className="font-bold"> eliminar las desigualdades económicas, políticas y sociales</span>.
-                    </p>
-                </div>
-
                 <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Target size={100} className="text-brand-500" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 relative z-10">Misión</h3>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed relative z-10">
-                            Formular, implementar, coordinar y evaluar políticas, planes, programas y proyectos para avanzar en la garantía del derecho a la igualdad y la equidad, 
-                            con enfoque de derechos, de género, diferencial, étnico-antirracista, interseccional y territorial, enfocándose en los "nadie" y en territorios históricamente excluidos.
+                    <Card title="¿Qué es el Ministerio de Igualdad y Equidad?">
+                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                            Entidad del Gobierno nacional encargada de <b>diseñar, formular, adoptar, dirigir, coordinar y ejecutar políticas, planes y programas</b> para eliminar desigualdades, garantizar el derecho a la igualdad y articular la política de Estado en igualdad y equidad.
                         </p>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Map size={100} className="text-blue-500" />
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                            <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
+                                <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">5</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Viceministerios</span>
+                            </div>
+                            <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
+                                <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">20</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Direcciones</span>
+                            </div>
+                            <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
+                                <span className="block text-2xl font-extrabold text-brand-600 dark:text-brand-400">24</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Programas</span>
+                            </div>
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 relative z-10">Visión</h3>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed relative z-10">
-                            Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones y territorios históricamente excluidos, 
-                            haciendo tangible la igualdad y la equidad mediante la garantía de derechos.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {['Enfoque de Derechos', 'Territorial', 'Diferencial', 'Étnico-Racial', 'Género', 'Interseccional', 'Justicia Ambiental', 'Curso de Vida'].map((item, i) => (
-                        <div key={i} className="bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl text-center border border-gray-200 dark:border-slate-700">
-                            <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{item}</span>
+                    </Card>
+                    <div className="space-y-6">
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                            <h3 className="text-lg font-bold text-brand-700 dark:text-brand-400 mb-2">Misión</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-300">
+                                Formular, implementar, coordinar y evaluar políticas, planes, programas y proyectos para avanzar en la garantía del derecho a la igualdad y la equidad, con enfoque de derechos, de género, diferencial, étnico-antirracista, interseccional y territorial.
+                            </p>
                         </div>
-                    ))}
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                            <h3 className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">Visión</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-300">
+                                Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones y territorios históricamente excluidos, haciendo tangible la igualdad y la equidad.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         )}
 
-        {/* TAB 2: ESTRUCTURA */}
-        {activeTab === 'structure' && (
-            <div className="animate-fade-in space-y-6">
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-brand-200 dark:border-brand-800 text-center">
-                        <span className="block text-3xl font-extrabold text-brand-600 dark:text-brand-400">5</span>
-                        <span className="text-xs uppercase text-slate-500 font-bold">Viceministerios</span>
+        {/* 2. MARCO NORMATIVO */}
+        {activeTab === 'normative' && (
+            <div className="animate-fade-in">
+                <Card title="Línea de Tiempo y Normativa Clave">
+                    <p className="text-slate-500 mb-6 text-sm">Hitos normativos que marcan la creación y estructuración del Ministerio. Haz clic para ver detalles.</p>
+                    <div className="relative max-w-2xl mx-auto space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-brand-200 before:to-transparent">
+                        {TIMELINE_DATA.map((item, i) => (
+                            <div key={item.id} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group cursor-pointer`} onClick={() => setSelectedTimelineItem(item)}>
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-brand-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 font-bold text-brand-600 text-xs hover:bg-brand-600 hover:text-white transition-colors">
+                                    {i + 1}
+                                </div>
+                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-brand-200 transition-all">
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{item.year}</div>
+                                    <h3 className="font-bold text-slate-800 dark:text-white text-sm">{item.title}</h3>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 text-center">
-                        <span className="block text-3xl font-extrabold text-slate-700 dark:text-white">20</span>
-                        <span className="text-xs uppercase text-slate-500 font-bold">Direcciones Técnicas</span>
-                    </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 text-center">
-                        <span className="block text-3xl font-extrabold text-slate-700 dark:text-white">32</span>
-                        <span className="text-xs uppercase text-slate-500 font-bold">Direcciones Territoriales</span>
-                    </div>
-                </div>
+                </Card>
 
-                <Card title="Organigrama Misional (Decreto 1075)">
-                    <div className="flex flex-col gap-4">
-                        <div className="p-4 bg-brand-600 text-white font-bold rounded-xl text-center shadow-lg mx-auto w-full md:w-1/2">
-                            Despacho de la Ministra
+                {/* Timeline Modal */}
+                {selectedTimelineItem && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedTimelineItem(null)}>
+                        <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
+                            <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedTimelineItem(null)}><X /></button>
+                            <span className="text-xs font-bold bg-brand-100 text-brand-800 px-2 py-1 rounded uppercase">{selectedTimelineItem.year}</span>
+                            <h3 className="text-2xl font-bold mt-2 mb-4 text-slate-900 dark:text-white">{selectedTimelineItem.title}</h3>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{selectedTimelineItem.content}</p>
                         </div>
-                        <div className="h-6 w-0.5 bg-gray-300 dark:bg-slate-600 mx-auto"></div>
-                        <div className="grid grid-cols-1 md:grid-cols-5 gap-2 text-xs">
-                             {[
-                                { t: "Viceministerio de las Mujeres", c: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300" },
-                                { t: "Viceministerio de la Juventud", c: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300" },
-                                { t: "Viceministerio Poblaciones Excluidas", c: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
-                                { t: "Viceministerio de Diversidades", c: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
-                                { t: "Viceministerio Pueblos Étnicos", c: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
-                             ].map((vm, i) => (
-                                 <div key={i} className={`p-3 rounded-lg font-bold text-center border ${vm.c} flex items-center justify-center`}>
-                                     {vm.t}
-                                 </div>
-                             ))}
+                    </div>
+                )}
+            </div>
+        )}
+
+        {/* 3. ESQUEMA DE PROCESOS */}
+        {activeTab === 'process' && (
+            <div className="animate-fade-in">
+                <Card title="Esquema de Procesos (Interactivo)">
+                    <p className="text-sm text-slate-500 mb-6">Explore cómo funciona el Ministerio. Pase el cursor sobre cada componente para ver su función.</p>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {/* Header Full Width */}
+                        <div className="lg:col-span-3 bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800 p-4 rounded-xl text-center font-bold text-brand-800 dark:text-brand-300 relative group cursor-help">
+                            Enfoques Transversales
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 font-normal">
+                                Cobija toda la actuación con los enfoques de Derecho, Territorial, Intersectorial, Diferencial, de Género, Étnico-Racial y Antirracista.
+                            </div>
                         </div>
-                        
-                        <div className="mt-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700">
-                            <h4 className="font-bold text-sm text-slate-700 dark:text-slate-300 mb-2">Órganos de Asesoría y Control</h4>
-                            <div className="flex flex-wrap gap-2 justify-center">
-                                <Badge>Oficina de Control Interno</Badge>
-                                <span className="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded border border-gray-200 dark:border-slate-600">Planeación</span>
-                                <span className="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded border border-gray-200 dark:border-slate-600">Jurídica</span>
-                                <span className="text-xs bg-white dark:bg-slate-700 px-2 py-1 rounded border border-gray-200 dark:border-slate-600">Control Disciplinario</span>
+
+                        {/* Column 1: Estratégicos */}
+                        <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
+                            <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Estratégicos</div>
+                            {['Gestión de Saberes', 'Gestión Estratégica', 'Gestión de Proyectos', 'Relacionamiento Ciudadano', 'Comunicaciones', 'Cooperación Internacional', 'Gestión TICs'].map((p, i) => (
+                                <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                    {p}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Column 2: Misionales */}
+                        <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
+                            <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Misionales</div>
+                            {['Atención a Juventudes', 'Atención a Mujeres', 'Poblaciones y Territorios Excluidos', 'Pueblos Étnicos y Campesinos', 'Discapacidad y LGBTIQ+'].map((p, i) => (
+                                <div key={i} className="p-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs font-medium text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                    {p}
+                                </div>
+                            ))}
+                            <div className="p-3 bg-brand-600 text-white rounded-lg text-xs font-bold text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                Articulación Intersectorial
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-lg hidden group-hover:block z-10">
+                                    Coordina acciones entre direcciones y entidades para una respuesta transformadora.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Column 3: Apoyo */}
+                        <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
+                            <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos de Apoyo</div>
+                            {['Talento Humano', 'Gestión Contractual', 'Gestión Jurídica', 'Logística y Recursos', 'Gestión Documental', 'Gestión Financiera'].map((p, i) => (
+                                <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
+                                    {p}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Footer Wrappers */}
+                        <div className="lg:col-span-1 border border-brand-500 bg-brand-50 dark:bg-brand-900/30 text-brand-800 dark:text-brand-300 p-3 rounded-lg text-center text-xs font-bold relative group cursor-help">
+                            Aseguramiento y Control Interno (3ra Línea)
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl hidden group-hover:block z-20 font-normal text-left">
+                                <b>Tercera línea de defensa:</b> La OCI evalúa objetivamente los controles y realiza auditorías.
+                            </div>
+                        </div>
+                         <div className="lg:col-span-2 border border-gray-300 bg-gray-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 p-3 rounded-lg text-center text-xs font-bold group relative cursor-help">
+                            Control Interno Disciplinario
+                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl hidden group-hover:block z-20 font-normal text-left">
+                                Garantiza la aplicación del régimen disciplinario y previene la corrupción.
                             </div>
                         </div>
                     </div>
@@ -137,63 +265,233 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
             </div>
         )}
 
-        {/* TAB 3: NORMATIVIDAD */}
-        {activeTab === 'normative' && (
-            <div className="animate-fade-in space-y-4">
-                 <TimelineItem year="Ene 2023" title="Ley 2281" description="Creación del Ministerio. Define objeto y competencias." />
-                 <TimelineItem year="May 2023" title="Ley 2294 (PND)" description="Plan Nacional de Desarrollo: Colombia potencia mundial de la vida." />
-                 <TimelineItem year="Jun 2023" title="Decreto 1075" description="Estructura Orgánica: Define funciones de despachos y direcciones." />
-                 <TimelineItem year="Jun 2023" title="Decreto 1076" description="Planta de Personal (Fase 1)." />
-                 <TimelineItem year="Ago 2023" title="Resolución 003" description="Adopción del Manual de Funciones." />
-                 <TimelineItem year="Sep 2024" title="Resolución 668" description="Adopción de los 8 Enfoques Transversales." />
-                 <TimelineItem year="Sep 2024" title="Resolución 669" description="Estrategias transformadoras (Alianzas, Iniciativas productivas, etc)." />
+        {/* 4. ESTRUCTURA ORGÁNICA */}
+        {activeTab === 'structure' && (
+            <div className="animate-fade-in">
+                <Card title="Estructura Orgánica (Decreto 1075)">
+                    <p className="text-sm text-slate-500 mb-8">Haga clic en una dependencia para ver sus funciones y componentes.</p>
+                    
+                    <div className="flex flex-col items-center gap-8 relative">
+                         {/* Level 0 */}
+                         <div 
+                            className={`w-56 p-4 rounded-xl text-center font-bold text-sm cursor-pointer transition-all shadow-md border hover:-translate-y-1 ${selectedOrgNode === 'entidades' ? 'bg-slate-800 text-white ring-4 ring-slate-200' : 'bg-slate-200 text-slate-700 border-slate-300'}`}
+                            onClick={() => setSelectedOrgNode('entidades')}
+                         >
+                             Entidades Adscritas
+                         </div>
+                         
+                         <div className="w-px h-8 bg-slate-300"></div>
+
+                         {/* Level 1 (Mid) */}
+                         <div className="flex flex-wrap justify-center gap-8 relative">
+                             {/* Connector Lines */}
+                             <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-300 -z-10"></div>
+
+                             <div 
+                                className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'territoriales' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`}
+                                onClick={() => setSelectedOrgNode('territoriales')}
+                             >
+                                 Direcciones Territoriales
+                             </div>
+                             
+                             <div 
+                                className={`w-56 p-5 rounded-xl text-center font-bold text-white shadow-xl cursor-pointer transition-all hover:-translate-y-1 z-10 ${selectedOrgNode === 'despacho' ? 'bg-slate-900 ring-4 ring-brand-200' : 'bg-brand-600'}`}
+                                onClick={() => setSelectedOrgNode('despacho')}
+                             >
+                                 Despacho de la Ministra
+                             </div>
+
+                             <div 
+                                className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'asesoras' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`}
+                                onClick={() => setSelectedOrgNode('asesoras')}
+                             >
+                                 Oficinas Asesoras
+                             </div>
+                         </div>
+
+                         <div className="w-px h-8 bg-slate-300"></div>
+                         
+                         {/* Level 2 (Viceministries) */}
+                         <div className="flex flex-wrap justify-center gap-3">
+                             {[
+                                {k: 'vm-mujeres', l: 'VM Mujeres'},
+                                {k: 'vm-juventud', l: 'VM Juventud'},
+                                {k: 'vm-poblaciones', l: 'VM Poblaciones'},
+                                {k: 'vm-diversidades', l: 'VM Diversidades'},
+                                {k: 'vm-etnicos', l: 'VM Pueblos Étnicos'}
+                             ].map(vm => (
+                                 <div 
+                                    key={vm.k}
+                                    className={`p-3 rounded-lg text-xs font-bold cursor-pointer transition-all border shadow-sm hover:-translate-y-1 ${selectedOrgNode === vm.k ? 'bg-slate-800 text-white' : 'bg-gray-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-gray-200'}`}
+                                    onClick={() => setSelectedOrgNode(vm.k)}
+                                 >
+                                     {vm.l}
+                                 </div>
+                             ))}
+                         </div>
+                    </div>
+                </Card>
+
+                {/* Org Chart Modal */}
+                {selectedOrgNode && ORG_DATA[selectedOrgNode] && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedOrgNode(null)}>
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
+                            <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedOrgNode(null)}><X /></button>
+                            <h3 className="text-xl font-bold mb-2 text-brand-700 dark:text-brand-400 border-b pb-2">{ORG_DATA[selectedOrgNode].title}</h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{ORG_DATA[selectedOrgNode].description}</p>
+                            
+                            {ORG_DATA[selectedOrgNode].dependencies && (
+                                <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-xl">
+                                    <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Componentes / Dependencias</h4>
+                                    <ul className="space-y-1">
+                                        {ORG_DATA[selectedOrgNode].dependencies.map((dep: string, idx: number) => (
+                                            <li key={idx} className="text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2">
+                                                <ChevronRight size={12} className="mt-0.5 text-brand-500"/> {dep}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         )}
 
-        {/* TAB 4: PROGRAMAS */}
+        {/* 5. ENFOQUES Y ESTRATEGIAS */}
+        {activeTab === 'approaches' && (
+            <div className="animate-fade-in">
+                <Card>
+                    <div className="flex gap-2 mb-6 border-b border-gray-100 dark:border-slate-700 pb-4">
+                        <button onClick={() => setEnfoqueSubTab('enfoques')} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${enfoqueSubTab === 'enfoques' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-slate-600'}`}>Enfoques Transversales</button>
+                        <button onClick={() => setEnfoqueSubTab('estrategias')} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${enfoqueSubTab === 'estrategias' ? 'bg-brand-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-slate-600'}`}>Estrategias</button>
+                    </div>
+
+                    {enfoqueSubTab === 'enfoques' ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                            {[
+                                {n:'01', t:'Enfoque de Derechos', d:'Sitúa a las personas como titulares de derechos.'},
+                                {n:'02', t:'Enfoque Territorial', d:'Ecosistema social, geográfico y cultural.'},
+                                {n:'03', t:'Enfoque Diferencial', d:'Respuestas adaptadas a barreras específicas.'},
+                                {n:'04', t:'Enfoque Étnico-Racial', d:'Protege la diversidad y supera el racismo.'},
+                                {n:'05', t:'Enfoque de Género', d:'Elimina desigualdades de mujeres y LGBTIQ+.'},
+                                {n:'06', t:'Enfoque Interseccional', d:'Reconoce múltiples ejes de discriminación.'},
+                                {n:'07', t:'Justicia Ambiental', d:'Respuesta justa a la crisis climática.'},
+                                {n:'08', t:'Curso de Vida', d:'Desarrollo humano como continuo.'}
+                            ].map(item => (
+                                <div key={item.n} className="text-center p-2">
+                                    <div className="w-12 h-12 rounded-full bg-brand-500 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-lg ring-4 ring-brand-50 dark:ring-brand-900">{item.n}</div>
+                                    <h3 className="font-bold text-brand-700 dark:text-brand-400 text-sm mb-1">{item.t}</h3>
+                                    <p className="text-xs text-slate-500">{item.d}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {[
+                                'Alianzas Público-Populares', 'Iniciativas Productivas', 'Infraestructura para Cerrar Brechas',
+                                'Espacios para la Juntanza', 'Cambio Cultural y Erradicación', 'Abordaje Psicosocial',
+                                'Transmisión de Saberes', 'Ecosistema Institucional', 'Gobernanza Interna',
+                                'Condiciones para Vida Digna', 'Restablecimiento de Derechos'
+                            ].map((e, i) => (
+                                <div key={i} className="p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-md transition-all">
+                                    <h3 className="font-bold text-slate-800 dark:text-white text-sm mb-1">{e}</h3>
+                                    <p className="text-xs text-slate-500">Estrategia transversal para el cierre de brechas.</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </Card>
+            </div>
+        )}
+
+        {/* 6. PROGRAMAS Y PROYECTOS */}
         {activeTab === 'programs' && (
             <div className="animate-fade-in">
-                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800 mb-4 flex gap-3">
-                     <FileText className="text-indigo-600 dark:text-indigo-400 shrink-0" />
-                     <div>
-                        <h4 className="font-bold text-indigo-900 dark:text-indigo-300 text-sm">Portafolio Programático</h4>
-                        <p className="text-indigo-800 dark:text-indigo-200 text-xs">24 programas estratégicos diseñados para cerrar brechas de desigualdad.</p>
-                     </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-3 h-96 overflow-y-auto pr-2">
-                    {[
-                        {n: "Hambre Cero", v: "Pobreza"}, {n: "Agua es Vida", v: "Pobreza"},
-                        {n: "Jóvenes en Paz", v: "Juventud"}, {n: "Casas de la Dignidad", v: "Mujeres"},
-                        {n: "Autonomía Económica", v: "Mujeres"}, {n: "Colombia sin Barreras", v: "Diversidades"},
-                        {n: "Herencia Viva (NARP)", v: "Étnicos"}, {n: "Saberes Ancestrales", v: "Étnicos"},
-                        {n: "Tierra Campesina", v: "Étnicos"}, {n: "Pactos Territoriales", v: "Pobreza"}
-                    ].map((p, i) => (
-                        <div key={i} className="p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-lg flex justify-between items-center group hover:border-brand-200 transition-colors">
-                            <span className="font-medium text-sm text-slate-700 dark:text-slate-300">{p.n}</span>
-                            <span className="text-[10px] uppercase font-bold text-slate-400 bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">{p.v}</span>
+                <Card title="Portafolio Programático (24)">
+                    
+                    {/* Toolbar */}
+                    <div className="flex flex-col md:flex-row gap-4 mb-6">
+                        <div className="flex-1 relative">
+                            <Search className="absolute left-3 top-3 text-slate-400" size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar por nombre, población..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 outline-none text-sm"
+                            />
                         </div>
-                    ))}
-                    <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg text-center text-xs text-slate-500 flex items-center justify-center italic">
-                        + 14 programas adicionales...
+                        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                            {['Todo', 'Mujeres', 'Juventud', 'Pobreza', 'Diversidades', 'Étnicos', 'Saberes'].map(f => (
+                                <button 
+                                    key={f} 
+                                    onClick={() => setActiveFilter(f)}
+                                    className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${activeFilter === f ? 'bg-brand-600 text-white border-brand-600' : 'bg-white dark:bg-slate-800 text-slate-600 border-gray-200 dark:border-slate-600 hover:bg-gray-50'}`}
+                                >
+                                    {f}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+
+                    {/* Results Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {filteredPrograms.length > 0 ? filteredPrograms.map(p => (
+                            <div key={p.id} className="border border-gray-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800 hover:border-brand-300 transition-all group">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-bold text-slate-800 dark:text-white">{p.nombre}</h3>
+                                    <span className="text-[10px] uppercase font-bold bg-gray-100 dark:bg-slate-700 text-slate-500 px-2 py-1 rounded">{p.viceministerio}</span>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{p.breve}</p>
+                                
+                                <details className="group/details">
+                                    <summary className="text-xs font-bold text-brand-600 cursor-pointer flex items-center gap-1">
+                                        Más información <ChevronDown size={12} className="group-open/details:rotate-180 transition-transform"/>
+                                    </summary>
+                                    <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg text-xs space-y-2 animate-fade-in">
+                                        <p><b>Población:</b> {p.poblacion}</p>
+                                        <p><b>Dependencia:</b> {p.dependencia}</p>
+                                        <p><b>Estrategia:</b> {p.estrategia}</p>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {p.tags.split(',').map(t => (
+                                                <span key={t} className="bg-white dark:bg-slate-600 px-1.5 py-0.5 rounded border border-gray-200 dark:border-slate-500 text-[10px] text-slate-500 dark:text-slate-300">#{t}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                        )) : (
+                            <div className="col-span-2 text-center py-12 text-slate-400">
+                                <Info className="mx-auto mb-2 opacity-50" size={32} />
+                                <p>No se encontraron programas.</p>
+                            </div>
+                        )}
+                    </div>
+                </Card>
             </div>
         )}
       </div>
 
-      <div className="mt-8 pt-8 border-t border-gray-100 dark:border-slate-700">
-        <Quiz 
-            questions={[
-                { id: 1, question: "¿Cuál ley creó el Ministerio de Igualdad y Equidad?", options: ["Ley 100", "Ley 2281 de 2023", "Ley 87 de 1993"], correctAnswer: 1 },
-                { id: 2, question: "¿Cuántos programas estratégicos conforman el portafolio actual?", options: ["10", "24", "32"], correctAnswer: 1 },
-                { id: 3, question: "¿Qué decreto define la estructura orgánica del Ministerio?", options: ["Decreto 1075 de 2023", "Decreto 1499", "Decreto 1600"], correctAnswer: 0 }
-            ]}
-            onComplete={onComplete}
-        />
-      </div>
+      {/* 7. EVALUACIÓN DE CONOCIMIENTOS (Distinct Tab) */}
+      {activeTab === 'quiz' && (
+          <div className="animate-fade-in">
+              <Quiz 
+                questions={[
+                    { id: 1, question: "¿Cuál ley creó el Ministerio de Igualdad y Equidad?", options: ["Ley 100", "Ley 2281 de 2023", "Ley 87 de 1993"], correctAnswer: 1 },
+                    { id: 2, question: "¿Cuántos programas estratégicos conforman el portafolio actual?", options: ["10", "24", "32"], correctAnswer: 1 },
+                    { id: 3, question: "¿Qué decreto define la estructura orgánica del Ministerio?", options: ["Decreto 1075 de 2023", "Decreto 1499", "Decreto 1600"], correctAnswer: 0 },
+                    { id: 4, question: "¿Quién ejerce la tercera línea de defensa en el MIPG?", options: ["Planeación", "Control Interno", "Talento Humano"], correctAnswer: 1 },
+                    { id: 5, question: "¿Cuál es el enfoque que protege la diversidad y supera el racismo?", options: ["Interseccional", "Étnico-Racial", "Territorial"], correctAnswer: 1 }
+                ]}
+                onComplete={onComplete}
+              />
+          </div>
+      )}
       
-      <FeedbackForm moduleName="Plataforma Estratégica" />
+      {activeTab !== 'quiz' && (
+          <FeedbackForm moduleName="Plataforma Estratégica" />
+      )}
     </div>
   );
 };
