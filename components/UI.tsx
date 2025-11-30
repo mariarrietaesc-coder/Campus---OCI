@@ -5,10 +5,9 @@ import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send }
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
   const textColor = whiteText ? 'text-white' : 'text-[#D23B78] dark:text-[#eb4884]'; 
   
-  // URL oficial del Escudo de Colombia (Wikimedia Commons - Alta calidad)
-  // NOTA PARA EL DESARROLLADOR: Si deseas usar un archivo local, sube tu imagen a la carpeta public/assets 
-  // y cambia esta línea por: const LOGO_URL = "/assets/escudo_colombia.png";
-  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
+  // CAMBIO: Ahora apunta a un archivo local. 
+  // Asegúrate de guardar tu imagen como "escudo.png" en la misma carpeta que el index.html
+  const LOGO_URL = "./escudo.png";
 
   if (variant === 'horizontal') {
       return (
@@ -18,6 +17,9 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
                     src={LOGO_URL} 
                     alt="Escudo de Colombia" 
                     className="w-full h-auto object-contain drop-shadow-sm"
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none'; // Ocultar si no se encuentra la imagen
+                    }}
                  />
             </div>
             <div className="h-10 w-[1px] bg-gray-300 dark:bg-slate-600"></div>
@@ -40,6 +42,10 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
             src={LOGO_URL} 
             alt="Escudo de Colombia" 
             className="w-24 h-auto mb-3 object-contain drop-shadow-sm"
+            onError={(e) => {
+                // Fallback visual si la imagen no está cargada aún
+                e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
+            }}
         />
         <div className={`text-6xl font-bold tracking-tight ${textColor} font-sans`}>
             Igualdad
