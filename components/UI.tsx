@@ -1,42 +1,81 @@
 import React, { useState } from 'react';
-import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send } from 'lucide-react';
+import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, Shield } from 'lucide-react';
 
-// --- Ministry Logo (Image Only Implementation) ---
+// --- Ministry Logo (Image Only Implementation with Smart Fallback) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
-  
-  // Apunta al archivo local escudo.png que has cargado en la raíz
-  const LOGO_URL = "./escudo.png";
+  const [useFallback, setUseFallback] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
+  // Local file (primary) - Asumimos que el usuario subirá este archivo
+  const LOCAL_URL = "./escudo.png";
+  // Remote backup (secondary) - Escudo oficial desde Wikipedia
+  const REMOTE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
+
+  const handleImgError = () => {
+      if (!useFallback) {
+          setUseFallback(true);
+      } else {
+          setHasError(true);
+      }
+  };
+
+  const currentSrc = useFallback ? REMOTE_URL : LOCAL_URL;
+  const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
+
+  // --- PLAN B: Fallback UI (Icon + Text) if images fail ---
+  if (hasError) {
+       if (variant === 'horizontal') {
+           return (
+               <div className={`flex items-center gap-3 ${className}`}>
+                   <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-600 border border-brand-200 dark:border-brand-800">
+                        <Shield size={20} />
+                   </div>
+                   <div className="flex flex-col justify-center leading-none">
+                        <span className={`font-bold text-lg tracking-tight ${textColor}`}>MinIgualdad</span>
+                        <span className="text-[10px] text-brand-600 dark:text-brand-400 font-bold uppercase tracking-wider">Control Interno</span>
+                   </div>
+               </div>
+           );
+       }
+       
+       // Vertical Fallback
+       return (
+           <div className={`flex flex-col items-center gap-4 ${className}`}>
+               <div className="w-24 h-24 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-slate-800 dark:to-slate-700 rounded-full flex items-center justify-center shadow-inner border border-brand-200 dark:border-slate-600">
+                    <Shield size={48} className="text-brand-600 dark:text-brand-400" />
+               </div>
+               <div className="text-center">
+                    <h1 className={`text-3xl font-extrabold tracking-tight ${textColor}`}>MinIgualdad</h1>
+                    <p className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest mt-2 border-t border-brand-200 dark:border-slate-700 pt-2 inline-block px-4">Oficina de Control Interno</p>
+               </div>
+           </div>
+       );
+  }
+
+  // --- PLAN A: Image (Local or Remote) ---
   if (variant === 'horizontal') {
       return (
         <div className={`flex items-center ${className}`}>
-            {/* Ajustamos la altura para que se vea bien en la barra de navegación */}
             <div className="h-12">
                  <img 
-                    src={LOGO_URL} 
+                    src={currentSrc} 
                     alt="Ministerio de Igualdad y Equidad" 
                     className="h-full w-auto object-contain"
-                    onError={(e) => {
-                        e.currentTarget.style.display = 'none'; 
-                    }}
+                    onError={handleImgError}
                  />
             </div>
         </div>
       );
   }
 
-  // Vertical Variant (Login, Sidebar, Certificate)
+  // Vertical Variant
   return (
     <div className={`flex flex-col items-center ${className}`}>
-        {/* Tamaño un poco más grande para las vistas principales */}
         <img 
-            src={LOGO_URL} 
+            src={currentSrc} 
             alt="Ministerio de Igualdad y Equidad" 
-            className="w-auto h-32 object-contain"
-            onError={(e) => {
-                // Fallback visual por si falla la carga local
-                e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
-            }}
+            className="w-auto h-32 object-contain drop-shadow-sm"
+            onError={handleImgError}
         />
     </div>
   );
