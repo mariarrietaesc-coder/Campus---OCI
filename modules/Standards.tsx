@@ -224,36 +224,41 @@ const InteractiveStandardsDiagram = ({ onSelect }: { onSelect: (idx: number) => 
     return (
         <div className="w-full max-w-[400px] mx-auto relative group">
             <svg viewBox="0 0 360 360" className="w-full h-auto overflow-visible drop-shadow-lg">
-                <defs>
-                    <path id="texto-cian-path" d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)} fill="none" />
-                    <path id="texto-externo-path" d={arcPath(radioAnilloExterno, -150 * rad, -30 * rad)} fill="none" />
-                </defs>
-
-                {/* Outer Rings */}
-                <circle cx="180" cy="180" r="205" fill="none" stroke="#3B82F6" strokeWidth="26" className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => onSelect(5)} />
-                <text className="pointer-events-none fill-white text-[14px] font-bold tracking-widest uppercase" dy="5">
-                    <textPath href="#texto-externo-path" startOffset="50%" textAnchor="middle">Orientación Global</textPath>
-                </text>
-
-                {/* Thematic Requirements Segment (Cyan/Teal) */}
-                <path 
-                    d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)}
-                    fill="none" stroke="#28a9d9" strokeWidth="26" 
-                    className="cursor-pointer hover:scale-105 transition-transform origin-center"
-                    onClick={() => onSelect(6)}
-                />
-                <text className="pointer-events-none fill-white text-[14px] font-bold tracking-widest uppercase" dy="5">
-                    <textPath href="#texto-cian-path" startOffset="50%" textAnchor="middle">Requisitos Temáticos</textPath>
-                </text>
-
-                {/* Inner Green Ring Base */}
-                <path 
-                    d={arcPath(radioAnilloVerde, (startOffset + 0 * full + outerGapDeg / 2) * rad, (startOffset + 3 * full + outerGapDeg / 2 + span) * rad)}
-                    fill="none" stroke="#A9D34A" strokeWidth="26" className="pointer-events-none"
-                />
-
-                {/* Segments */}
+                {/* 
+                   Correction: All SVG content is now wrapped in the main transformation group (180,180).
+                   This ensures that paths generated with arcPath (which assumes 0,0 center) are correctly positioned.
+                   Outer elements like circles now use cx=0 cy=0 relative to this group.
+                */}
                 <g transform="translate(180,180)">
+                    <defs>
+                        <path id="texto-cian-path" d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)} fill="none" />
+                        <path id="texto-externo-path" d={arcPath(radioAnilloExterno, -150 * rad, -30 * rad)} fill="none" />
+                    </defs>
+
+                    {/* Outer Rings - Now centered at 0,0 relative to group */}
+                    <circle cx="0" cy="0" r="205" fill="none" stroke="#3B82F6" strokeWidth="26" className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => onSelect(5)} />
+                    <text className="pointer-events-none fill-white text-[14px] font-bold tracking-widest uppercase" dy="5">
+                        <textPath href="#texto-externo-path" startOffset="50%" textAnchor="middle">Orientación Global</textPath>
+                    </text>
+
+                    {/* Thematic Requirements Segment (Cyan/Teal) */}
+                    <path 
+                        d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)}
+                        fill="none" stroke="#28a9d9" strokeWidth="26" 
+                        className="cursor-pointer hover:scale-105 transition-transform origin-center"
+                        onClick={() => onSelect(6)}
+                    />
+                    <text className="pointer-events-none fill-white text-[14px] font-bold tracking-widest uppercase" dy="5">
+                        <textPath href="#texto-cian-path" startOffset="50%" textAnchor="middle">Requisitos Temáticos</textPath>
+                    </text>
+
+                    {/* Inner Green Ring Base */}
+                    <path 
+                        d={arcPath(radioAnilloVerde, (startOffset + 0 * full + outerGapDeg / 2) * rad, (startOffset + 3 * full + outerGapDeg / 2 + span) * rad)}
+                        fill="none" stroke="#A9D34A" strokeWidth="26" className="pointer-events-none"
+                    />
+
+                    {/* Segments */}
                     {SEGMENTS_DATA.map((seg, i) => {
                         const startDeg = startOffset + i * full + gapDeg / 2;
                         const endDeg = startOffset + i * full + gapDeg / 2 + span;
