@@ -17,8 +17,8 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto print:p-0 print:bg-white print:static">
-      <div className="relative bg-white shadow-2xl rounded-xl max-w-4xl w-full overflow-hidden print:shadow-none print:rounded-none print:w-full print:max-w-none">
+    <div id="certificate-view" className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto print:p-0 print:bg-white print:static">
+      <div className="relative bg-white shadow-2xl rounded-xl max-w-4xl w-full overflow-hidden print:shadow-none print:rounded-none print:w-full print:max-w-none print:border-none">
         
         {/* Toolbar (Hidden when printing) */}
         <div className="bg-slate-100 p-4 flex justify-between items-center border-b border-gray-200 print:hidden">
@@ -34,7 +34,7 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
         </div>
 
         {/* Certificate Content */}
-        <div ref={printRef} className="p-12 md:p-16 text-center relative bg-white min-h-[600px] flex flex-col justify-between border-[12px] border-double border-brand-50 print:border-none print:p-0">
+        <div ref={printRef} className="p-12 md:p-16 text-center relative bg-white min-h-[600px] flex flex-col justify-between border-[12px] border-double border-brand-50 print:border-4 print:border-brand-500 print:h-screen print:flex print:flex-col print:justify-between">
             
             {/* Background Watermark */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
@@ -73,7 +73,7 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
             </div>
 
             {/* Signature Area */}
-            <div className="mt-16 flex flex-col items-center relative z-10">
+            <div className="mt-16 flex flex-col items-center relative z-10 page-break-inside-avoid">
                 <div className="w-64 border-b border-slate-400 mb-4"></div>
                 <p className="font-bold text-slate-900 text-lg">RAÚL GONZÁLEZ</p>
                 <p className="text-slate-600 text-sm uppercase">Jefe de la Oficina de Control Interno</p>
@@ -90,30 +90,36 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
       {/* Print Styles Injection */}
       <style>{`
         @media print {
-            body * { visibility: hidden; }
-            #root { display: none; }
-            .print\\:hidden { display: none !important; }
-            .print\\:p-0 { padding: 0 !important; }
-            .print\\:bg-white { background: white !important; }
-            .print\\:static { position: static !important; }
-            .print\\:shadow-none { box-shadow: none !important; }
-            .print\\:rounded-none { border-radius: 0 !important; }
-            .print\\:w-full { width: 100% !important; }
-            .print\\:max-w-none { max-width: none !important; }
-            .print\\:border-none { border: none !important; }
-            
-            /* Target the specific certificate content to show */
-            .fixed.inset-0.z-\\[100\\] { 
-                visibility: visible !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background: white !important;
-                display: block !important;
+            body * {
+                visibility: hidden;
             }
-            .fixed.inset-0.z-\\[100\\] * { visibility: visible !important; }
+            #certificate-view, #certificate-view * {
+                visibility: visible;
+            }
+            #certificate-view {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: white;
+                z-index: 9999;
+            }
+            #certificate-view > div {
+                box-shadow: none;
+                max-width: none;
+                width: 100%;
+                border-radius: 0;
+            }
+            .print\\:hidden {
+                display: none !important;
+            }
+            @page {
+                size: landscape;
+                margin: 0;
+            }
         }
       `}</style>
     </div>
