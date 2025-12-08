@@ -4,8 +4,9 @@ import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, 
 // --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
   
-  // Usamos la URL directa (Raw) del repositorio para asegurar que la imagen cargue siempre
-  const LOGO_URL = "https://raw.githubusercontent.com/mariarrietaesc-coder/Campus---OCI/main/escudo.png";
+  // SOLUCIÓN: Usamos el enlace oficial de Wikimedia Commons.
+  // Esto evita los problemas de que el archivo desaparezca de tu repositorio GitHub.
+  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/300px-Escudo_de_Colombia.svg.png";
 
   const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
   const brandColor = whiteText ? 'text-white' : 'text-brand-600 dark:text-brand-400';
