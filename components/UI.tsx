@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, Shield } from 'lucide-react';
+import { ESCUDO_BASE64 } from './LogoData';
 
 // --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
@@ -13,7 +14,7 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
       return (
         <div className={`flex items-center gap-3 ${className}`}>
             <img 
-                src="/assets/escudo.png" 
+                src={ESCUDO_BASE64} 
                 alt="Escudo de Colombia" 
                 className="h-14 w-auto object-contain drop-shadow-sm filter"
                 style={{ minWidth: '40px' }}
@@ -32,7 +33,7 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
         <img 
-            src="/assets/escudo.png" 
+            src={ESCUDO_BASE64} 
             alt="Ministerio de Igualdad y Equidad" 
             className="h-44 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
         />
