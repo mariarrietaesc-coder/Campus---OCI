@@ -4,8 +4,9 @@ import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, 
 // --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
   
-  // Official Coat of Arms of Colombia
-  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/300px-Escudo_de_Colombia.svg.png";
+  // Use the local file uploaded by the user. 
+  // Assuming the file is in the public root as per the file list provided.
+  const LOGO_URL = "/escudo.png";
 
   const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
   const brandColor = whiteText ? 'text-white' : 'text-brand-600 dark:text-brand-400';
@@ -18,12 +19,12 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
             <img 
                 src={LOGO_URL} 
                 alt="Escudo de Colombia" 
-                className="h-10 w-auto object-contain drop-shadow-sm"
+                className="h-12 w-auto object-contain drop-shadow-sm"
             />
-            <div className={`h-8 w-px ${borderColor} mx-0.5`}></div>
+            <div className={`h-10 w-px ${borderColor} mx-1`}></div>
             <div className="flex flex-col justify-center leading-none">
                  <span className={`font-serif font-bold text-[10px] uppercase tracking-wider ${textColor} opacity-80 mb-0.5`}>República de Colombia</span>
-                 <span className={`font-sans font-black text-sm uppercase tracking-tight leading-none ${brandColor}`}>Ministerio de<br/>Igualdad y Equidad</span>
+                 <span className={`font-sans font-black text-xs sm:text-sm uppercase tracking-tight leading-none ${brandColor}`}>Ministerio de<br/>Igualdad y Equidad</span>
             </div>
         </div>
       );
@@ -31,18 +32,18 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
 
   // --- Vertical Layout (Login / Certificate) ---
   return (
-    <div className={`flex flex-col items-center text-center gap-4 ${className}`}>
+    <div className={`flex flex-col items-center text-center gap-5 ${className}`}>
         <img 
             src={LOGO_URL} 
             alt="Escudo de Colombia" 
-            className="h-24 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+            className="h-28 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
         />
         <div className="flex flex-col items-center leading-tight">
              <span className={`font-serif font-bold text-sm uppercase tracking-[0.2em] ${textColor} mb-2`}>República de Colombia</span>
              <h1 className={`font-sans font-black text-2xl uppercase tracking-wide leading-none ${brandColor}`}>
                 Ministerio de<br/>Igualdad y Equidad
              </h1>
-             <div className="w-16 h-1 bg-brand-500 rounded-full mt-3"></div>
+             <div className="w-16 h-1 bg-brand-500 rounded-full mt-4"></div>
         </div>
     </div>
   );
