@@ -4,9 +4,8 @@ import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, 
 // --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
   
-  // SOLUCIÓN: Usamos la URL "Raw" directa. 
-  // IMPORTANTE: El repositorio GitHub DEBE SER PÚBLICO para que esto funcione.
-  const LOGO_URL = "https://raw.githubusercontent.com/mariarrietaesc-coder/Campus---OCI/main/escudo.png";
+  // SOLUCIÓN: Usamos la URL "Raw" directa de la nueva ubicación.
+  const LOGO_URL = "https://raw.githubusercontent.com/mariarrietaesc-coder/Campus---OCI/main/public/images/escudo.png";
 
   const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
   const brandColor = whiteText ? 'text-white' : 'text-brand-600 dark:text-brand-400';
