@@ -5,10 +5,6 @@ import { ESCUDO_BASE64 } from './LogoData';
 
 // --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
-  const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
-  const brandColor = whiteText ? 'text-white' : 'text-brand-600 dark:text-brand-400';
-  const borderColor = whiteText ? 'bg-white/30' : 'bg-slate-300 dark:bg-slate-600';
-
   // --- Horizontal Layout (Sidebar / Header) ---
   if (variant === 'horizontal') {
       return (
@@ -19,17 +15,11 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
                 className="h-14 w-auto object-contain drop-shadow-sm filter"
                 style={{ minWidth: '40px' }}
             />
-            <div className={`h-10 w-px ${borderColor} mx-1`}></div>
-            <div className="flex flex-col justify-center leading-none">
-                 <span className={`font-serif font-bold text-[10px] uppercase tracking-wider ${textColor} opacity-80 mb-0.5`}>República de Colombia</span>
-                 <span className={`font-sans font-black text-xs sm:text-sm uppercase tracking-tight leading-none ${brandColor}`}>Ministerio de<br/>Igualdad y Equidad</span>
-            </div>
         </div>
       );
   }
 
   // --- Vertical Layout (Login / Certificate) ---
-  // Diseño oficial centrado con escudo grande
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
         <img 
@@ -37,12 +27,6 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
             alt="Ministerio de Igualdad y Equidad" 
             className="h-44 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
         />
-        <div className="mt-6 text-center">
-            <p className="font-serif font-bold text-xs tracking-[0.2em] text-slate-500 uppercase mb-1">República de Colombia</p>
-            <h1 className="font-sans font-black text-2xl uppercase tracking-tight text-brand-600 dark:text-brand-400 leading-none">
-                Ministerio de<br/>Igualdad y Equidad
-            </h1>
-        </div>
     </div>
   );
 };

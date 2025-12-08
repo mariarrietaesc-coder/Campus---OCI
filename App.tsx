@@ -196,9 +196,9 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                 
                 {/* Title Section */}
                 <div className="text-center mb-10">
-                    <h2 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">Campus Virtual OCI</h2>
+                    <h2 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">Campus Virtual Oficina de Control Interno</h2>
                     <div className="h-1 w-12 bg-brand-500 mx-auto rounded-full mb-2"></div>
-                    <p className="text-slate-500 text-sm font-medium">Plataforma de Formación y Control</p>
+                    <p className="text-slate-500 text-sm font-medium">Plataforma de Sensibilización</p>
                 </div>
 
                 {/* Form Section */}
