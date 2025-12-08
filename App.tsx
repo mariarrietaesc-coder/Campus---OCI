@@ -155,33 +155,41 @@ const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }
 
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100">
-                <div className="mb-8 flex justify-center">
+            <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-100">
+                
+                {/* Logo Section */}
+                <div className="mb-6 flex justify-center">
                     <MinistryLogo variant="vertical" />
                 </div>
                 
-                <h2 className="text-xl font-bold text-center text-slate-900 mb-1">Campus Virtual OCI</h2>
-                <p className="text-center text-slate-500 text-sm mb-8">Plataforma de Formación y Control</p>
+                {/* Title Section */}
+                <div className="text-center mb-10">
+                    <h2 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">Campus Virtual OCI</h2>
+                    <div className="h-1 w-12 bg-brand-500 mx-auto rounded-full mb-2"></div>
+                    <p className="text-slate-500 text-sm font-medium">Plataforma de Formación y Control</p>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Form Section */}
+                <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Nombre Completo</label>
-                        <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. Juan Pérez" />
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Nombre Completo</label>
+                        <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" placeholder="Ej. Juan Pérez" />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Cargo / Rol</label>
-                        <input type="text" required value={role} onChange={e => setRole(e.target.value)} className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Ej. Auditor Junior" />
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Cargo / Rol</label>
+                        <input type="text" required value={role} onChange={e => setRole(e.target.value)} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" placeholder="Ej. Auditor Junior" />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Correo Institucional</label>
-                        <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="usuario@minigualdad.gov.co" />
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Correo Institucional</label>
+                        <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" placeholder="usuario@minigualdad.gov.co" />
                     </div>
-                    <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-colors mt-4 shadow-lg shadow-brand-200">
+                    <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl shadow-brand-200 mt-2">
                         Ingresar al Campus
                     </button>
                 </form>
-                <p className="text-xs text-center text-slate-400 mt-6">
-                    Sus datos se borrarán automáticamente al cerrar el navegador (Modo Seguro).
+                <p className="text-[10px] text-center text-slate-400 mt-8 leading-tight">
+                    Acceso exclusivo para funcionarios de la OCI.<br/>
+                    Sus datos se borrarán automáticamente al cerrar el navegador.
                 </p>
             </div>
         </div>

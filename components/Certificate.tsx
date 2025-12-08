@@ -75,14 +75,14 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
             {/* Signature Area */}
             <div className="mt-16 flex flex-col items-center relative z-10 page-break-inside-avoid">
                 <div className="w-64 border-b border-slate-400 mb-4"></div>
-                <p className="font-bold text-slate-900 text-lg">RAÚL GONZÁLEZ</p>
+                <p className="font-bold text-slate-900 text-lg">RAÚL EDUARDO GONZÁLEZ GARZÓN</p>
                 <p className="text-slate-600 text-sm uppercase">Jefe de la Oficina de Control Interno</p>
                 <p className="text-slate-500 text-xs mt-1">Ministerio de Igualdad y Equidad</p>
             </div>
 
             {/* Footer */}
             <div className="mt-12 text-[10px] text-slate-400 uppercase tracking-widest">
-                Documento generado electrónicamente a través del Campus Virtual OCI
+                Documento generado electrónicamente a través del Campus Virtual Oficina de Control Interno
             </div>
         </div>
       </div>

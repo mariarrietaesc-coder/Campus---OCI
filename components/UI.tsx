@@ -31,20 +31,15 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
   }
 
   // --- Vertical Layout (Login / Certificate) ---
+  // MODIFICADO: Se eliminó el texto redundante "República de Colombia / Ministerio..."
+  // Ahora solo muestra el logo (Imagen), asumiendo que la imagen ya contiene la marca "Igualdad".
   return (
-    <div className={`flex flex-col items-center text-center gap-5 ${className}`}>
+    <div className={`flex flex-col items-center justify-center ${className}`}>
         <img 
             src={LOGO_URL} 
-            alt="Escudo de Colombia" 
-            className="h-28 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+            alt="Ministerio de Igualdad y Equidad" 
+            className="h-40 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500"
         />
-        <div className="flex flex-col items-center leading-tight">
-             <span className={`font-serif font-bold text-sm uppercase tracking-[0.2em] ${textColor} mb-2`}>República de Colombia</span>
-             <h1 className={`font-sans font-black text-2xl uppercase tracking-wide leading-none ${brandColor}`}>
-                Ministerio de<br/>Igualdad y Equidad
-             </h1>
-             <div className="w-16 h-1 bg-brand-500 rounded-full mt-4"></div>
-        </div>
     </div>
   );
 };
