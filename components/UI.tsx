@@ -13,7 +13,7 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
       return (
         <div className={`flex items-center gap-3 ${className}`}>
             <img 
-                src="/assets/escudo_colombia.png" 
+                src="/assets/escudo.png" 
                 alt="Escudo de Colombia" 
                 className="h-14 w-auto object-contain drop-shadow-sm filter"
                 style={{ minWidth: '40px' }}
@@ -32,7 +32,7 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
         <img 
-            src="/assets/escudo_colombia.png" 
+            src="/assets/escudo.png" 
             alt="Ministerio de Igualdad y Equidad" 
             className="h-44 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
         />
