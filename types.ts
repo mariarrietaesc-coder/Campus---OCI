@@ -1,9 +1,14 @@
+
 export type ModuleId = 'dashboard' | 'strategic' | 'mipg' | 'competencies' | 'standards' | 'forensic' | 'library' | 'assistant' | 'tools';
 
 export interface User {
+  id: string; // Email is used as ID usually, but good to have unique key
   name: string;
-  role: string;
+  role: string; // Cargo shown in certificate
   email: string;
+  isAdmin?: boolean;
+  isActive: boolean;
+  password?: string; // Optional for simple email-only auth, but good for structure
 }
 
 export interface ModuleConfig {

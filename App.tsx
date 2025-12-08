@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { StrategicModule } from './modules/Strategic';
@@ -7,10 +8,12 @@ import { ForensicModule } from './modules/Forensic';
 import { AssistantModule } from './modules/Assistant';
 import { LibraryModule } from './modules/Library';
 import { ToolsModule } from './modules/Tools';
+import { AdminModule } from './modules/Admin'; // NEW
 import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
-import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2 } from 'lucide-react';
+import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2, Lock, AlertCircle } from 'lucide-react';
+import { UserStore } from './data/store'; // NEW
 
 const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
     <div className="p-8 text-center">
@@ -26,7 +29,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   
-  // Default empty state
+  // Default empty state (fallback)
   const emptyProgress: ProgressMap = {
     dashboard: { completed: true, score: 0 },
     strategic: { completed: false, score: 0 },
@@ -41,14 +44,19 @@ function App() {
 
   const [progress, setProgress] = useState<ProgressMap>(emptyProgress);
 
-  // Load user and progress from SESSION storage (clears on browser close)
+  // Initialize Store and Check Session
   useEffect(() => {
-    // CAMBIO: Usamos sessionStorage en lugar de localStorage
-    const savedUser = sessionStorage.getItem('oci_user');
-    const savedProgress = sessionStorage.getItem('oci_progress');
+    UserStore.init(); // Initialize Mock DB
     
-    if (savedUser) setUser(JSON.parse(savedUser));
-    if (savedProgress) setProgress(JSON.parse(savedProgress));
+    // Check if user is already logged in session
+    const savedUserStr = sessionStorage.getItem('oci_user');
+    if (savedUserStr) {
+        const savedUser = JSON.parse(savedUserStr);
+        setUser(savedUser);
+        // Load progress specific to this user email
+        const userProgress = UserStore.getProgress(savedUser.email);
+        setProgress(userProgress);
+    }
   }, []);
 
   // Theme Toggle Effect
@@ -60,38 +68,49 @@ function App() {
     }
   }, [darkMode]);
 
-  const handleLogin = (name: string, role: string, email: string) => {
-    const newUser = { name, role, email };
-    setUser(newUser);
-    sessionStorage.setItem('oci_user', JSON.stringify(newUser));
+  const handleLogin = (user: User) => {
+    setUser(user);
+    // Load their specific progress
+    const userProgress = UserStore.getProgress(user.email);
+    setProgress(userProgress);
+    sessionStorage.setItem('oci_user', JSON.stringify(user));
   };
 
   const handleLogout = () => {
     setUser(null);
     sessionStorage.removeItem('oci_user');
-    // Optional: Clear progress on logout too if desired, currently sticking to session rule
     setCurrentModule('dashboard');
+    setProgress(emptyProgress);
   };
 
   const handleModuleComplete = (moduleId: ModuleId, score: number) => {
+    if (!user) return;
     const newProgress = { ...progress, [moduleId]: { completed: true, score } };
     setProgress(newProgress);
-    sessionStorage.setItem('oci_progress', JSON.stringify(newProgress));
+    // Save to permanent storage
+    UserStore.saveProgress(user.email, newProgress);
   };
 
   const handleResetProgress = () => {
+    if(!user) return;
     if(confirm('¿Estás seguro de reiniciar todo el progreso? Esto borrará tus avances actuales.')) {
         setProgress(emptyProgress);
-        sessionStorage.setItem('oci_progress', JSON.stringify(emptyProgress));
+        UserStore.saveProgress(user.email, emptyProgress);
     }
   };
 
   const toggleTheme = () => setDarkMode(!darkMode);
 
   if (!user) {
-    return <LoginView onLogin={handleLogin} />;
+    return <LoginView onLoginSuccess={handleLogin} />;
   }
 
+  // --- ADMIN ROUTE ---
+  if (user.isAdmin) {
+      return <AdminModule onLogout={handleLogout} currentUser={user} />;
+  }
+
+  // --- STUDENT ROUTE ---
   const renderModule = () => {
     switch (currentModule) {
       case 'dashboard':
@@ -142,20 +161,33 @@ function App() {
   );
 }
 
-// --- Login View ---
-const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }> = ({ onLogin }) => {
-    const [name, setName] = useState('');
-    const [role, setRole] = useState('');
+// --- Login View (Updated for Auth) ---
+const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
+    const [error, setError] = useState('');
+    const [isChecking, setIsChecking] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (name && role && email) onLogin(name, role, email);
+        setError('');
+        setIsChecking(true);
+
+        // Simple delay to simulate check
+        setTimeout(() => {
+            const result = UserStore.authenticate(email);
+            setIsChecking(false);
+            
+            if (result.success && result.user) {
+                onLoginSuccess(result.user);
+            } else {
+                setError(result.message || 'Error de autenticación');
+            }
+        }, 600);
     };
 
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-100">
+            <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-100 relative overflow-hidden">
                 
                 {/* Logo Section */}
                 <div className="mb-6 flex justify-center">
@@ -170,27 +202,51 @@ const LoginView: React.FC<{ onLogin: (n: string, r: string, e: string) => void }
                 </div>
 
                 {/* Form Section */}
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Nombre Completo</label>
-                        <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" placeholder="Ej. Juan Pérez" />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Cargo / Rol</label>
-                        <input type="text" required value={role} onChange={e => setRole(e.target.value)} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" placeholder="Ej. Auditor Junior" />
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Correo Institucional</label>
-                        <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" placeholder="usuario@minigualdad.gov.co" />
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-3.5 text-slate-400" size={18} />
+                            <input 
+                                type="email" 
+                                required 
+                                value={email} 
+                                onChange={e => setEmail(e.target.value)} 
+                                className="w-full pl-10 pr-3.5 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" 
+                                placeholder="usuario@minigualdad.gov.co" 
+                            />
+                        </div>
                     </div>
-                    <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl shadow-brand-200 mt-2">
-                        Ingresar al Campus
+                    
+                    {error && (
+                        <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 p-3 rounded-lg border border-red-100 animate-fade-in">
+                            <AlertCircle size={16} /> {error}
+                        </div>
+                    )}
+
+                    <button 
+                        type="submit" 
+                        disabled={isChecking}
+                        className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-slate-400 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl shadow-brand-200 mt-2"
+                    >
+                        {isChecking ? 'Verificando...' : 'Ingresar al Campus'}
                     </button>
                 </form>
-                <p className="text-[10px] text-center text-slate-400 mt-8 leading-tight">
-                    Acceso exclusivo para funcionarios de la OCI.<br/>
-                    Sus datos se borrarán automáticamente al cerrar el navegador.
-                </p>
+
+                <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <p className="text-[10px] text-slate-400 leading-tight mb-4">
+                        Acceso restringido únicamente a correos autorizados.<br/>
+                        Si no tiene acceso, contacte al Administrador del Sistema.
+                    </p>
+                    
+                    {/* HINT FOR DEMO PURPOSES */}
+                    <div className="inline-block text-left bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] text-slate-500 mx-auto">
+                        <p className="font-bold text-slate-600 mb-1">Correos habilitados (Demo):</p>
+                        <p className="font-mono">admin@minigualdad.gov.co</p>
+                        <p className="font-mono">jefe.oci@minigualdad.gov.co</p>
+                        <p className="font-mono">funcionario@minigualdad.gov.co</p>
+                    </div>
+                </div>
             </div>
         </div>
     );

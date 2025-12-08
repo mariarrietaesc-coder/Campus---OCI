@@ -1,12 +1,9 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, Shield } from 'lucide-react';
 
 // --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
-  
-  // SOLUCIÓN: Usamos la URL "Raw" directa de la nueva ubicación.
-  const LOGO_URL = "https://raw.githubusercontent.com/mariarrietaesc-coder/Campus---OCI/main/public/images/escudo.png";
-
   const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
   const brandColor = whiteText ? 'text-white' : 'text-brand-600 dark:text-brand-400';
   const borderColor = whiteText ? 'bg-white/30' : 'bg-slate-300 dark:bg-slate-600';
@@ -16,9 +13,10 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
       return (
         <div className={`flex items-center gap-3 ${className}`}>
             <img 
-                src={LOGO_URL} 
+                src="/assets/escudo_colombia.png" 
                 alt="Escudo de Colombia" 
-                className="h-12 w-auto object-contain drop-shadow-sm"
+                className="h-14 w-auto object-contain drop-shadow-sm filter"
+                style={{ minWidth: '40px' }}
             />
             <div className={`h-10 w-px ${borderColor} mx-1`}></div>
             <div className="flex flex-col justify-center leading-none">
@@ -30,22 +28,27 @@ export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' |
   }
 
   // --- Vertical Layout (Login / Certificate) ---
-  // MODIFICADO: Se eliminó el texto redundante "República de Colombia / Ministerio..."
-  // Ahora solo muestra el logo (Imagen), asumiendo que la imagen ya contiene la marca "Igualdad".
+  // Diseño oficial centrado con escudo grande
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
         <img 
-            src={LOGO_URL} 
+            src="/assets/escudo_colombia.png" 
             alt="Ministerio de Igualdad y Equidad" 
-            className="h-40 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500"
+            className="h-44 w-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
         />
+        <div className="mt-6 text-center">
+            <p className="font-serif font-bold text-xs tracking-[0.2em] text-slate-500 uppercase mb-1">República de Colombia</p>
+            <h1 className="font-sans font-black text-2xl uppercase tracking-tight text-brand-600 dark:text-brand-400 leading-none">
+                Ministerio de<br/>Igualdad y Equidad
+            </h1>
+        </div>
     </div>
   );
 };
 
 // --- Card ---
-export const Card: React.FC<{ children: React.ReactNode; className?: string; title?: string }> = ({ children, className = "", title }) => (
-  <div className={`bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-brand-100 dark:border-slate-700 p-6 ${className}`}>
+export const Card: React.FC<{ children: React.ReactNode; className?: string; title?: string; onClick?: () => void }> = ({ children, className = "", title, onClick }) => (
+  <div onClick={onClick} className={`bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-brand-100 dark:border-slate-700 p-6 ${className}`}>
     {title && <h3 className="text-xl font-bold text-brand-700 dark:text-brand-400 mb-4">{title}</h3>}
     {children}
   </div>
