@@ -1,82 +1,49 @@
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, MessageCircle, Send, Shield } from 'lucide-react';
 
-// --- Ministry Logo (Image Only Implementation with Smart Fallback) ---
+// --- Ministry Logo (Official Government Layout) ---
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
-  const [useFallback, setUseFallback] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  
+  // Official Coat of Arms of Colombia
+  const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/300px-Escudo_de_Colombia.svg.png";
 
-  // Local file (primary) - Asumimos que el usuario subirá este archivo
-  const LOCAL_URL = "./escudo.png";
-  // Remote backup (secondary) - Escudo oficial desde Wikipedia
-  const REMOTE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Escudo_de_Colombia.svg/200px-Escudo_de_Colombia.svg.png";
-
-  const handleImgError = () => {
-      if (!useFallback) {
-          setUseFallback(true);
-      } else {
-          setHasError(true);
-      }
-  };
-
-  const currentSrc = useFallback ? REMOTE_URL : LOCAL_URL;
   const textColor = whiteText ? 'text-white' : 'text-slate-900 dark:text-white';
+  const brandColor = whiteText ? 'text-white' : 'text-brand-600 dark:text-brand-400';
+  const borderColor = whiteText ? 'bg-white/30' : 'bg-slate-300 dark:bg-slate-600';
 
-  // --- PLAN B: Fallback UI (Icon + Text) if images fail ---
-  if (hasError) {
-       if (variant === 'horizontal') {
-           return (
-               <div className={`flex items-center gap-3 ${className}`}>
-                   <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-600 border border-brand-200 dark:border-brand-800">
-                        <Shield size={20} />
-                   </div>
-                   <div className="flex flex-col justify-center leading-none">
-                        <span className={`font-bold text-lg tracking-tight ${textColor}`}>MinIgualdad</span>
-                        <span className="text-[10px] text-brand-600 dark:text-brand-400 font-bold uppercase tracking-wider">Control Interno</span>
-                   </div>
-               </div>
-           );
-       }
-       
-       // Vertical Fallback
-       return (
-           <div className={`flex flex-col items-center gap-4 ${className}`}>
-               <div className="w-24 h-24 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-slate-800 dark:to-slate-700 rounded-full flex items-center justify-center shadow-inner border border-brand-200 dark:border-slate-600">
-                    <Shield size={48} className="text-brand-600 dark:text-brand-400" />
-               </div>
-               <div className="text-center">
-                    <h1 className={`text-3xl font-extrabold tracking-tight ${textColor}`}>MinIgualdad</h1>
-                    <p className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest mt-2 border-t border-brand-200 dark:border-slate-700 pt-2 inline-block px-4">Oficina de Control Interno</p>
-               </div>
-           </div>
-       );
-  }
-
-  // --- PLAN A: Image (Local or Remote) ---
+  // --- Horizontal Layout (Sidebar / Header) ---
   if (variant === 'horizontal') {
       return (
-        <div className={`flex items-center ${className}`}>
-            <div className="h-12">
-                 <img 
-                    src={currentSrc} 
-                    alt="Ministerio de Igualdad y Equidad" 
-                    className="h-full w-auto object-contain"
-                    onError={handleImgError}
-                 />
+        <div className={`flex items-center gap-3 ${className}`}>
+            <img 
+                src={LOGO_URL} 
+                alt="Escudo de Colombia" 
+                className="h-10 w-auto object-contain drop-shadow-sm"
+            />
+            <div className={`h-8 w-px ${borderColor} mx-0.5`}></div>
+            <div className="flex flex-col justify-center leading-none">
+                 <span className={`font-serif font-bold text-[10px] uppercase tracking-wider ${textColor} opacity-80 mb-0.5`}>República de Colombia</span>
+                 <span className={`font-sans font-black text-sm uppercase tracking-tight leading-none ${brandColor}`}>Ministerio de<br/>Igualdad y Equidad</span>
             </div>
         </div>
       );
   }
 
-  // Vertical Variant
+  // --- Vertical Layout (Login / Certificate) ---
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`flex flex-col items-center text-center gap-4 ${className}`}>
         <img 
-            src={currentSrc} 
-            alt="Ministerio de Igualdad y Equidad" 
-            className="w-auto h-32 object-contain drop-shadow-sm"
-            onError={handleImgError}
+            src={LOGO_URL} 
+            alt="Escudo de Colombia" 
+            className="h-24 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
         />
+        <div className="flex flex-col items-center leading-tight">
+             <span className={`font-serif font-bold text-sm uppercase tracking-[0.2em] ${textColor} mb-2`}>República de Colombia</span>
+             <h1 className={`font-sans font-black text-2xl uppercase tracking-wide leading-none ${brandColor}`}>
+                Ministerio de<br/>Igualdad y Equidad
+             </h1>
+             <div className="w-16 h-1 bg-brand-500 rounded-full mt-3"></div>
+        </div>
     </div>
   );
 };
@@ -126,7 +93,7 @@ export const Accordion: React.FC<{ title: string; children: React.ReactNode; def
   );
 };
 
-// --- Feedback Form (REMOVED as requested to save space) ---
+// --- Feedback Form (Placeholder) ---
 export const FeedbackForm: React.FC<{ moduleName: string }> = ({ moduleName }) => {
     return null; 
 };
