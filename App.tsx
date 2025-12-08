@@ -12,7 +12,7 @@ import { AdminModule } from './modules/Admin'; // NEW
 import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
-import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2, Lock, AlertCircle } from 'lucide-react';
+import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { UserStore } from './data/store'; // NEW
 
 const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
@@ -164,6 +164,8 @@ function App() {
 // --- Login View (Updated for Auth) ---
 const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isChecking, setIsChecking] = useState(false);
 
@@ -174,7 +176,7 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
 
         // Simple delay to simulate check
         setTimeout(() => {
-            const result = UserStore.authenticate(email);
+            const result = UserStore.authenticate(email, password);
             setIsChecking(false);
             
             if (result.success && result.user) {
@@ -217,6 +219,28 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                             />
                         </div>
                     </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Contraseña (Identificación)</label>
+                        <div className="relative">
+                            <ShieldCheck className="absolute left-3 top-3.5 text-slate-400" size={18} />
+                            <input 
+                                type={showPassword ? "text" : "password"}
+                                required 
+                                value={password} 
+                                onChange={e => setPassword(e.target.value)} 
+                                className="w-full pl-10 pr-10 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" 
+                                placeholder="Número de documento" 
+                            />
+                            <button 
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
                     
                     {error && (
                         <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 p-3 rounded-lg border border-red-100 animate-fade-in">
@@ -235,16 +259,15 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
 
                 <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                     <p className="text-[10px] text-slate-400 leading-tight mb-4">
-                        Acceso restringido únicamente a correos autorizados.<br/>
-                        Si no tiene acceso, contacte al Administrador del Sistema.
+                        Acceso restringido únicamente al equipo de la OCI.<br/>
+                        Utilice su número de identificación como contraseña inicial.
                     </p>
                     
                     {/* HINT FOR DEMO PURPOSES */}
                     <div className="inline-block text-left bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] text-slate-500 mx-auto">
-                        <p className="font-bold text-slate-600 mb-1">Correos habilitados (Demo):</p>
-                        <p className="font-mono">admin@minigualdad.gov.co</p>
-                        <p className="font-mono">jefe.oci@minigualdad.gov.co</p>
-                        <p className="font-mono">funcionario@minigualdad.gov.co</p>
+                        <p className="font-bold text-slate-600 mb-1">Datos de prueba (Jefe OCI):</p>
+                        <p className="font-mono">User: rgonzalez@minigualdad.gov.co</p>
+                        <p className="font-mono">Pass: 79283776</p>
                     </div>
                 </div>
             </div>
@@ -266,7 +289,7 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                 <div className="w-20 h-20 bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Award size={40} />
                 </div>
-                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Hola, {user.name}</h1>
+                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Hola, {user.name.split(' ')[0]}</h1>
                 <p className="text-slate-600 dark:text-slate-400 mt-2 max-w-lg mx-auto">
                     Bienvenido de nuevo a tu espacio de formación. {isFinished ? '¡Has completado todo el plan de estudios!' : 'Continúa donde lo dejaste para fortalecer tus competencias.'}
                 </p>
