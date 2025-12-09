@@ -240,15 +240,18 @@ const InteractiveStandardsDiagram = ({ onSelect }: { onSelect: (idx: number) => 
                     </text>
 
                     {/* Thematic Requirements Segment (Cyan/Teal) */}
-                    <path 
-                        d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)}
-                        fill="none" stroke="#28a9d9" strokeWidth="26" 
-                        className="cursor-pointer hover:scale-105 transition-transform origin-center"
+                    <g 
+                        className="cursor-pointer hover:opacity-75 transition-opacity" 
                         onClick={() => onSelect(6)}
-                    />
-                    <text className="pointer-events-none fill-white text-[14px] font-bold tracking-widest uppercase" dy="5">
-                        <textPath href="#texto-cian-path" startOffset="50%" textAnchor="middle">Requisitos Temáticos</textPath>
-                    </text>
+                    >
+                        <path 
+                            d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)}
+                            fill="none" stroke="#28a9d9" strokeWidth="26" 
+                        />
+                        <text className="pointer-events-none fill-white text-[14px] font-bold tracking-widest uppercase" dy="5">
+                            <textPath href="#texto-cian-path" startOffset="50%" textAnchor="middle">Requisitos Temáticos</textPath>
+                        </text>
+                    </g>
 
                     {/* Inner Green Ring Base */}
                     <path 
