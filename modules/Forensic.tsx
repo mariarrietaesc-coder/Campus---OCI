@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Card, Badge, Accordion, Quiz } from '../components/UI';
-import { Search, AlertTriangle, FileText, Lock, Eye, BookOpen } from 'lucide-react';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, Badge, Accordion, Quiz, MinistryLogo } from '../components/UI';
+import { Search, AlertTriangle, FileText, Lock, Eye, BookOpen, Clock, CheckCircle } from 'lucide-react';
+import { QuizState } from '../types';
 
 // Helper components moved to top
 const BrainIcon = () => (
@@ -9,15 +11,75 @@ const BrainIcon = () => (
 // Renamed to avoid confusion with Lucide's CheckCircle if it were imported
 const LocalCheckCircle = ({className, size}: any) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
 
-export const ForensicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
+interface ForensicModuleProps {
+    onComplete: (score: number) => void;
+    onTimeUpdate: (seconds: number) => void;
+    saveProgress: () => void;
+    data: QuizState;
+}
+
+export const ForensicModule: React.FC<ForensicModuleProps> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
   const [showCaseResult, setShowCaseResult] = useState(false);
+
+  // Time tracking logic
+  const timerRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  const saveProgressRef = useRef(saveProgress);
+
+  useEffect(() => {
+      onTimeUpdateRef.current = onTimeUpdate;
+      saveProgressRef.current = saveProgress;
+  }, [onTimeUpdate, saveProgress]);
+
+  useEffect(() => {
+      const pushTime = () => {
+          const now = Date.now();
+          const diffSeconds = Math.floor((now - startTimeRef.current) / 1000);
+          if (diffSeconds > 0) {
+              onTimeUpdateRef.current(diffSeconds);
+              startTimeRef.current = now;
+          }
+      };
+
+      timerRef.current = window.setInterval(pushTime, 2000);
+
+      return () => {
+          if (timerRef.current) window.clearInterval(timerRef.current);
+          pushTime();
+          saveProgressRef.current();
+      };
+  }, []);
+
+  const timeSpent = data.timeSpentSeconds || 0;
+  const minTime = data.minTimeSeconds || 60;
+  const timeLeft = Math.max(0, minTime - timeSpent);
+  const isQuizLocked = timeLeft > 0 && !data.completed;
 
   return (
     <div className="space-y-8 animate-fade-in pb-12">
-      <div className="mb-6">
-        <Badge type="brand">Módulo 4</Badge>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Auditoría Forense</h1>
-        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Detección, prevención e investigación de fraude y corrupción.</p>
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 border-b border-gray-100 dark:border-slate-800">
+          <div>
+            <Badge type="brand">Módulo 4</Badge>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Auditoría Forense</h1>
+            <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Detección, prevención e investigación de fraude y corrupción.</p>
+          </div>
+          <div className="hidden md:flex items-center gap-4">
+              <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${timeLeft > 0 ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>
+                      {timeLeft > 0 ? <Clock size={20} /> : <CheckCircle size={20} />}
+                  </div>
+                  <div>
+                      <p className="text-[10px] uppercase font-bold text-slate-400">Tiempo de Estudio</p>
+                      <p className="font-mono font-bold text-slate-800 dark:text-white">
+                          {Math.floor(timeSpent / 60)}m {timeSpent % 60}s <span className="text-slate-400 text-xs">/ {Math.floor(minTime/60)}m req</span>
+                      </p>
+                  </div>
+              </div>
+              <MinistryLogo variant="horizontal" />
+          </div>
       </div>
 
       {/* Visual Fraud Triangle */}
@@ -119,14 +181,32 @@ export const ForensicModule: React.FC<{ onComplete: (s: number) => void }> = ({ 
          </Card>
       </div>
 
-      <Quiz 
-        questions={[
-            { id: 1, question: "Según el Triángulo del Fraude, ¿qué factor podemos controlar mejor?", options: ["Presión", "Oportunidad", "Racionalización"], correctAnswer: 1 },
-            { id: 2, question: "¿Cuál es la frecuencia mínima de auditorías forenses (D. 1600)?", options: ["Cada año", "Cada 2 años", "Cuando se sospeche algo"], correctAnswer: 1 },
-            { id: 3, question: "Si la OCI detecta un delito, debe:", options: ["Capturar al responsable", "Denunciar a Fiscalía y Contraloría", "Despedir al funcionario"], correctAnswer: 1 }
-        ]}
-        onComplete={onComplete}
-      />
+      {!isQuizLocked ? (
+        <Quiz 
+            questions={[
+                { id: 1, question: "Según el Triángulo del Fraude, ¿qué factor podemos controlar mejor?", options: ["Presión", "Oportunidad", "Racionalización"], correctAnswer: 1 },
+                { id: 2, question: "¿Cuál es la frecuencia mínima de auditorías forenses (D. 1600)?", options: ["Cada año", "Cada 2 años", "Cuando se sospeche algo"], correctAnswer: 1 },
+                { id: 3, question: "Si la OCI detecta un delito, debe:", options: ["Capturar al responsable", "Denunciar a Fiscalía y Contraloría", "Despedir al funcionario"], correctAnswer: 1 }
+            ]}
+            onComplete={onComplete}
+        />
+      ) : (
+        <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mt-8">
+            <div className="w-20 h-20 bg-gray-100 dark:bg-slate-700 text-gray-400 rounded-full flex items-center justify-center mb-6">
+                <Lock size={40} />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Evaluación Bloqueada</h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mb-6">
+                Debes completar el tiempo mínimo de estudio para acceder a la evaluación final.
+            </p>
+            <div className="bg-amber-50 dark:bg-amber-900/20 px-6 py-3 rounded-lg border border-amber-200 dark:border-amber-800">
+                <p className="text-amber-800 dark:text-amber-200 font-bold flex items-center gap-2">
+                    <Clock size={18} />
+                    Tiempo restante: {Math.ceil(timeLeft / 60)} minutos
+                </p>
+            </div>
+        </div>
+      )}
     </div>
   );
 };

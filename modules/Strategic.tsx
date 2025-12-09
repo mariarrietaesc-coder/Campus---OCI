@@ -78,6 +78,14 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
   // Time tracking logic
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(Date.now());
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  const saveProgressRef = useRef(saveProgress);
+
+  // Update refs when props change to avoid stale closures in the interval
+  useEffect(() => {
+      onTimeUpdateRef.current = onTimeUpdate;
+      saveProgressRef.current = saveProgress;
+  }, [onTimeUpdate, saveProgress]);
 
   // Start/Stop Timer based on visibility/mounting
   useEffect(() => {
@@ -86,7 +94,7 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
           const now = Date.now();
           const diffSeconds = Math.floor((now - startTimeRef.current) / 1000);
           if (diffSeconds > 0) {
-              onTimeUpdate(diffSeconds);
+              onTimeUpdateRef.current(diffSeconds);
               startTimeRef.current = now; // Reset start marker
           }
       };
@@ -98,7 +106,7 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
       return () => {
           if (timerRef.current) window.clearInterval(timerRef.current);
           pushTime(); // Save remaining time
-          saveProgress(); // Push to DB on unmount
+          saveProgressRef.current(); // Push to DB on unmount
       };
   }, []);
 

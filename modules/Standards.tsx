@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Card, Badge, Quiz } from '../components/UI';
-import { Shield, Grid, ArrowLeft, ArrowRight, ChevronDown, X, MousePointerClick, CheckCircle } from 'lucide-react';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
+import { Shield, Grid, ArrowLeft, ArrowRight, ChevronDown, X, MousePointerClick, CheckCircle, Clock, Lock } from 'lucide-react';
+import { QuizState } from '../types';
 
 // --- MATH & SVG HELPERS ---
 const outerR = 150, innerR = 92, n = 5;
@@ -351,12 +353,54 @@ const SECTIONS = [
     { id: 'quiz', label: 'Evaluación' }
 ];
 
-export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
+interface StandardsModuleProps {
+    onComplete: (score: number) => void;
+    onTimeUpdate: (seconds: number) => void;
+    saveProgress: () => void;
+    data: QuizState;
+}
+
+export const StandardsModule: React.FC<StandardsModuleProps> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
     const [activeTab, setActiveTab] = useState('intro');
     const [selectedSegment, setSelectedSegment] = useState<any>(null);
 
+    // Time tracking logic
+    const timerRef = useRef<number | null>(null);
+    const startTimeRef = useRef<number>(Date.now());
+    const onTimeUpdateRef = useRef(onTimeUpdate);
+    const saveProgressRef = useRef(saveProgress);
+
+    useEffect(() => {
+        onTimeUpdateRef.current = onTimeUpdate;
+        saveProgressRef.current = saveProgress;
+    }, [onTimeUpdate, saveProgress]);
+
+    useEffect(() => {
+        const pushTime = () => {
+            const now = Date.now();
+            const diffSeconds = Math.floor((now - startTimeRef.current) / 1000);
+            if (diffSeconds > 0) {
+                onTimeUpdateRef.current(diffSeconds);
+                startTimeRef.current = now;
+            }
+        };
+
+        timerRef.current = window.setInterval(pushTime, 2000);
+
+        return () => {
+            if (timerRef.current) window.clearInterval(timerRef.current);
+            pushTime();
+            saveProgressRef.current();
+        };
+    }, []);
+
     const currentSectionIndex = SECTIONS.findIndex(s => s.id === activeTab);
     const progressPercentage = Math.round(((currentSectionIndex + 1) / SECTIONS.length) * 100);
+
+    const timeSpent = data.timeSpentSeconds || 0;
+    const minTime = data.minTimeSeconds || 60;
+    const timeLeft = Math.max(0, minTime - timeSpent);
+    const isQuizLocked = timeLeft > 0 && !data.completed;
 
     const handleNext = () => {
         if (currentSectionIndex < SECTIONS.length - 1) {
@@ -396,18 +440,37 @@ export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({
                         <div className="relative group flex-1 md:flex-none">
                             <select 
                                 value={activeTab} 
-                                onChange={(e) => { setActiveTab(e.target.value); window.scrollTo(0,0); }}
+                                onChange={(e) => {
+                                    const newVal = e.target.value;
+                                    if (newVal === 'quiz' && isQuizLocked) {
+                                        alert(`Debes estudiar ${Math.ceil(timeLeft/60)} minutos más para habilitar la evaluación.`);
+                                        return;
+                                    }
+                                    setActiveTab(newVal); 
+                                    window.scrollTo(0,0); 
+                                }}
                                 className="appearance-none w-full md:w-64 pl-4 pr-8 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none cursor-pointer shadow-sm"
                             >
                                 {SECTIONS.map(s => (
-                                    <option key={s.id} value={s.id}>{s.label}</option>
+                                    <option key={s.id} value={s.id} disabled={s.id === 'quiz' && isQuizLocked}>
+                                        {s.label} {s.id === 'quiz' && isQuizLocked ? '(Bloqueado)' : ''}
+                                    </option>
                                 ))}
                             </select>
                             <ChevronDown size={16} className="absolute right-3 top-2.5 text-slate-400 pointer-events-none" />
                         </div>
                     </div>
-                    <div className="hidden md:flex items-center text-xs text-slate-400">
-                        Normas Globales 2024 &bull; {SECTIONS[currentSectionIndex].label}
+                    
+                    <div className="flex items-center gap-4">
+                         <div className="hidden md:flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                            <div className={`w-2 h-2 rounded-full ${timeLeft > 0 ? 'bg-amber-500' : 'bg-green-500'}`}></div>
+                            <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
+                                {Math.floor(timeSpent / 60)}:{String(timeSpent % 60).padStart(2, '0')}
+                            </span>
+                         </div>
+                         <div className="hidden md:flex items-center text-xs text-slate-400">
+                            Normas Globales 2024 &bull; {SECTIONS[currentSectionIndex].label}
+                        </div>
                     </div>
                 </div>
                 <div className="w-full h-1 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -631,16 +694,33 @@ export const StandardsModule: React.FC<{ onComplete: (s: number) => void }> = ({
                 {/* EVALUACIÓN */}
                 {activeTab === 'quiz' && (
                     <div className="animate-fade-in">
-                        <Quiz 
-                            questions={[
-                                { id: 1, question: "¿Cuántos dominios tienen las Normas Globales 2024?", options: ["3", "5", "10"], correctAnswer: 1 },
-                                { id: 2, question: "El principio de 'Debido Cuidado Profesional' pertenece al dominio:", options: ["Propósito", "Ética y Profesionalismo", "Gestión"], correctAnswer: 1 },
-                                { id: 3, question: "¿Cuál es el propósito del Dominio III?", options: ["Gobierno de la Función", "Ejecución de Trabajos", "Planificación Anual"], correctAnswer: 0 },
-                                { id: 4, question: "Según el MIE, ¿qué documento soporta el propósito formal de la OCI?", options: ["Manual de Funciones", "Estatuto de Auditoría Interna (Res. 944)", "Plan Nacional de Desarrollo"], correctAnswer: 1 },
-                                { id: 5, question: "¿Qué dominio exige un programa de calidad (PAMC)?", options: ["Dominio IV", "Dominio II", "Dominio V"], correctAnswer: 0 }
-                            ]}
-                            onComplete={onComplete}
-                        />
+                        {!isQuizLocked ? (
+                            <Quiz 
+                                questions={[
+                                    { id: 1, question: "¿Cuántos dominios tienen las Normas Globales 2024?", options: ["3", "5", "10"], correctAnswer: 1 },
+                                    { id: 2, question: "El principio de 'Debido Cuidado Profesional' pertenece al dominio:", options: ["Propósito", "Ética y Profesionalismo", "Gestión"], correctAnswer: 1 },
+                                    { id: 3, question: "¿Cuál es el propósito del Dominio III?", options: ["Gobierno de la Función", "Ejecución de Trabajos", "Planificación Anual"], correctAnswer: 0 },
+                                    { id: 4, question: "Según el MIE, ¿qué documento soporta el propósito formal de la OCI?", options: ["Manual de Funciones", "Estatuto de Auditoría Interna (Res. 944)", "Plan Nacional de Desarrollo"], correctAnswer: 1 },
+                                    { id: 5, question: "¿Qué dominio exige un programa de calidad (PAMC)?", options: ["Dominio IV", "Dominio II", "Dominio V"], correctAnswer: 0 }
+                                ]}
+                                onComplete={onComplete}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center p-12 text-center">
+                                <div className="w-20 h-20 bg-gray-100 dark:bg-slate-700 text-gray-400 rounded-full flex items-center justify-center mb-6">
+                                    <Lock size={40} />
+                                </div>
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Evaluación Bloqueada</h2>
+                                <p className="text-slate-600 dark:text-slate-400 max-w-md">
+                                    Debes completar el tiempo mínimo de estudio para acceder a la evaluación.
+                                </p>
+                                <div className="mt-6 bg-amber-50 dark:bg-amber-900/20 px-6 py-3 rounded-lg border border-amber-200 dark:border-amber-800">
+                                    <p className="text-amber-800 dark:text-amber-200 font-bold">
+                                        Tiempo restante: {Math.ceil(timeLeft / 60)} minutos
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
