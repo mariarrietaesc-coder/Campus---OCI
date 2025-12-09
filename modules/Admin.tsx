@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { UserStore } from '../data/store';
 import { User, ProgressMap } from '../types';
 import { Card, Badge, MinistryLogo } from '../components/UI';
-import { Users, UserPlus, Activity, Power, Search, BarChart2, X, Shield, Lock, Trash2, LogOut } from 'lucide-react';
+import { Users, UserPlus, Activity, Power, Search, BarChart2, X, Shield, Lock, Trash2, LogOut, Calendar } from 'lucide-react';
 
 export const AdminModule: React.FC<{ onLogout: () => void, currentUser: User }> = ({ onLogout, currentUser }) => {
     const [users, setUsers] = useState<User[]>([]);
@@ -125,7 +125,7 @@ export const AdminModule: React.FC<{ onLogout: () => void, currentUser: User }> 
                             placeholder="Buscar por nombre, correo o cargo..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white"
                         />
                     </div>
                     <button 
@@ -200,15 +200,15 @@ export const AdminModule: React.FC<{ onLogout: () => void, currentUser: User }> 
                         <form onSubmit={handleAddUser} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                                <input required type="text" value={newName} onChange={e => setNewName(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600" placeholder="Ej. Pepito Pérez" />
+                                <input required type="text" value={newName} onChange={e => setNewName(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 text-slate-900 dark:text-white" placeholder="Ej. Pepito Pérez" />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correo Institucional</label>
-                                <input required type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600" placeholder="usuario@minigualdad.gov.co" />
+                                <input required type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 text-slate-900 dark:text-white" placeholder="usuario@minigualdad.gov.co" />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cargo / Rol</label>
-                                <input required type="text" value={newRole} onChange={e => setNewRole(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600" placeholder="Ej. Contratista OCI" />
+                                <input required type="text" value={newRole} onChange={e => setNewRole(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 text-slate-900 dark:text-white" placeholder="Ej. Contratista OCI" />
                             </div>
                             <div className="flex items-center gap-2 pt-2">
                                 <input type="checkbox" id="isAdmin" checked={newIsAdmin} onChange={e => setNewIsAdmin(e.target.checked)} className="w-4 h-4 text-brand-600 rounded" />
@@ -237,22 +237,33 @@ export const AdminModule: React.FC<{ onLogout: () => void, currentUser: User }> 
                                 const modData = viewingProgress.data[modId as any];
                                 const isDone = modData?.completed;
                                 const score = modData?.score || 0;
+                                const date = modData?.completedAt;
                                 
                                 return (
-                                    <div key={modId} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl">
+                                    <div key={modId} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl gap-3">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${isDone ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'}`}>
                                                 {idx + 1}
                                             </div>
-                                            <span className="font-medium capitalize text-slate-700 dark:text-slate-200">
-                                                {modId === 'strategic' ? 'Plataforma Estratégica' : 
-                                                 modId === 'mipg' ? 'Modelo MIPG' : 
-                                                 modId === 'standards' ? 'Normas Globales' : 'Auditoría Forense'}
-                                            </span>
+                                            <div>
+                                                <span className="font-medium capitalize text-slate-700 dark:text-slate-200 block">
+                                                    {modId === 'strategic' ? 'Plataforma Estratégica' : 
+                                                     modId === 'mipg' ? 'Modelo MIPG' : 
+                                                     modId === 'standards' ? 'Normas Globales' : 'Auditoría Forense'}
+                                                </span>
+                                                {isDone && date && (
+                                                    <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                                                        <Calendar size={10} />
+                                                        <span>{date}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="text-right">
                                             {isDone ? (
-                                                <Badge type="success">Completado ({score}%)</Badge>
+                                                <div className="flex flex-col items-end">
+                                                    <Badge type="success">Aprobado ({score}%)</Badge>
+                                                </div>
                                             ) : (
                                                 <span className="text-xs text-slate-400 font-bold uppercase">Pendiente</span>
                                             )}

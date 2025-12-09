@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
-import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft, Menu } from 'lucide-react';
+import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft, Menu, Clock, Lock } from 'lucide-react';
+import { QuizState } from '../types';
 
 // --- DATA: Programas y Proyectos ---
 const PROGRAMAS_DATA = [
@@ -56,7 +58,14 @@ const TIMELINE_DATA = [
     { id: 8, title: 'PEI v2: Aprobación', year: 'Oct 2024', content: 'Formaliza la plataforma estratégica (misión, visión, objetivos) y el despliegue estratégico con dos objetivos estratégicos y uno operacional, alineados al PND y a los ODS.' }
 ];
 
-export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({ onComplete }) => {
+interface StrategicModuleProps {
+    onComplete: (score: number) => void;
+    onTimeUpdate: (seconds: number) => void;
+    saveProgress: () => void;
+    data: QuizState;
+}
+
+export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
   const [activeTab, setActiveTab] = useState<'menu' | string>('menu');
   
   // Specific view states
@@ -65,6 +74,33 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
   const [activeFilter, setActiveFilter] = useState('Todo');
   const [selectedOrgNode, setSelectedOrgNode] = useState<string | null>(null);
   const [selectedTimelineItem, setSelectedTimelineItem] = useState<any>(null);
+
+  // Time tracking logic
+  const timerRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
+
+  // Start/Stop Timer based on visibility/mounting
+  useEffect(() => {
+      // Function to push time update
+      const pushTime = () => {
+          const now = Date.now();
+          const diffSeconds = Math.floor((now - startTimeRef.current) / 1000);
+          if (diffSeconds > 0) {
+              onTimeUpdate(diffSeconds);
+              startTimeRef.current = now; // Reset start marker
+          }
+      };
+
+      // Interval to update UI every second (optional, could update only every 10s)
+      timerRef.current = window.setInterval(pushTime, 2000); // Update every 2 seconds
+
+      // Cleanup on unmount or tab switch
+      return () => {
+          if (timerRef.current) window.clearInterval(timerRef.current);
+          pushTime(); // Save remaining time
+          saveProgress(); // Push to DB on unmount
+      };
+  }, []);
 
   const filteredPrograms = useMemo(() => {
     let result = PROGRAMAS_DATA;
@@ -109,8 +145,13 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
       }
   };
   
-  // Calculate progress percentage for the bar
   const progressPercentage = activeTab === 'menu' ? 0 : Math.round(((currentSectionIndex + 1) / sections.length) * 100);
+
+  // Time Calculation
+  const timeSpent = data.timeSpentSeconds || 0;
+  const minTime = data.minTimeSeconds || 60; // Default 1 min if not set
+  const timeLeft = Math.max(0, minTime - timeSpent);
+  const isQuizLocked = timeLeft > 0 && !data.completed;
 
   // --- RENDER MENU GRID ---
   if (activeTab === 'menu') {
@@ -122,7 +163,18 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
                     <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Plataforma Estratégica</h1>
                     <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Identidad, estructura y portafolio del Ministerio.</p>
                 </div>
-                <div className="hidden md:block">
+                <div className="hidden md:flex items-center gap-4">
+                    <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${timeLeft > 0 ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>
+                            {timeLeft > 0 ? <Clock size={20} /> : <CheckCircle size={20} />}
+                        </div>
+                        <div>
+                            <p className="text-[10px] uppercase font-bold text-slate-400">Tiempo de Estudio</p>
+                            <p className="font-mono font-bold text-slate-800 dark:text-white">
+                                {Math.floor(timeSpent / 60)}m {timeSpent % 60}s <span className="text-slate-400 text-xs">/ {Math.floor(minTime/60)}m req</span>
+                            </p>
+                        </div>
+                    </div>
                     <MinistryLogo variant="horizontal" />
                 </div>
             </div>
@@ -130,25 +182,45 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sections.map((section) => {
                     const Icon = section.icon;
+                    const isLockedQuiz = section.id === 'quiz' && isQuizLocked;
+                    
                     return (
                         <button 
                             key={section.id}
-                            onClick={() => setActiveTab(section.id)}
-                            className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-lg transition-all text-left group"
+                            onClick={() => !isLockedQuiz && setActiveTab(section.id)}
+                            disabled={isLockedQuiz}
+                            className={`p-6 rounded-2xl border transition-all text-left group relative overflow-hidden
+                                ${isLockedQuiz 
+                                    ? 'bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-800 opacity-75 cursor-not-allowed' 
+                                    : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-lg'
+                                }
+                            `}
                         >
-                            <div className="w-12 h-12 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <Icon size={24} />
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform
+                                ${isLockedQuiz ? 'bg-gray-200 text-gray-500' : 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 group-hover:scale-110'}
+                            `}>
+                                {isLockedQuiz ? <Lock size={24} /> : <Icon size={24} />}
                             </div>
                             <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-1">{section.label}</h3>
                             <p className="text-sm text-slate-500 dark:text-slate-400">{section.desc}</p>
+                            
+                            {isLockedQuiz && (
+                                <div className="absolute inset-0 bg-white/50 dark:bg-black/50 flex items-center justify-center backdrop-blur-[1px]">
+                                    <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                        Faltan {Math.ceil(timeLeft / 60)} min
+                                    </span>
+                                </div>
+                            )}
                         </button>
                     )
                 })}
             </div>
             
-            <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex gap-3 text-blue-800 dark:text-blue-200 text-sm">
+            <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex gap-3 text-blue-800 dark:text-blue-200 text-sm border border-blue-100 dark:border-blue-800">
                 <Info className="shrink-0" />
-                <p>Completa cada una de las secciones anteriores para obtener una visión integral antes de realizar la evaluación final.</p>
+                <p>
+                    <b>Nota:</b> Para garantizar la apropiación del conocimiento, el examen final se desbloqueará después de <b>{Math.ceil(minTime/60)} minutos</b> de estudio en este módulo.
+                </p>
             </div>
         </div>
       );
@@ -178,13 +250,20 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
                         <select 
                             value={activeTab} 
                             onChange={(e) => {
-                                setActiveTab(e.target.value);
+                                const newVal = e.target.value;
+                                if (newVal === 'quiz' && isQuizLocked) {
+                                    alert(`Debes estudiar ${Math.ceil(timeLeft/60)} minutos más para habilitar la evaluación.`);
+                                    return;
+                                }
+                                setActiveTab(newVal);
                                 window.scrollTo(0,0);
                             }}
                             className="appearance-none w-full md:w-64 pl-9 pr-8 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none cursor-pointer shadow-sm"
                         >
                             {sections.map(s => (
-                                <option key={s.id} value={s.id}>{s.label}</option>
+                                <option key={s.id} value={s.id} disabled={s.id === 'quiz' && isQuizLocked}>
+                                    {s.label} {s.id === 'quiz' && isQuizLocked ? '(Bloqueado)' : ''}
+                                </option>
                             ))}
                         </select>
                         <div className="absolute left-3 top-2.5 text-brand-600 dark:text-brand-400 pointer-events-none">
@@ -194,8 +273,13 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
                     </div>
                 </div>
                 
-                <div className="hidden md:flex items-center text-xs text-slate-400">
-                    Módulo 1 &bull; Tema {currentSectionIndex + 1} de {sections.length}
+                <div className="flex items-center gap-4">
+                     <div className="hidden md:block text-xs font-mono bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">
+                        {Math.floor(timeSpent / 60)}:{String(timeSpent % 60).padStart(2, '0')}
+                     </div>
+                     <div className="hidden md:flex items-center text-xs text-slate-400">
+                        Tema {currentSectionIndex + 1} de {sections.length}
+                    </div>
                 </div>
             </div>
             
@@ -414,7 +498,7 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
                         <div className="flex flex-col md:flex-row gap-4 mb-6">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-3 text-slate-400" size={18} />
-                                <input type="text" placeholder="Buscar por nombre, población..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 outline-none text-sm"/>
+                                <input type="text" placeholder="Buscar por nombre, población..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 focus:ring-2 focus:ring-brand-500 outline-none text-sm text-slate-900 dark:text-white"/>
                             </div>
                             <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
                                 {['Todo', 'Mujeres', 'Juventud', 'Pobreza', 'Diversidades', 'Étnicos', 'Saberes'].map(f => (
@@ -451,16 +535,33 @@ export const StrategicModule: React.FC<{ onComplete: (s: number) => void }> = ({
             {/* 7. EVALUACIÓN */}
             {activeTab === 'quiz' && (
                 <div className="animate-fade-in">
-                    <Quiz 
-                        questions={[
-                            { id: 1, question: "¿Cuál ley creó el Ministerio de Igualdad y Equidad?", options: ["Ley 100", "Ley 2281 de 2023", "Ley 87 de 1993"], correctAnswer: 1 },
-                            { id: 2, question: "¿Cuántos programas estratégicos conforman el portafolio actual?", options: ["10", "24", "32"], correctAnswer: 1 },
-                            { id: 3, question: "¿Qué decreto define la estructura orgánica del Ministerio?", options: ["Decreto 1075 de 2023", "Decreto 1499", "Decreto 1600"], correctAnswer: 0 },
-                            { id: 4, question: "¿Quién ejerce la tercera línea de defensa en el MIPG?", options: ["Planeación", "Control Interno", "Talento Humano"], correctAnswer: 1 },
-                            { id: 5, question: "¿Cuál es el enfoque que protege la diversidad y supera el racismo?", options: ["Interseccional", "Étnico-Racial", "Territorial"], correctAnswer: 1 }
-                        ]}
-                        onComplete={onComplete}
-                    />
+                    {!isQuizLocked ? (
+                        <Quiz 
+                            questions={[
+                                { id: 1, question: "¿Cuál ley creó el Ministerio de Igualdad y Equidad?", options: ["Ley 100", "Ley 2281 de 2023", "Ley 87 de 1993"], correctAnswer: 1 },
+                                { id: 2, question: "¿Cuántos programas estratégicos conforman el portafolio actual?", options: ["10", "24", "32"], correctAnswer: 1 },
+                                { id: 3, question: "¿Qué decreto define la estructura orgánica del Ministerio?", options: ["Decreto 1075 de 2023", "Decreto 1499", "Decreto 1600"], correctAnswer: 0 },
+                                { id: 4, question: "¿Quién ejerce la tercera línea de defensa en el MIPG?", options: ["Planeación", "Control Interno", "Talento Humano"], correctAnswer: 1 },
+                                { id: 5, question: "¿Cuál es el enfoque que protege la diversidad y supera el racismo?", options: ["Interseccional", "Étnico-Racial", "Territorial"], correctAnswer: 1 }
+                            ]}
+                            onComplete={onComplete}
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center p-12 text-center">
+                            <div className="w-20 h-20 bg-gray-100 dark:bg-slate-700 text-gray-400 rounded-full flex items-center justify-center mb-6">
+                                <Lock size={40} />
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Evaluación Bloqueada</h2>
+                            <p className="text-slate-600 dark:text-slate-400 max-w-md">
+                                Debes completar el tiempo mínimo de estudio para acceder a la evaluación.
+                            </p>
+                            <div className="mt-6 bg-amber-50 dark:bg-amber-900/20 px-6 py-3 rounded-lg border border-amber-200 dark:border-amber-800">
+                                <p className="text-amber-800 dark:text-amber-200 font-bold">
+                                    Tiempo restante: {Math.ceil(timeLeft / 60)} minutos
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

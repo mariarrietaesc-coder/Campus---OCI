@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, Badge } from '../components/UI';
 import { Search, FileText, Download, Eye, Filter } from 'lucide-react';
@@ -39,7 +40,7 @@ export const LibraryModule: React.FC = () => {
                             placeholder="Buscar por nombre, ley o tema..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-brand-500 outline-none dark:text-white"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-brand-500 outline-none text-slate-900 dark:text-white"
                         />
                     </div>
                     

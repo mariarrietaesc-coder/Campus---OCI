@@ -29,6 +29,9 @@ export interface QuizQuestion {
 export interface QuizState {
   completed: boolean;
   score: number;
+  completedAt?: string; // Fecha de finalización para auditoría
+  timeSpentSeconds: number; // Tiempo estudiado en segundos
+  minTimeSeconds?: number; // Tiempo mínimo requerido para desbloquear examen
 }
 
 export type ProgressMap = Record<ModuleId, QuizState>;

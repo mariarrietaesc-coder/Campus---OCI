@@ -8,12 +8,11 @@ import { ForensicModule } from './modules/Forensic';
 import { AssistantModule } from './modules/Assistant';
 import { LibraryModule } from './modules/Library';
 import { ToolsModule } from './modules/Tools';
-import { AdminModule } from './modules/Admin'; // NEW
 import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
 import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { UserStore } from './data/store'; // NEW
+import { UserStore } from './data/store'; 
 
 const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
     <div className="p-8 text-center">
@@ -29,33 +28,33 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   
-  // Default empty state (fallback)
+  // Default empty state 
   const emptyProgress: ProgressMap = {
-    dashboard: { completed: true, score: 0 },
-    strategic: { completed: false, score: 0 },
-    mipg: { completed: false, score: 0 },
-    competencies: { completed: false, score: 0 },
-    standards: { completed: false, score: 0 },
-    forensic: { completed: false, score: 0 },
-    library: { completed: true, score: 0 },
-    assistant: { completed: true, score: 0 },
-    tools: { completed: true, score: 0 },
+    dashboard: { completed: true, score: 0, timeSpentSeconds: 0 },
+    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
+    mipg: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
+    competencies: { completed: false, score: 0, timeSpentSeconds: 0 },
+    standards: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
+    forensic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
+    library: { completed: true, score: 0, timeSpentSeconds: 0 },
+    assistant: { completed: true, score: 0, timeSpentSeconds: 0 },
+    tools: { completed: true, score: 0, timeSpentSeconds: 0 },
   };
 
   const [progress, setProgress] = useState<ProgressMap>(emptyProgress);
 
-  // Initialize Store and Check Session
+  // Initialize Store
   useEffect(() => {
-    UserStore.init(); // Initialize Mock DB
-    
-    // Check if user is already logged in session
+    UserStore.init();
+    // Check session after init
     const savedUserStr = sessionStorage.getItem('oci_user');
     if (savedUserStr) {
         const savedUser = JSON.parse(savedUserStr);
         setUser(savedUser);
-        // Load progress specific to this user email
         const userProgress = UserStore.getProgress(savedUser.email);
-        setProgress(userProgress);
+        // Merge with defaults to ensure new fields exist
+        const mergedProgress = { ...emptyProgress, ...userProgress };
+        setProgress(mergedProgress);
     }
   }, []);
 
@@ -70,9 +69,9 @@ function App() {
 
   const handleLogin = (user: User) => {
     setUser(user);
-    // Load their specific progress
     const userProgress = UserStore.getProgress(user.email);
-    setProgress(userProgress);
+    const mergedProgress = { ...emptyProgress, ...userProgress };
+    setProgress(mergedProgress);
     sessionStorage.setItem('oci_user', JSON.stringify(user));
   };
 
@@ -83,12 +82,57 @@ function App() {
     setProgress(emptyProgress);
   };
 
+  // Called when a Quiz is finished
   const handleModuleComplete = (moduleId: ModuleId, score: number) => {
     if (!user) return;
-    const newProgress = { ...progress, [moduleId]: { completed: true, score } };
+    
+    const now = new Date();
+    const timestamp = now.toLocaleDateString('es-CO', { 
+        year: 'numeric', month: 'short', day: 'numeric', 
+        hour: '2-digit', minute: '2-digit' 
+    });
+
+    const currentModProgress = progress[moduleId];
+
+    const newProgress = { 
+        ...progress, 
+        [moduleId]: { 
+            ...currentModProgress,
+            completed: true, 
+            score, 
+            completedAt: timestamp 
+        } 
+    };
+    
     setProgress(newProgress);
-    // Save to permanent storage
     UserStore.saveProgress(user.email, newProgress);
+  };
+
+  // Called periodically by the module to update time
+  const handleTimeUpdate = (moduleId: ModuleId, additionalSeconds: number) => {
+      if (!user) return;
+      
+      const currentMod = progress[moduleId];
+      const newTime = (currentMod.timeSpentSeconds || 0) + additionalSeconds;
+      
+      const newProgress = {
+          ...progress,
+          [moduleId]: {
+              ...currentMod,
+              timeSpentSeconds: newTime
+          }
+      };
+      
+      // Update local state immediately for UI
+      setProgress(newProgress);
+      // Also save to localStorage periodically indirectly via module saves or unmounts,
+      // but for robustness we can save periodically here if performance allows.
+      // For now, let's rely on the module's unmount/save trigger or simple periodic saves handled by the module component props.
+  };
+
+  // Force save to DB (e.g. when leaving a module)
+  const saveCurrentProgressToDB = () => {
+      if(user) UserStore.saveProgress(user.email, progress);
   };
 
   const handleResetProgress = () => {
@@ -105,24 +149,26 @@ function App() {
     return <LoginView onLoginSuccess={handleLogin} />;
   }
 
-  // --- ADMIN ROUTE ---
-  if (user.isAdmin) {
-      return <AdminModule onLogout={handleLogout} currentUser={user} />;
-  }
+  // Common props for modules
+  const modProps = (id: ModuleId) => ({
+      onComplete: (s: number) => handleModuleComplete(id, s),
+      onTimeUpdate: (secs: number) => handleTimeUpdate(id, secs),
+      saveProgress: saveCurrentProgressToDB,
+      data: progress[id]
+  });
 
-  // --- STUDENT ROUTE ---
   const renderModule = () => {
     switch (currentModule) {
       case 'dashboard':
         return <DashboardView progress={progress} onChange={setCurrentModule} user={user} onShowCertificate={() => setShowCertificate(true)} onReset={handleResetProgress} />;
       case 'strategic':
-        return <StrategicModule onComplete={(s) => handleModuleComplete('strategic', s)} />;
+        return <StrategicModule {...modProps('strategic')} />;
       case 'mipg':
-        return <MIPGModule onComplete={(s) => handleModuleComplete('mipg', s)} />;
+        return <MIPGModule {...modProps('mipg')} />;
       case 'standards':
-        return <StandardsModule onComplete={(s) => handleModuleComplete('standards', s)} />;
+        return <StandardsModule {...modProps('standards')} />;
       case 'forensic':
-        return <ForensicModule onComplete={(s) => handleModuleComplete('forensic', s)} />;
+        return <ForensicModule {...modProps('forensic')} />;
       case 'assistant':
         return <AssistantModule />;
       case 'library':
@@ -140,7 +186,10 @@ function App() {
     <>
         <Layout 
         currentModule={currentModule} 
-        onModuleChange={setCurrentModule} 
+        onModuleChange={(id) => {
+            saveCurrentProgressToDB(); // Save before switching
+            setCurrentModule(id);
+        }} 
         progress={progress} 
         user={user} 
         onLogout={handleLogout}
@@ -161,7 +210,7 @@ function App() {
   );
 }
 
-// --- Login View (Updated for Auth) ---
+// --- Login View (Updated for Async) ---
 const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -169,22 +218,23 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
     const [error, setError] = useState('');
     const [isChecking, setIsChecking] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setIsChecking(true);
 
-        // Simple delay to simulate check
-        setTimeout(() => {
-            const result = UserStore.authenticate(email, password);
-            setIsChecking(false);
-            
+        try {
+            const result = await UserStore.authenticate(email, password);
             if (result.success && result.user) {
                 onLoginSuccess(result.user);
             } else {
                 setError(result.message || 'Error de autenticación');
             }
-        }, 600);
+        } catch (e) {
+            setError("Error de conexión local.");
+        } finally {
+            setIsChecking(false);
+        }
     };
 
     return (
@@ -214,14 +264,14 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                                 required 
                                 value={email} 
                                 onChange={e => setEmail(e.target.value)} 
-                                className="w-full pl-10 pr-3.5 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" 
+                                className="w-full pl-10 pr-3.5 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-900" 
                                 placeholder="usuario@minigualdad.gov.co" 
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Contraseña (Identificación)</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Contraseña</label>
                         <div className="relative">
                             <ShieldCheck className="absolute left-3 top-3.5 text-slate-400" size={18} />
                             <input 
@@ -229,8 +279,8 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                                 required 
                                 value={password} 
                                 onChange={e => setPassword(e.target.value)} 
-                                className="w-full pl-10 pr-10 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all" 
-                                placeholder="Número de documento" 
+                                className="w-full pl-10 pr-10 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-900" 
+                                placeholder="Ingresa tu contraseña" 
                             />
                             <button 
                                 type="button"
@@ -259,8 +309,7 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
 
                 <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                     <p className="text-[10px] text-slate-400 leading-tight mb-4">
-                        Acceso restringido únicamente al equipo de la OCI.<br/>
-                        Utilice su número de identificación como contraseña inicial.
+                        Acceso restringido únicamente al equipo de la OCI.
                     </p>
                     
                     {/* HINT FOR DEMO PURPOSES */}
