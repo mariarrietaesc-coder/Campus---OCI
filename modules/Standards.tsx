@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
 import { Shield, Grid, ArrowLeft, ArrowRight, ChevronDown, X, MousePointerClick, CheckCircle, Clock, Lock } from 'lucide-react';
 import { QuizState } from '../types';
+import { IIA_LOGO_BASE64 } from '../components/LogoData';
 
 // --- MATH & SVG HELPERS ---
 const outerR = 150, innerR = 92, n = 5;
@@ -226,11 +227,6 @@ const InteractiveStandardsDiagram = ({ onSelect }: { onSelect: (idx: number) => 
     return (
         <div className="w-full max-w-[400px] mx-auto relative group">
             <svg viewBox="0 0 360 360" className="w-full h-auto overflow-visible drop-shadow-lg">
-                {/* 
-                   Correction: All SVG content is now wrapped in the main transformation group (180,180).
-                   This ensures that paths generated with arcPath (which assumes 0,0 center) are correctly positioned.
-                   Outer elements like circles now use cx=0 cy=0 relative to this group.
-                */}
                 <g transform="translate(180,180)">
                     <defs>
                         <path id="texto-cian-path" d={arcPath(radioAnilloVerde, (startOffset + 4 * full + outerGapDeg / 2) * rad, (startOffset + 4 * full + outerGapDeg / 2 + span) * rad)} fill="none" />
@@ -306,14 +302,18 @@ const InteractiveStandardsDiagram = ({ onSelect }: { onSelect: (idx: number) => 
                     <circle r="62" fill="white" />
                      <foreignObject x="-30" y="-30" width="60" height="60">
                         <div className="w-full h-full flex items-center justify-center text-brand-700">
-                             <Shield size={40} strokeWidth={1.5} />
+                             {IIA_LOGO_BASE64 ? (
+                                 <img src={IIA_LOGO_BASE64} alt="IIA" className="w-full h-full object-contain" />
+                             ) : (
+                                 <Shield size={40} strokeWidth={1.5} />
+                             )}
                         </div>
                      </foreignObject>
                     <text y="42" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#1E3A8A">Normas Globales</text>
                     <text y="54" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#1E3A8A">de Auditoría Interna™</text>
                 </g>
             </svg>
-            <div className="absolute top-0 right-0 bg-white/90 backdrop-blur rounded-lg p-2 text-xs text-slate-500 shadow-sm border border-slate-100 flex items-center gap-1">
+            <div className="absolute bottom-0 right-0 bg-white/90 backdrop-blur rounded-lg p-2 text-xs text-slate-500 shadow-sm border border-slate-100 flex items-center gap-1">
                 <MousePointerClick size={14} /> Interactúa con el gráfico
             </div>
         </div>

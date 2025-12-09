@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
-import { Target, Map, Layout, Scale, Users, FileText, ChevronRight, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft, Menu, Clock, Lock } from 'lucide-react';
+import { Target, Map, Layout, Scale, Users, FileText, Search, X, ChevronDown, CheckCircle, Info, BookOpen, ArrowRight, Grid, ArrowLeft, Clock, Lock, ArrowUpRight, BarChart2, Briefcase, ShieldAlert } from 'lucide-react';
 import { QuizState } from '../types';
 
 // --- DATA: Programas y Proyectos ---
@@ -32,18 +32,169 @@ const PROGRAMAS_DATA = [
     {id:'cultura-paz', nombre:'Cultura para la Paz y la No Estigmatización', viceministerio:'Juventud', dependencia:'Jóvenes en Paz', poblacion:'Toda la población colombiana', estrategia:'Cambio cultural', breve:'Estrategias de comunicación y pedagogía para transformar imaginarios que perpetúan la desigualdad.', tags:'cultura,paz,pedagogia'}
 ];
 
-// --- DATA: Organigrama ---
-const ORG_DATA: any = {
-      'entidades': { title: 'Entidades Adscritas y Vinculadas', description: 'Organismos que, aunque tienen autonomía, están vinculados al sector para coordinar políticas. El Ministerio ejerce como ente rector.', dependencies: ['Instituto Colombiano de Bienestar Familiar (ICBF)', 'Instituto Nacional para Sordos (INSOR)', 'Instituto Nacional para Ciegos (INCI)'] },
-      'territoriales': { title: 'Direcciones Territoriales', description: 'Funciones (Art. 17, D.1075): Apoyar la articulación y coordinación territorial, implementar estrategias para poblaciones marginadas y participar en la planeación y ejecución de políticas a nivel local.', dependencies: ['32 Direcciones Territoriales (una por departamento)'] },
-      'secretaria': { title: 'Secretaría General', description: 'Funciones (Art. 43, D.1075): Asistir a la Ministra en la administración del Ministerio, coordinar la gestión de recursos físicos, financieros y de talento humano, y liderar la implementación de políticas y procesos administrativos.', dependencies: ['Subdirección Administrativa y Financiera', 'Subdirección de Contratación', 'Subdirección de Talento Humano'] },
-      'despacho': { title: 'Despacho de la Ministra', description: 'Funciones (Art. 6, D.1075): Formular y dirigir las políticas del sector, coordinar la planeación estratégica, ejercer la representación legal y asegurar el cumplimiento de las funciones y competencias del Ministerio.', dependencies: ['Viceministerios', 'Secretaría General', 'Oficinas Asesoras', 'Direcciones Territoriales'] },
-      'asesoras': { title: 'Oficinas Asesoras', description: 'Funciones (Arts. 7 al 16, D.1075): Apoyan la gestión estratégica en áreas clave como planeación, jurídica, comunicaciones, TICs, control interno y cooperación, asegurando la coherencia y legalidad de las acciones del Ministerio.', dependencies: ['Oficina de Saberes y Conocimientos', 'Oficina de Proyectos', 'Oficina de TICs', 'Oficina de Comunicaciones', 'Oficina de Control Interno', 'Oficina de Control Disciplinario', 'Oficina de Planeación', 'Oficina Jurídica', 'Oficina de Alianzas Estratégicas', 'Oficina de Relacionamiento con la Ciudadanía'] },
-      'vm-mujeres': { title: 'Viceministerio de las Mujeres', description: 'Funciones (Art. 18, D.1075): Liderar la política pública para la promoción de los derechos de las mujeres en su diversidad, coordinar el Sistema Nacional de Mujeres y articular acciones para prevenir y atender las violencias de género.', dependencies: ['Dirección para la Prevención de Violencias', 'Dirección para la Autonomía Económica', 'Dirección para Garantía de Derechos', 'Dirección para Mujeres en Actividades Sexuales Pagas', 'Dirección para Madres Cabeza de Familia'] },
-      'vm-juventud': { title: 'Viceministerio de las Juventudes', description: 'Funciones (Art. 24, D.1075): Liderar la política pública para promover los derechos de la juventud, articular el programa "Jóvenes en Paz" y fomentar oportunidades para el desarrollo integral de los y las jóvenes del país.', dependencies: ['Dirección para el Goce Efectivo de los Derechos', 'Dirección de Barrismo Social', 'Dirección de Jóvenes en Paz'] },
-      'vm-poblaciones': { title: 'Viceministerio para Poblaciones y Territorios Excluidos', description: 'Funciones (Art. 28, D.1075): Liderar políticas para la superación de la pobreza y la exclusión de poblaciones vulnerables (migrantes, personas mayores, habitantes de calle) y dirigir el Sistema Nacional de Cuidado.', dependencies: ['Dirección para la Superación de la Pobreza', 'Dirección de Cuidado', 'Dirección para la Población Migrante', 'Dirección de Acceso Igualitario al Agua', 'Dirección para Personas en Situación de Calle', 'Dirección para Personas Mayores'] },
-      'vm-diversidades': { title: 'Viceministerio de las Diversidades', description: 'Funciones (Art. 35, D.1075): Liderar la política para la promoción de los derechos de las personas con discapacidad y la población LGBTIQ+, y coordinar acciones para prevenir y erradicar la discriminación.', dependencies: ['Dirección para la Garantía de Derechos de la Población LGBTIQ+', 'Dirección para la Garantía de Derechos de las Personas con Discapacidad'] },
-      'vm-etnicos': { title: 'Viceministerio de Pueblos Étnicos y Campesinos', description: 'Funciones (Art. 38, D.1075): Liderar la política para la promoción de los derechos de los pueblos y comunidades negras, afrodescendientes, raizales, palenqueras, indígenas, Rrom y campesinos.', dependencies: ['Dirección para Comunidades Negras, Afro, Raizales y Palenqueras', 'Dirección para Pueblos Indígenas', 'Dirección para el Pueblo Rrom', 'Dirección para el Campesinado'] }
+// --- DATA: Procesos (Detailed Text) ---
+const PROCESS_DEFINITIONS = {
+    estrategicos: [
+        { title: 'Gestión de Saberes y Conocimientos', desc: 'Definir y establecer los lineamientos, metodologías e instrumentos necesarios para orientar la ruta estratégica del Ministerio de la Igualdad y la Equidad, garantizando la creación y ejecución efectiva de políticas públicas que promuevan la equidad y la igualdad, generando así un valor público alineado con los objetivos de gobierno.' },
+        { title: 'Gestión Estratégica', desc: 'Liderar la planeación institucional, el seguimiento a metas y la asignación de recursos.' },
+        { title: 'Gestión de Proyectos', desc: 'Formular y estructurar los proyectos dirigidos a organismos públicos, privados e internacionales, teniendo en cuenta el ámbito de competencia del Ministerio y, en especial, el enfoque territorial, a través de las metodologías establecidas.' },
+        { title: 'Relacionamiento Ciudadano', desc: 'Implementar políticas que fortalezcan la relación entre el Estado y las ciudadanías, a través de un modelo de relacionamiento integral, transparente, participativo e incluyente.' },
+        { title: 'Comunicaciones', desc: 'Fortalecer la gestión comunicativa del Ministerio de Igualdad y Equidad mediante la planificación, implementación, seguimiento y mejora continua de lineamientos, estrategias y acciones.' },
+        { title: 'Cooperación Internacional', desc: 'Gestionar alianzas estratégicas y convenios con agencias de cooperación, sector privado y organismos internacionales en temas de Igualdad y Equidad.' },
+        { title: 'Gestión TICs', desc: 'Gestionar los servicios, información y recursos tecnológicos de forma segura, mediante la formulación, desarrollo y evaluación de políticas, lineamientos, planes, programas y proyectos.' }
+    ],
+    misionales: [
+        // --- TOP (Pink) ---
+        { 
+            title: 'Formulación de Políticas Públicas, Diseño de Programas y Gestión de Recursos', 
+            desc: 'Diseñar e implementar políticas públicas, programas y gestión de recursos con enfoque diferencial e interseccional que contribuyan a reducir las brechas de desigualdad y promuevan la igualdad y equidad en los territorios y poblaciones objetivo del Ministerio.',
+            highlight: true 
+        },
+        // --- MIDDLE (White - Viceministries) ---
+        { title: 'Atención a Juventudes', desc: 'Implementar políticas, programas y estrategias transformadoras que promuevan el desarrollo integral, la convivencia pacífica y el cierre de brechas para la juventud.' },
+        { title: 'Atención a Mujeres', desc: 'Diseñar e implementar políticas públicas, programas y gestión de recursos con enfoque diferencial e interseccional que contribuyan a reducir las brechas de desigualdad.' },
+        { title: 'Poblaciones y Territorios Excluidos', desc: 'Implementar programas, proyectos y estrategias, para impulsar el goce efectivo de los derechos de las poblaciones y territorios marginados y excluidos.' },
+        { title: 'Pueblos Étnicos y Campesinos', desc: 'Formular de manera efectiva las intervenciones, proyectos y acciones transformadoras dirigidas a pueblos y comunidades negras, afrodescendientes, raizales, palenqueras, indígenas, Rrom y campesinas.' },
+        { title: 'Discapacidad y LGBTIQ+', desc: 'Diseñar, implementar y coordinar políticas, programas y estrategias integrales que garanticen los derechos, promuevan la inclusión plena y aseguren el goce efectivo de derechos.' },
+        // --- BOTTOM (Pink) ---
+        { 
+            title: 'Articulación Intersectorial', 
+            desc: 'Establecer y mantener mecanismos efectivos de coordinación, comunicación y colaboración entre el Ministerio de Igualdad y Equidad y las diversas entidades gubernamentales, organizaciones de la sociedad civil y comunidades, para potenciar el impacto de las políticas de igualdad y equidad a nivel nacional y territorial.',
+            highlight: true 
+        },
+        { 
+            title: 'Traslado, Seguimiento y Evaluación', 
+            desc: 'Gestionar eficientemente el traslado de proyectos, realizar un seguimiento sistemático de la ejecución de programas y recursos, y evaluar el impacto de las acciones transformadoras del Ministerio, para asegurar el cumplimiento de las metas de igualdad y equidad.',
+            highlight: true 
+        },
+        { 
+            title: 'Gestión del Conocimiento e Innovación Público Popular', 
+            desc: 'Desarrollar, integrar y difundir conocimientos e innovaciones que contribuyan a la identificación y superación de las desigualdades, valorando tanto el saber científico como el popular y ancestral, para informar y mejorar las políticas y programas del Ministerio de Igualdad y Equidad.',
+            highlight: true 
+        }
+    ],
+    apoyo: [
+        { title: 'Talento Humano', desc: 'Administrar de manera integral el ciclo de vida laboral de las servidoras y servidores públicos del Ministerio, mediante la gestión de los planes, programas, estrategias y acciones que garanticen su vinculación, desarrollo, bienestar, evaluación periódica y retiro.' },
+        { title: 'Gestión Contractual', desc: 'Adquirir los bienes, obras y/o servicios requeridos por el Ministerio durante cada vigencia, elaborando, modificando y liquidando los contratos y/o convenios necesarios.' },
+        { title: 'Gestión Jurídica', desc: 'Establecer las políticas de gestión sobre las cuales se enmarca la actividad litigiosa y producción normativa, además de representar judicial y extrajudicialmente a la Entidad.' },
+        { title: 'Logística y Recursos', desc: 'Gestionar los bienes, obras, locaciones e infraestructura y servicios administrativos, de mantenimiento y asistencia logística necesarios para el funcionamiento adecuado.' },
+        { title: 'Gestión Documental', desc: 'Orientar y coordinar los lineamientos administrativos y técnicos relacionados con la planificación, procesamiento, gestión y organización de la documentación.' },
+        { title: 'Gestión Financiera', desc: 'Gestionar los recursos públicos asignados al Ministerio, a través del desarrollo de actividades de planificación y control presupuestario, la administración de tesorería y la contabilidad pública.' }
+    ],
+    evaluacion: [
+        { title: 'Control Interno Disciplinario', desc: 'Garantizar el cumplimiento del régimen disciplinario del Ministerio, a través de la determinación de la responsabilidad disciplinaria de personas en el servicio público y exservidores públicos.' },
+        { title: 'Aseguramiento del Control Interno', desc: 'Articular la información proveniente de diversas fuentes internas y externas para fomentar el mejoramiento y control de la gestión institucional, asesorando a la alta dirección mediante la aplicación de técnicas modernas de auditoría, seguimiento y evaluación independiente.' }
+    ]
+};
+
+// --- DATA: Organigrama Detailed ---
+interface OrgNode {
+    title: string;
+    description: string;
+    dependencies: { name: string; desc: string }[]; 
+}
+
+const ORG_DATA: Record<string, OrgNode> = {
+      'entidades': { 
+          title: 'Entidades Adscritas y Vinculadas', 
+          description: 'Organismos con autonomía administrativa pero vinculados al sector para coordinar políticas públicas específicas.', 
+          dependencies: [
+              { name: 'Instituto Colombiano de Bienestar Familiar (ICBF)', desc: 'Entidad adscrita encargada de la protección integral de la primera infancia, la niñez, la adolescencia y el bienestar de las familias.' },
+              { name: 'Instituto Nacional para Sordos (INSOR)', desc: 'Promueve, desde el sector educación, el desarrollo e inclusión social de la población sorda colombiana.' },
+              { name: 'Instituto Nacional para Ciegos (INCI)', desc: 'Trabaja para garantizar los derechos de los colombianos con discapacidad visual en términos de inclusión y accesibilidad.' }
+          ] 
+      },
+      'territoriales': { 
+          title: 'Direcciones Territoriales', 
+          description: 'Brazos operativos del Ministerio en las regiones (Art. 17, D.1075). Su función es aterrizar la política de igualdad en los territorios.', 
+          dependencies: [
+              { name: '32 Direcciones Departamentales', desc: 'Una por departamento. Se encargan de la articulación con gobiernos locales, organizaciones sociales y la implementación de la oferta institucional en territorio.' }
+          ] 
+      },
+      'secretaria': { 
+          title: 'Secretaría General', 
+          description: 'Motor administrativo del Ministerio (Art. 43, D.1075). Gestiona el talento humano, los recursos financieros, físicos y la contratación.', 
+          dependencies: [
+              { name: 'Subdirección Administrativa y Financiera', desc: 'Art. 44. Administra el presupuesto, la contabilidad, la tesorería y los recursos físicos (bienes, servicios generales) de la entidad.' },
+              { name: 'Subdirección de Contratación', desc: 'Art. 45. Lidera los procesos contractuales (licitaciones, convenios) asegurando transparencia y cumplimiento legal en la adquisición de bienes y servicios.' },
+              { name: 'Subdirección de Talento Humano', desc: 'Art. 46. Gestiona el bienestar, la nómina, la capacitación y el desarrollo de los servidores públicos del Ministerio.' }
+          ] 
+      },
+      'despacho': { 
+          title: 'Despacho de la Ministra', 
+          description: 'Cabeza del Sector Administrativo (Art. 6, D.1075). Define las directrices políticas, representa legalmente al Ministerio y lidera el consejo directivo.', 
+          dependencies: [
+              { name: 'Viceministerios', desc: 'Lideran la formulación técnica de políticas por población.' },
+              { name: 'Secretaría General', desc: 'Soporte administrativo y financiero.' },
+              { name: 'Oficinas Asesoras', desc: 'Órganos de consejo y control directo.' }
+          ] 
+      },
+      'asesoras': { 
+          title: 'Oficinas Asesoras', 
+          description: 'Órganos de apoyo directo al Despacho (Arts. 7-16, D.1075) que brindan soporte transversal en temas estratégicos y de control.', 
+          dependencies: [
+              { name: 'Oficina de Saberes y Conocimientos Estratégicos', desc: 'Art. 7. Gestiona la investigación, innovación y el diálogo de saberes ancestrales y modernos para fundamentar las políticas.' },
+              { name: 'Oficina de Proyectos para la Igualdad', desc: 'Art. 8. Estructura y viabiliza los proyectos de inversión del Ministerio para asegurar recursos y ejecución técnica.' },
+              { name: 'Oficina de Tecnologías de la Información', desc: 'Art. 9. Lidera la transformación digital, la infraestructura tecnológica y los sistemas de información de la entidad.' },
+              { name: 'Oficina Asesora de Comunicaciones', desc: 'Art. 10. Define la estrategia de comunicación pública, prensa y relacionamiento con medios para visibilizar la gestión.' },
+              { name: 'Oficina de Control Interno', desc: 'Art. 11. (Nuestra Oficina). Evalúa de forma independiente la gestión y el control interno (3ra Línea de Defensa).' },
+              { name: 'Oficina de Control Interno Disciplinario', desc: 'Art. 12. Adelanta procesos disciplinarios contra servidores en primera instancia, garantizando el debido proceso.' },
+              { name: 'Oficina Asesora de Planeación', desc: 'Art. 13. Lidera la planeación estratégica, el presupuesto y el seguimiento a metas institucionales.' },
+              { name: 'Oficina Jurídica', desc: 'Art. 14. Blinda jurídicamente a la entidad, emite conceptos, revisa actos administrativos y defiende judicialmente al Ministerio.' },
+              { name: 'Oficina de Alianzas Estratégicas', desc: 'Art. 15. Gestiona la cooperación internacional y las relaciones con el sector privado para apalancar recursos.' },
+              { name: 'Oficina de Relacionamiento con la Ciudadanía', desc: 'Art. 16. Gestiona el servicio al ciudadano, PQRSDF y mecanismos de participación.' }
+          ] 
+      },
+      'vm-mujeres': { 
+          title: 'Viceministerio de las Mujeres', 
+          description: 'Lidera la política pública de equidad de género y derechos de las mujeres (Art. 18, D.1075).', 
+          dependencies: [
+              { name: 'Dirección para la Prevención de Violencias', desc: 'Art. 19. Estrategias para erradicar violencias basadas en género.' },
+              { name: 'Dirección para la Autonomía Económica', desc: 'Art. 20. Fomento al emprendimiento y empleo digno para mujeres.' },
+              { name: 'Dirección para la Garantía de Derechos', desc: 'Art. 21. Transversalización del enfoque de género en el Estado.' },
+              { name: 'Dirección para Mujeres en Actividades Sexuales Pagas', desc: 'Art. 22. Garantía de derechos de esta población específica.' },
+              { name: 'Dirección para Madres Cabeza de Familia', desc: 'Art. 23. Programas de apoyo social y económico.' }
+          ] 
+      },
+      'vm-juventud': { 
+          title: 'Viceministerio de las Juventudes', 
+          description: 'Articula el Subsistema de Juventud y programas como Jóvenes en Paz (Art. 24, D.1075).', 
+          dependencies: [
+              { name: 'Dirección para el Goce Efectivo de los Derechos', desc: 'Art. 25. Ciudadanía juvenil y participación.' },
+              { name: 'Dirección de Barrismo Social', desc: 'Art. 26. Convivencia y paz en el fútbol.' },
+              { name: 'Dirección de Jóvenes en Paz', desc: 'Art. 27. Programa de transferencias y educación para jóvenes en riesgo.' }
+          ] 
+      },
+      'vm-poblaciones': { 
+          title: 'Viceministerio para las Poblaciones y Territorios Excluidos', 
+          description: 'Superación de la pobreza y atención a vulnerables (Art. 28, D.1075).', 
+          dependencies: [
+              { name: 'Dirección para la Superación de la Pobreza', desc: 'Art. 29. Estrategias contra el hambre y la pobreza extrema.' },
+              { name: 'Dirección de Cuidado', desc: 'Art. 30. Sistema Nacional de Cuidado.' },
+              { name: 'Dirección para la Población Migrante', desc: 'Art. 31. Inclusión de población migrante.' },
+              { name: 'Dirección de Acceso Igualitario al Agua', desc: 'Art. 32. Soluciones de agua en territorios marginados.' },
+              { name: 'Dirección para Personas en Situación de Calle', desc: 'Art. 33. Dignidad y derechos para habitantes de calle.' },
+              { name: 'Dirección para Personas Mayores', desc: 'Art. 34. Protección a la vejez.' }
+          ] 
+      },
+      'vm-diversidades': { 
+          title: 'Viceministerio de las Diversidades', 
+          description: 'Garantía de derechos de población diversa y con discapacidad (Art. 35, D.1075).', 
+          dependencies: [
+              { name: 'Dirección para la Garantía de Derechos LGBTIQ+', desc: 'Art. 36. Política pública LGBTIQ+.' },
+              { name: 'Dirección para los Derechos de Personas con Discapacidad', desc: 'Art. 37. Inclusión y accesibilidad.' }
+          ] 
+      },
+      'vm-etnicos': { 
+          title: 'Viceministerio de Pueblos Étnicos y Campesinos', 
+          description: 'Derechos de grupos étnicos y campesinado (Art. 38, D.1075).', 
+          dependencies: [
+              { name: 'Dirección para Comunidades NARP', desc: 'Art. 39. Negras, Afro, Raizales y Palenqueras.' },
+              { name: 'Dirección para Pueblos Indígenas', desc: 'Art. 40. Derechos y territorio indígena.' },
+              { name: 'Dirección para el Pueblo Rrom', desc: 'Art. 41. Protección cultural Gitana.' },
+              { name: 'Dirección para el Campesinado', desc: 'Art. 42. Derechos del campesinado como sujeto de derechos.' }
+          ] 
+      }
 };
 
 // --- DATA: Timeline ---
@@ -73,7 +224,9 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('Todo');
   const [selectedOrgNode, setSelectedOrgNode] = useState<string | null>(null);
+  const [selectedSubNode, setSelectedSubNode] = useState<{name: string, desc: string} | null>(null); 
   const [selectedTimelineItem, setSelectedTimelineItem] = useState<any>(null);
+  const [selectedProcess, setSelectedProcess] = useState<{title: string, desc: string} | null>(null);
 
   // Time tracking logic
   const timerRef = useRef<number | null>(null);
@@ -334,7 +487,7 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
                             </div>
                             <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><BookOpen size={80}/></div>
-                                <h3 className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2 relative z-10">Visión</h3>
+                                <h3 className="text-lg font-bold text-brand-600 dark:text-brand-400 mb-2 relative z-10">Visión</h3>
                                 <p className="text-sm text-slate-600 dark:text-slate-300 relative z-10">
                                     Ser un hito permanente en la historia de Colombia que transforma, de forma concreta, la vida de poblaciones y territorios históricamente excluidos, haciendo tangible la igualdad y la equidad.
                                 </p>
@@ -375,51 +528,116 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
                 </div>
             )}
 
-            {/* 3. PROCESOS */}
+            {/* 3. PROCESOS (UPDATED DESIGN) */}
             {activeTab === 'process' && (
                 <div className="animate-fade-in">
                     <Card title="Esquema de Procesos (Interactivo)">
                         <p className="text-sm text-slate-500 mb-6">Explore cómo funciona el Ministerio. Pase el cursor sobre cada componente para ver su función.</p>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div className="md:col-span-2 lg:col-span-3 bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800 p-4 rounded-xl text-center font-bold text-brand-800 dark:text-brand-300 relative group cursor-help">
-                                Enfoques Transversales
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 font-normal">
-                                    Cobija toda la actuación con los enfoques de Derecho, Territorial, Intersectorial, Diferencial, de Género, Étnico-Racial y Antirracista.
-                                </div>
-                            </div>
-                            <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
-                                <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Estratégicos</div>
-                                {['Gestión de Saberes', 'Gestión Estratégica', 'Gestión de Proyectos', 'Relacionamiento Ciudadano', 'Comunicaciones', 'Cooperación Internacional', 'Gestión TICs'].map((p, i) => (
-                                    <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                        {p}
-                                    </div>
+                        {/* Enfoques Transversales Bar */}
+                        <div className="w-full bg-brand-50 dark:bg-brand-900/30 text-brand-800 dark:text-brand-300 font-bold text-center py-3 rounded-lg mb-6 border border-brand-200 dark:border-brand-800 shadow-sm">
+                            Enfoques Transversales
+                        </div>
+
+                        {/* 3 Columns Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            
+                            {/* Estratégicos */}
+                            <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col gap-3">
+                                <h4 className="font-bold text-slate-800 dark:text-white text-center mb-2">Procesos Estratégicos</h4>
+                                {PROCESS_DEFINITIONS.estrategicos.map((p, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => setSelectedProcess(p)}
+                                        className="w-full py-3 px-2 text-center rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-600 hover:shadow-md transition-all text-xs font-semibold text-slate-600 dark:text-slate-300"
+                                    >
+                                        {p.title}
+                                    </button>
                                 ))}
                             </div>
-                            <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
-                                <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos Misionales</div>
-                                {['Atención a Juventudes', 'Atención a Mujeres', 'Poblaciones y Territorios Excluidos', 'Pueblos Étnicos y Campesinos', 'Discapacidad y LGBTIQ+'].map((p, i) => (
-                                    <div key={i} className="p-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs font-medium text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                        {p}
-                                    </div>
-                                ))}
-                                <div className="p-3 bg-brand-600 text-white rounded-lg text-xs font-bold text-center hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                    Articulación Intersectorial
-                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded shadow-lg hidden group-hover:block z-10">
-                                        Coordina acciones entre direcciones y entidades para una respuesta transformadora.
-                                    </div>
-                                </div>
+
+                            {/* Misionales */}
+                            <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col gap-3">
+                                <h4 className="font-bold text-slate-800 dark:text-white text-center mb-2">Procesos Misionales</h4>
+                                {PROCESS_DEFINITIONS.misionales.map((p, i) => {
+                                    // Use 'highlight' property to style special processes
+                                    const isHighlighted = (p as any).highlight;
+                                    return (
+                                        <button 
+                                            key={i} 
+                                            onClick={() => setSelectedProcess(p)}
+                                            className={`w-full py-3 px-2 text-center rounded-lg transition-all text-xs font-bold hover:shadow-md border
+                                                ${isHighlighted 
+                                                    ? 'bg-brand-600 text-white border-brand-600 hover:bg-brand-700 shadow-brand-200' 
+                                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-slate-300'
+                                                }`}
+                                        >
+                                            {p.title}
+                                        </button>
+                                    );
+                                })}
                             </div>
-                            <div className="border border-dashed border-gray-300 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800 flex flex-col gap-3">
-                                <div className="text-center font-bold text-slate-700 dark:text-slate-300 border-b pb-2 mb-2">Procesos de Apoyo</div>
-                                {['Talento Humano', 'Gestión Contractual', 'Gestión Jurídica', 'Logística y Recursos', 'Gestión Documental', 'Gestión Financiera'].map((p, i) => (
-                                    <div key={i} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-lg text-xs font-medium text-center hover:bg-white hover:shadow hover:scale-105 transition-all cursor-help relative group">
-                                        {p}
-                                    </div>
+
+                            {/* Apoyo */}
+                            <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col gap-3">
+                                <h4 className="font-bold text-slate-800 dark:text-white text-center mb-2">Procesos de Apoyo</h4>
+                                {PROCESS_DEFINITIONS.apoyo.map((p, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => setSelectedProcess(p)}
+                                        className="w-full py-3 px-2 text-center rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-600 hover:shadow-md transition-all text-xs font-semibold text-slate-600 dark:text-slate-300"
+                                    >
+                                        {p.title}
+                                    </button>
                                 ))}
                             </div>
                         </div>
+
+                        {/* Bottom Control Bars (Interactive) */}
+                        <div className="flex flex-col gap-3">
+                             {PROCESS_DEFINITIONS.evaluacion.map((p, i) => (
+                                <button 
+                                    key={i}
+                                    onClick={() => setSelectedProcess(p)}
+                                    className="w-full bg-brand-50 dark:bg-brand-900/30 text-brand-800 dark:text-brand-300 font-bold py-3 rounded-lg border border-brand-200 dark:border-brand-800 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors shadow-sm text-sm"
+                                >
+                                    {p.title}
+                                </button>
+                             ))}
+                        </div>
+
                     </Card>
+
+                    {/* PROCESS MODAL */}
+                    {selectedProcess && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setSelectedProcess(null)}>
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl max-w-lg w-full relative shadow-2xl border-t-4 border-brand-500" onClick={e => e.stopPropagation()}>
+                                <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors" onClick={() => setSelectedProcess(null)}>
+                                    <X size={24} />
+                                </button>
+                                
+                                <div className="mb-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Detalle del Proceso</span>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2 leading-tight pr-8">{selectedProcess.title}</h3>
+                                </div>
+                                
+                                <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                        {selectedProcess.desc}
+                                    </p>
+                                </div>
+
+                                <div className="mt-6 flex justify-end">
+                                    <button 
+                                        onClick={() => setSelectedProcess(null)}
+                                        className="px-4 py-2 bg-slate-800 text-white text-sm font-bold rounded-lg hover:bg-slate-700 transition-colors"
+                                    >
+                                        Entendido
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -428,39 +646,147 @@ export const StrategicModule: React.FC<StrategicModuleProps> = ({ onComplete, on
                 <div className="animate-fade-in">
                     <Card title="Estructura Orgánica (Decreto 1075)">
                         <p className="text-sm text-slate-500 mb-8">Haga clic en una dependencia para ver sus funciones y componentes.</p>
-                        <div className="flex flex-col items-center gap-8 relative overflow-x-auto pb-4">
-                            <div className={`w-56 p-4 rounded-xl text-center font-bold text-sm cursor-pointer transition-all shadow-md border hover:-translate-y-1 ${selectedOrgNode === 'entidades' ? 'bg-slate-800 text-white ring-4 ring-slate-200' : 'bg-slate-200 text-slate-700 border-slate-300'}`} onClick={() => setSelectedOrgNode('entidades')}>Entidades Adscritas</div>
-                            <div className="w-px h-8 bg-slate-300"></div>
-                            <div className="flex flex-wrap justify-center gap-8 relative">
-                                <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-slate-300 -z-10"></div>
-                                <div className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'territoriales' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} onClick={() => setSelectedOrgNode('territoriales')}>Direcciones Territoriales</div>
-                                <div className={`w-56 p-5 rounded-xl text-center font-bold text-white shadow-xl cursor-pointer transition-all hover:-translate-y-1 z-10 ${selectedOrgNode === 'despacho' ? 'bg-slate-900 ring-4 ring-brand-200' : 'bg-brand-600'}`} onClick={() => setSelectedOrgNode('despacho')}>Despacho de la Ministra</div>
-                                <div className={`w-48 p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'asesoras' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} onClick={() => setSelectedOrgNode('asesoras')}>Oficinas Asesoras</div>
+                        
+                        <div className="flex flex-col items-center gap-12">
+                            {/* Nivel Superior */}
+                            <div className="flex justify-center">
+                                <div 
+                                    className={`w-64 p-4 rounded-xl text-center font-bold text-sm cursor-pointer transition-all shadow-md border hover:-translate-y-1 ${selectedOrgNode === 'entidades' ? 'bg-slate-800 text-white ring-4 ring-slate-200' : 'bg-slate-200 text-slate-700 border-slate-300'}`} 
+                                    onClick={() => setSelectedOrgNode('entidades')}
+                                >
+                                    Entidades Adscritas
+                                </div>
                             </div>
-                            <div className="w-px h-8 bg-slate-300"></div>
-                            <div className="flex flex-wrap justify-center gap-3">
-                                {[{k: 'vm-mujeres', l: 'VM Mujeres'}, {k: 'vm-juventud', l: 'VM Juventud'}, {k: 'vm-poblaciones', l: 'VM Poblaciones'}, {k: 'vm-diversidades', l: 'VM Diversidades'}, {k: 'vm-etnicos', l: 'VM Pueblos Étnicos'}].map(vm => (
-                                    <div key={vm.k} className={`p-3 rounded-lg text-xs font-bold cursor-pointer transition-all border shadow-sm hover:-translate-y-1 ${selectedOrgNode === vm.k ? 'bg-slate-800 text-white' : 'bg-gray-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-gray-200'}`} onClick={() => setSelectedOrgNode(vm.k)}>{vm.l}</div>
-                                ))}
+
+                            {/* Nivel Medio - Ramas y Despacho */}
+                            <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-8 relative w-full max-w-4xl">
+                                
+                                {/* Rama Izquierda */}
+                                <div className="flex flex-col gap-4 w-full md:w-1/3 items-center md:items-end">
+                                    <div 
+                                        className={`w-full max-w-[220px] p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'territoriales' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} 
+                                        onClick={() => setSelectedOrgNode('territoriales')}
+                                    >
+                                        Oficinas Territoriales
+                                    </div>
+                                    <div 
+                                        className={`w-full max-w-[220px] p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'secretaria' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} 
+                                        onClick={() => setSelectedOrgNode('secretaria')}
+                                    >
+                                        Secretaría General
+                                    </div>
+                                </div>
+
+                                {/* Centro - Despacho */}
+                                <div className="relative z-10">
+                                    <div 
+                                        className={`w-64 p-6 rounded-xl text-center font-extrabold text-white shadow-xl cursor-pointer transition-all hover:-translate-y-1 border-4 ${selectedOrgNode === 'despacho' ? 'bg-slate-900 border-white ring-4 ring-brand-200' : 'bg-brand-600 border-brand-400'}`} 
+                                        onClick={() => setSelectedOrgNode('despacho')}
+                                    >
+                                        Despacho de la Ministra
+                                    </div>
+                                </div>
+
+                                {/* Rama Derecha */}
+                                <div className="flex flex-col gap-4 w-full md:w-1/3 items-center md:items-start">
+                                    <div 
+                                        className={`w-full max-w-[220px] p-3 rounded-xl text-center font-bold text-xs cursor-pointer transition-all shadow border hover:-translate-y-1 bg-white dark:bg-slate-800 ${selectedOrgNode === 'asesoras' ? 'border-brand-500 ring-2 ring-brand-200' : 'border-gray-200'}`} 
+                                        onClick={() => setSelectedOrgNode('asesoras')}
+                                    >
+                                        Oficinas Asesoras
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Nivel Inferior - Viceministerios */}
+                            <div className="w-full">
+                                <div className="h-8 w-px bg-slate-300 mx-auto mb-4"></div>
+                                <div className="flex flex-wrap justify-center gap-3">
+                                    {[
+                                        {k: 'vm-mujeres', l: 'Viceministerio de las Mujeres'}, 
+                                        {k: 'vm-juventud', l: 'Viceministerio de las Juventudes'}, 
+                                        {k: 'vm-poblaciones', l: 'Viceministerio para las Poblaciones y Territorios Excluidos'}, 
+                                        {k: 'vm-diversidades', l: 'Viceministerio de las Diversidades'}, 
+                                        {k: 'vm-etnicos', l: 'Viceministerio de Pueblos Étnicos y Campesinos'}
+                                    ].map(vm => (
+                                        <div 
+                                            key={vm.k} 
+                                            className={`p-3 rounded-lg text-xs font-bold cursor-pointer transition-all border shadow-sm hover:-translate-y-1 ${selectedOrgNode === vm.k ? 'bg-slate-800 text-white' : 'bg-gray-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-gray-200'}`} 
+                                            onClick={() => setSelectedOrgNode(vm.k)}
+                                        >
+                                            {vm.l}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </Card>
+
+                    {/* MODAL NIVEL 1: DETALLE DE DEPENDENCIA PRINCIPAL */}
                     {selectedOrgNode && ORG_DATA[selectedOrgNode] && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedOrgNode(null)}>
-                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl max-w-lg w-full relative shadow-2xl" onClick={e => e.stopPropagation()}>
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl max-w-4xl w-full relative shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
                                 <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500" onClick={() => setSelectedOrgNode(null)}><X /></button>
-                                <h3 className="text-xl font-bold mb-2 text-brand-700 dark:text-brand-400 border-b pb-2">{ORG_DATA[selectedOrgNode].title}</h3>
-                                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{ORG_DATA[selectedOrgNode].description}</p>
-                                {ORG_DATA[selectedOrgNode].dependencies && (
-                                    <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-xl">
-                                        <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Componentes / Dependencias</h4>
-                                        <ul className="space-y-1">
-                                            {ORG_DATA[selectedOrgNode].dependencies.map((dep: string, idx: number) => (
-                                                <li key={idx} className="text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2"><ChevronRight size={12} className="mt-0.5 text-brand-500"/> {dep}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
+                                
+                                <h3 className="text-xl font-bold mb-2 text-brand-700 dark:text-brand-400 border-b pb-2 pr-8 break-words">{ORG_DATA[selectedOrgNode].title}</h3>
+                                <div className="overflow-y-auto pr-2 custom-scrollbar">
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{ORG_DATA[selectedOrgNode].description}</p>
+                                    
+                                    {ORG_DATA[selectedOrgNode].dependencies && (
+                                        <div className="bg-gray-50 dark:bg-slate-700 p-4 rounded-xl">
+                                            <h4 className="text-xs font-bold uppercase text-slate-500 mb-3 flex items-center gap-2">
+                                                <Grid size={14}/> Componentes / Dependencias
+                                            </h4>
+                                            <p className="text-[10px] text-slate-400 mb-3 italic">Haga clic en una dependencia para ver sus funciones específicas.</p>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {ORG_DATA[selectedOrgNode].dependencies.map((dep, idx) => (
+                                                    <button 
+                                                        key={idx} 
+                                                        onClick={() => setSelectedSubNode(dep)}
+                                                        className="w-full text-left p-3 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 hover:border-brand-400 hover:shadow-md transition-all group flex items-start justify-between h-full"
+                                                    >
+                                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-tight">{dep.name}</span>
+                                                        <ArrowUpRight size={14} className="text-slate-300 group-hover:text-brand-500 transition-colors shrink-0 ml-2 mt-0.5" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL NIVEL 2: DETALLE DE SUB-DEPENDENCIA (POP-UP SOBRE POP-UP) */}
+                    {selectedSubNode && (
+                        <div 
+                            className="fixed inset-0 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-fade-in" 
+                            style={{ zIndex: 60 }}
+                            onClick={() => setSelectedSubNode(null)}
+                        >
+                            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-2xl w-full relative shadow-2xl border-2 border-brand-100 dark:border-slate-600 transform scale-100 transition-transform flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+                                <div className="flex-none mb-4">
+                                    <button className="absolute top-3 right-3 p-1 bg-gray-100 dark:bg-slate-800 rounded-full text-slate-400 hover:text-red-500 transition-colors" onClick={() => setSelectedSubNode(null)}>
+                                        <X size={20} />
+                                    </button>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded">Funciones Específicas</span>
+                                    <h3 className="text-lg font-extrabold text-slate-900 dark:text-white mt-2 leading-tight pr-8 break-words">{selectedSubNode.name}</h3>
+                                </div>
+                                
+                                <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                                        {selectedSubNode.desc}
+                                    </p>
+                                </div>
+
+                                <div className="flex-none mt-4">
+                                    <button 
+                                        onClick={() => setSelectedSubNode(null)}
+                                        className="w-full py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                        Volver
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}

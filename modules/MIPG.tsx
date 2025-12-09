@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, Badge, Accordion, TimelineItem, Quiz, MinistryLogo } from '../components/UI';
-import { BookOpen, Clock, Activity, Shield, RefreshCw, CheckCircle, Info, Grid, ArrowLeft, ArrowRight, ChevronDown, Layout, Target, FileText, Layers, BarChart2, Lock } from 'lucide-react';
+import { BookOpen, Clock, Activity, Shield, RefreshCw, CheckCircle, Info, Grid, ArrowLeft, ArrowRight, ChevronDown, Layout, Target, FileText, Layers, BarChart2, Lock, X, Lightbulb, Users, Zap, Scale, Leaf, Database, FileCheck, HardHat, Eye, UserCheck, Briefcase } from 'lucide-react';
 import { QuizState } from '../types';
 
 const SECTIONS = [
@@ -10,8 +10,226 @@ const SECTIONS = [
   { id: 'dimensions', label: '7 Dimensiones', icon: Layout, desc: 'Políticas de Gestión y Desempeño.' },
   { id: 'subsystems', label: 'Subsistemas SIG', icon: Layers, desc: 'Calidad, Ambiental, SST, etc.' },
   { id: 'defenses', label: 'Líneas de Defensa', icon: Shield, desc: 'Roles y responsabilidades de control.' },
-  { id: 'furag', label: 'Ciclo FURAG', icon: RefreshCw, desc: 'Planear, Hacer, Verificar, Actuar.' },
+  { id: 'operation', label: 'Ciclo Operativo', icon: RefreshCw, desc: 'La mejora continua (PHVA).' },
   { id: 'quiz', label: 'Evaluación', icon: CheckCircle, desc: 'Prueba rápida de conocimiento.' }
+];
+
+// --- DATA: PRINCIPIOS MIPG ---
+const MIPG_PRINCIPLES = [
+    {
+        title: "Orientación a resultados",
+        icon: Target,
+        short: "Toma como eje de la gestión pública las necesidades de los ciudadanos.",
+        desc: "Toma como eje de toda la gestión pública, las necesidades de los ciudadanos asociadas al propósito fundamental de la entidad, así como los resultados necesarios para su satisfacción.",
+        application: [
+            { area: "Direccionamiento Estratégico y Planeación", items: ["Caracterización de Usuarios", "Análisis de Contexto", "Planeación Estratégica", "Análisis de Capacidad Institucional", "Programación Presupuestal"] }
+        ]
+    },
+    {
+        title: "Articulación interinstitucional",
+        icon: Users,
+        short: "Coordinación y operación entre entidades públicas.",
+        desc: "Adelantar acciones de coordinación, cooperación y articulación con otras organizaciones del sector público o privado, del orden territorial, nacional o internacional, con el fin de formular e implementar estrategias para resolver las necesidades de los ciudadanos asociadas al propósito fundamental de la entidad.",
+        application: [
+            { area: "Direccionamiento Estratégico y Planeación", items: ["Análisis de Capacidad Institucional"] },
+            { area: "Gestión para el Resultado", items: ["Desarrollo de Alianzas"] }
+        ]
+    },
+    {
+        title: "Excelencia y calidad",
+        icon: Zap,
+        short: "Bienes y servicios públicos que satisfacen las necesidades de los ciudadanos.",
+        desc: "Lograr que a lo largo del tiempo, los atributos de los servicios o productos públicos, brindados a los ciudadanos, sean los mejores para satisfacer sus necesidades.",
+        application: [
+            { area: "Direccionamiento Estratégico y Planeación", items: ["Necesidades y expectativas de los usuarios (Caracterización)", "Servicio al Ciudadano", "Ley de Transparencia y Acceso a la Información", "Racionalización de Trámites", "Rendición de Cuentas y Participación"] },
+            { area: "Gestión para el Resultado", items: ["Modelo de operación por procesos"] }
+        ]
+    },
+    {
+        title: "Aprendizaje e innovación",
+        icon: Lightbulb,
+        short: "Mejora permanente, aprovechando los conocimientos y la innovación.",
+        desc: "Mejora permanente, incorporando la innovación, aprovechando la creatividad de sus grupos internos y, en lo posible, de los grupos de interés de la entidad.",
+        application: [
+            { area: "Gestión del Conocimiento y la Innovación", items: [] },
+            { area: "Evaluación de Resultados", items: [] },
+            { area: "Control Interno", items: [] }
+        ]
+    },
+    {
+        title: "Integridad, transparencia y confianza",
+        icon: Scale,
+        short: "Como principal criterio de actuación de los servidores públicos.",
+        desc: "Criterios de actuación de los servidores públicos y el deber hacia los ciudadanos.",
+        application: [
+            { area: "Direccionamiento Estratégico y Planeación", items: [] },
+            { area: "Gestión del Talento Humano", items: ["Código de Integridad"] },
+            { area: "Gestión para el Resultado", items: ["Participación ciudadana en la gestión pública", "Gestión Ambiental"] },
+            { area: "Información y Comunicación", items: [] }
+        ]
+    },
+    {
+        title: "Toma de decisiones basada en evidencia",
+        icon: BarChart2,
+        short: "Captura, análisis y uso de información para la toma de decisiones.",
+        desc: "Capturar, analizar y usar información para la toma de decisiones que afectan la consecución de los resultados de la entidad.",
+        application: [
+            { area: "Gestión del Conocimiento y la Innovación", items: [] },
+            { area: "Evaluación de Resultados", items: [] },
+            { area: "Control Interno", items: [] }
+        ]
+    }
+];
+
+// --- DATA: SUBSISTEMAS (Res 1022) ---
+const SUBSYSTEMS_DATA = [
+    {
+        acronym: "SGC",
+        name: "Gestión de Calidad",
+        leader: "Oficina Asesora de Planeación",
+        icon: FileCheck,
+        desc: "Promueve la mejora continua, la satisfacción del ciudadano y el cumplimiento de requisitos legales (ISO 9001).",
+        responsibilities: [
+            "Promover la implementación y sostenibilidad del modelo de operación por procesos.",
+            "Orientar el diseño y actualización de la documentación de procesos.",
+            "Administrar el repositorio de acciones de mejora.",
+            "Liderar la gestión de riesgos para maximizar objetivos estratégicos.",
+            "Definir metodología para monitorear cumplimiento de requisitos."
+        ]
+    },
+    {
+        acronym: "SCI",
+        name: "Control Interno",
+        leader: "Oficina Asesora de Planeación",
+        icon: Shield,
+        desc: "Configura el esquema de controles (MECI) para la autoevaluación y gestión de riesgos (2da Línea de Defensa).",
+        responsibilities: [
+            "Diseñar mecanismos de autoevaluación y control organizacional (MECI).",
+            "Articular el Sistema de Control Interno con las demás dimensiones MIPG.",
+            "Promover la cultura del autocontrol en la entidad.",
+            "Supervisar la gestión de alertas y desviaciones de procesos.",
+            "Apoyar la formulación de planes de mejoramiento institucional."
+        ]
+    },
+    {
+        acronym: "SGA",
+        name: "Gestión Ambiental",
+        leader: "Sub. Administrativa y Financiera",
+        icon: Leaf,
+        desc: "Minimiza los impactos ambientales de la operación y promueve el uso eficiente de recursos (ISO 14001).",
+        responsibilities: [
+            "Identificar y evaluar aspectos e impactos ambientales en sedes.",
+            "Controlar contaminación, uso de agua, energía y residuos.",
+            "Realizar simulacros de emergencias ambientales.",
+            "Promover buenas prácticas ambientales y toma de conciencia.",
+            "Asegurar cumplimiento de obligaciones y permisos ambientales."
+        ]
+    },
+    {
+        acronym: "SGSI",
+        name: "Seguridad de la Información",
+        leader: "Oficina de Tecnologías (TIC)",
+        icon: Lock,
+        desc: "Garantiza la confidencialidad, integridad y disponibilidad de la información (ISO 27001).",
+        responsibilities: [
+            "Alinear el SGSI con estrategias de Gobierno Digital.",
+            "Implementar controles de seguridad y privacidad de la información.",
+            "Gestionar activos de información y riesgos tecnológicos.",
+            "Supervisar la gestión de incidentes de seguridad.",
+            "Garantizar la continuidad de la operación tecnológica."
+        ]
+    },
+    {
+        acronym: "SIGA",
+        name: "Gestión Documental y Archivo",
+        leader: "Sub. Administrativa y Financiera",
+        icon: Database,
+        desc: "Asegura la organización, preservación y acceso a la memoria institucional.",
+        responsibilities: [
+            "Diseñar políticas de administración y disposición final de documentos.",
+            "Supervisar Tablas de Retención (TRD) y Cuadros de Clasificación (CCD).",
+            "Promover digitalización y herramientas tecnológicas de archivo.",
+            "Realizar auditorías internas al sistema documental.",
+            "Capacitar en buenas prácticas de gestión documental."
+        ]
+    },
+    {
+        acronym: "SST",
+        name: "Seguridad y Salud en el Trabajo",
+        leader: "Sub. Talento Humano",
+        icon: HardHat,
+        desc: "Previene lesiones y enfermedades laborales, promoviendo el bienestar (ISO 45001).",
+        responsibilities: [
+            "Ejecutar Planes de Trabajo Anual del SG-SST.",
+            "Generar estrategias de prevención de accidentalidad.",
+            "Realizar simulacros y gestión de peligros.",
+            "Apoyar funcionamiento del COPASST.",
+            "Gestionar investigación de incidentes y accidentes laborales."
+        ]
+    }
+];
+
+// --- DATA: LINEAS DE DEFENSA (Manual GE_A-MN-003) ---
+const DEFENSE_LINES_DATA = [
+    {
+        id: "E",
+        name: "Línea Estratégica",
+        actors: "Alta Dirección y Comité Institucional (CICCI)",
+        icon: Users,
+        color: "bg-slate-800 text-white",
+        desc: "Define el marco general para la gestión del riesgo y el control.",
+        roles: [
+            "Definir el marco general de operación.",
+            "Supervisar el cumplimiento de planes y objetivos.",
+            "Analizar riesgos estratégicos que afectan la misión.",
+            "Aprobar el Esquema de Líneas de Defensa y el Mapa de Aseguramiento."
+        ]
+    },
+    {
+        id: "1",
+        name: "1ª Línea de Defensa",
+        concept: "Autocontrol",
+        actors: "Gerentes Públicos, Líderes de Proceso y Equipos",
+        icon: UserCheck,
+        color: "bg-blue-600 text-white",
+        desc: "Responsables de la gestión operacional día a día. 'Yo ejecuto, yo controlo'.",
+        roles: [
+            "Identificar, monitorear y gestionar riesgos propios de su labor.",
+            "Diseñar e implementar controles operativos.",
+            "Garantizar que las actividades diarias cumplan con los procedimientos.",
+            "Reportar desviaciones y aplicar acciones correctivas inmediatas."
+        ]
+    },
+    {
+        id: "2",
+        name: "2ª Línea de Defensa",
+        concept: "Autoevaluación",
+        actors: "Oficina de Planeación, Líderes SIG y Supervisores",
+        icon: Eye,
+        color: "bg-indigo-600 text-white",
+        desc: "Monitorean temas transversales y generan alertas de aseguramiento.",
+        roles: [
+            "Efectuar seguimiento a temas transversales (ej. Riesgos, Calidad, SST).",
+            "Generar alertas a la 1ra Línea y a la Línea Estratégica.",
+            "Consolidar información para la toma de decisiones.",
+            "Facilitar la construcción del Mapa de Aseguramiento."
+        ]
+    },
+    {
+        id: "3",
+        name: "3ª Línea de Defensa",
+        concept: "Evaluación Independiente",
+        actors: "Oficina de Control Interno (OCI)",
+        icon: Shield,
+        color: "bg-brand-600 text-white",
+        desc: "Aseguramiento objetivo e independiente sobre la efectividad del sistema.",
+        roles: [
+            "Evaluar la efectividad de los controles de 1ra y 2da línea.",
+            "Liderar la construcción del Mapa de Aseguramiento.",
+            "Realizar auditorías basadas en riesgos.",
+            "Medir el nivel de confianza de los servicios de aseguramiento de la 2da línea."
+        ]
+    }
 ];
 
 interface MIPGModuleProps {
@@ -23,6 +241,9 @@ interface MIPGModuleProps {
 
 export const MIPGModule: React.FC<MIPGModuleProps> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
   const [activeTab, setActiveTab] = useState<'menu' | string>('menu');
+  const [selectedPrinciple, setSelectedPrinciple] = useState<any>(null);
+  const [selectedSubsystem, setSelectedSubsystem] = useState<any>(null);
+  const [selectedDefense, setSelectedDefense] = useState<any>(null);
   
   // Time tracking logic
   const timerRef = useRef<number | null>(null);
@@ -213,60 +434,149 @@ export const MIPGModule: React.FC<MIPGModuleProps> = ({ onComplete, onTimeUpdate
         <div className="min-h-[500px]">
 
             {activeTab === 'intro' && (
-                <div className="grid md:grid-cols-2 gap-6 animate-fade-in">
-                    <div className="space-y-6">
-                        <Card title="¿Qué es el MIPG?">
-                            <p className="text-slate-600 dark:text-slate-300 mb-6">
-                                Es un marco de referencia para <b>dirigir, planear, ejecutar, hacer seguimiento, evaluar y controlar</b> la gestión de las entidades públicas. Su objetivo es generar valor público y fortalecer las políticas de gestión y desempeño institucional.
-                            </p>
-                            <div className="grid grid-cols-3 gap-3">
-                                <div className="p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-center border border-brand-100 dark:border-brand-800">
-                                    <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">7</div>
-                                    <div className="text-[10px] uppercase font-bold text-slate-500">Dimensiones</div>
+                <div className="animate-fade-in space-y-8">
+                    {/* Definition Section */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-6">
+                            <Card title="¿Qué es el MIPG?">
+                                <p className="text-slate-600 dark:text-slate-300 mb-6">
+                                    Es un marco de referencia para <b>dirigir, planear, ejecutar, hacer seguimiento, evaluar y controlar</b> la gestión de las entidades públicas. Su objetivo es generar valor público y fortalecer las políticas de gestión y desempeño institucional.
+                                </p>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-center border border-brand-100 dark:border-brand-800">
+                                        <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">7</div>
+                                        <div className="text-[10px] uppercase font-bold text-slate-500">Dimensiones</div>
+                                    </div>
+                                    <div className="p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-center border border-brand-100 dark:border-brand-800">
+                                        <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">19</div>
+                                        <div className="text-[10px] uppercase font-bold text-slate-500">Políticas</div>
+                                    </div>
+                                    <div className="p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-center border border-brand-100 dark:border-brand-800">
+                                        <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">1</div>
+                                        <div className="text-[10px] uppercase font-bold text-slate-500">Instrumento (FURAG)</div>
+                                    </div>
                                 </div>
-                                <div className="p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-center border border-brand-100 dark:border-brand-800">
-                                    <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">19</div>
-                                    <div className="text-[10px] uppercase font-bold text-slate-500">Políticas</div>
-                                </div>
-                                <div className="p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-center border border-brand-100 dark:border-brand-800">
-                                    <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">1</div>
-                                    <div className="text-[10px] uppercase font-bold text-slate-500">Instrumento (FURAG)</div>
-                                </div>
-                            </div>
-                        </Card>
-                        <Card title="Principios">
-                            <div className="flex flex-wrap gap-2">
-                                {['Orientación a resultados', 'Excelencia y calidad', 'Articulación interinstitucional', 'Toma de decisiones basada en evidencia', 'Aprendizaje e innovación', 'Integridad y confianza'].map(p => (
-                                    <span key={p} className="px-3 py-1 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300">{p}</span>
-                                ))}
-                            </div>
-                        </Card>
+                            </Card>
+                        </div>
+                        <div>
+                            <Card title="Implementación en el Ministerio" className="h-full border-l-4 border-l-brand-500">
+                                <p className="text-slate-600 dark:text-slate-300 mb-4">
+                                    El MIPG fue adoptado formalmente mediante la <b>Resolución 1022 de 2024</b>, creando el Sistema Integrado de Gestión (SIG-MIPG).
+                                </p>
+                                <ul className="space-y-4">
+                                    <li className="flex gap-3 items-start">
+                                        <FileText className="text-brand-500 shrink-0 mt-0.5" size={18} />
+                                        <div>
+                                            <p className="font-bold text-slate-800 dark:text-white text-sm">Manual del SIG-MIPG</p>
+                                            <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1 py-0.5 rounded text-slate-600 dark:text-slate-400">ES_A-MS-001</code>
+                                            <p className="text-xs text-slate-500 mt-1">Establece la estructura, procesos, roles y responsabilidades.</p>
+                                        </div>
+                                    </li>
+                                    <li className="flex gap-3 items-start">
+                                        <Activity className="text-brand-500 shrink-0 mt-0.5" size={18} />
+                                        <div>
+                                            <p className="font-bold text-slate-800 dark:text-white text-sm">Procedimiento de Administración</p>
+                                            <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1 py-0.5 rounded text-slate-600 dark:text-slate-400">GE_A-PR-004</code>
+                                            <p className="text-xs text-slate-500 mt-1">Describe el ciclo operativo desde el autodiagnóstico hasta el reporte en FURAG.</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </Card>
+                        </div>
                     </div>
+
+                    {/* Principles Section */}
                     <div>
-                        <Card title="Implementación en el Ministerio" className="h-full border-l-4 border-l-brand-500">
-                            <p className="text-slate-600 dark:text-slate-300 mb-4">
-                                El MIPG fue adoptado formalmente mediante la <b>Resolución 1022 de 2024</b>, creando el Sistema Integrado de Gestión (SIG-MIPG).
-                            </p>
-                            <ul className="space-y-4">
-                                <li className="flex gap-3 items-start">
-                                    <FileText className="text-brand-500 shrink-0 mt-0.5" size={18} />
-                                    <div>
-                                        <p className="font-bold text-slate-800 dark:text-white text-sm">Manual del SIG-MIPG</p>
-                                        <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1 py-0.5 rounded text-slate-600 dark:text-slate-400">ES_A-MS-001</code>
-                                        <p className="text-xs text-slate-500 mt-1">Establece la estructura, procesos, roles y responsabilidades.</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-3 items-start">
-                                    <Activity className="text-brand-500 shrink-0 mt-0.5" size={18} />
-                                    <div>
-                                        <p className="font-bold text-slate-800 dark:text-white text-sm">Procedimiento de Administración</p>
-                                        <code className="text-xs bg-gray-100 dark:bg-slate-700 px-1 py-0.5 rounded text-slate-600 dark:text-slate-400">GE_A-PR-004</code>
-                                        <p className="text-xs text-slate-500 mt-1">Describe el ciclo operativo desde el autodiagnóstico hasta el reporte en FURAG.</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        </Card>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 pl-2 border-l-4 border-brand-500">
+                            Principios del Modelo
+                        </h2>
+                        <p className="text-slate-600 dark:text-slate-300 mb-6 text-sm">
+                            El MIPG se fundamenta en principios que guían la actuación de los servidores públicos. Haz clic en cada uno para conocer su aplicación práctica.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {MIPG_PRINCIPLES.map((p, i) => {
+                                const Icon = p.icon;
+                                return (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => setSelectedPrinciple(p)}
+                                        className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-lg transition-all text-left group"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                            <Icon size={20} />
+                                        </div>
+                                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">{p.title}</h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                                            {p.short}
+                                        </p>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
+
+                    {/* Principle Detail Modal */}
+                    {selectedPrinciple && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setSelectedPrinciple(null)}>
+                            <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-2xl max-w-2xl w-full relative shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                                <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors" onClick={() => setSelectedPrinciple(null)}>
+                                    <X size={24} />
+                                </button>
+                                
+                                <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-slate-700">
+                                    <div className="w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+                                        <selectedPrinciple.icon size={24} />
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Principio MIPG</span>
+                                        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mt-1">{selectedPrinciple.title}</h3>
+                                    </div>
+                                </div>
+                                
+                                <div className="overflow-y-auto pr-2 custom-scrollbar">
+                                    <div className="bg-brand-50 dark:bg-brand-900/20 p-4 rounded-xl mb-6">
+                                        <p className="text-sm font-medium text-brand-900 dark:text-brand-100 leading-relaxed">
+                                            {selectedPrinciple.desc}
+                                        </p>
+                                    </div>
+
+                                    <h4 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
+                                        <Activity size={16} className="text-brand-500" />
+                                        Cómo se aplica
+                                    </h4>
+                                    
+                                    <div className="space-y-4">
+                                        {selectedPrinciple.application.map((app: any, idx: number) => (
+                                            <div key={idx} className="border border-gray-100 dark:border-slate-700 rounded-lg p-4 bg-gray-50/50 dark:bg-slate-700/30">
+                                                <h5 className="font-bold text-slate-700 dark:text-slate-200 text-sm mb-2">{app.area}</h5>
+                                                {app.items.length > 0 ? (
+                                                    <ul className="space-y-1">
+                                                        {app.items.map((item: string, i: number) => (
+                                                            <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex gap-2 items-start">
+                                                                <span className="block w-1.5 h-1.5 rounded-full bg-brand-400 mt-1 shrink-0"></span>
+                                                                {item}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-xs text-slate-400 italic">Aplica transversalmente a esta dimensión.</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex justify-end pt-4 border-t border-gray-100 dark:border-slate-700">
+                                    <button 
+                                        onClick={() => setSelectedPrinciple(null)}
+                                        className="px-6 py-2 bg-slate-900 dark:bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-brand-500 transition-colors shadow-lg"
+                                    >
+                                        Entendido
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -332,73 +642,295 @@ export const MIPGModule: React.FC<MIPGModuleProps> = ({ onComplete, onTimeUpdate
 
             {activeTab === 'subsystems' && (
                 <div className="animate-fade-in">
-                    <Card title="Subsistemas del SIG-MIPG">
-                        <div className="grid md:grid-cols-2 gap-4">
-                            {[
-                                { t: 'Gestión de Calidad', d: 'Mejora continua y estandarización.', r: 'Planeación' },
-                                { t: 'Control Interno', d: 'Autorregulación y transparencia.', r: 'OCI' },
-                                { t: 'Gestión Ambiental', d: 'Prácticas sostenibles.', r: 'Sub. Admin' },
-                                { t: 'Seguridad de la Información', d: 'Confidencialidad e integridad.', r: 'TICs' },
-                                { t: 'Gestión Documental', d: 'Archivos y memoria.', r: 'Sub. Admin' },
-                                { t: 'Seguridad y Salud (SST)', d: 'Bienestar y prevención.', r: 'Talento Humano' },
-                                { t: 'Gestión del Riesgo', d: 'Tratamiento de riesgos.', r: 'Planeación' },
-                            ].map((s, i) => (
-                                <div key={i} className="p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-700/30">
-                                    <h4 className="font-bold text-slate-800 dark:text-white text-sm">{i + 1}. {s.t}</h4>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{s.d}</p>
-                                    <span className="inline-block mt-2 text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-1 rounded border border-gray-200 dark:border-slate-600 text-brand-600 dark:text-brand-400">{s.r}</span>
-                                </div>
-                            ))}
+                    <Card title="Subsistemas del SIG-MIPG (Res. 1022/2024)">
+                        <p className="text-sm text-slate-500 mb-6">El SIG del Ministerio se compone de 6 subsistemas clave. Haz clic en cada uno para ver las responsabilidades específicas de su líder (Art. 15).</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {SUBSYSTEMS_DATA.map((sub, i) => {
+                                const Icon = sub.icon;
+                                return (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => setSelectedSubsystem(sub)}
+                                        className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-lg transition-all text-left group flex flex-col h-full"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <Icon size={20} />
+                                            </div>
+                                            <Badge type="brand">{sub.acronym}</Badge>
+                                        </div>
+                                        <h3 className="font-bold text-slate-800 dark:text-white mb-2">{sub.name}</h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 flex-1">
+                                            {sub.desc}
+                                        </p>
+                                        <div className="pt-3 border-t border-gray-100 dark:border-slate-700">
+                                            <p className="text-[10px] uppercase text-slate-400 font-bold mb-1">Liderado por:</p>
+                                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{sub.leader}</p>
+                                        </div>
+                                    </button>
+                                );
+                            })}
                         </div>
                     </Card>
+
+                    {/* Subsystem Detail Modal */}
+                    {selectedSubsystem && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setSelectedSubsystem(null)}>
+                            <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-2xl max-w-2xl w-full relative shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                                <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors" onClick={() => setSelectedSubsystem(null)}>
+                                    <X size={24} />
+                                </button>
+                                
+                                <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-slate-700">
+                                    <div className="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+                                        <selectedSubsystem.icon size={24} />
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Subsistema SIG</span>
+                                        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                                            {selectedSubsystem.name} ({selectedSubsystem.acronym})
+                                        </h3>
+                                    </div>
+                                </div>
+                                
+                                <div className="overflow-y-auto pr-2 custom-scrollbar">
+                                    <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-xl mb-6 border border-gray-100 dark:border-slate-600">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wide">Dependencia Líder</span>
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white">
+                                            {selectedSubsystem.leader}
+                                        </p>
+                                    </div>
+
+                                    <h4 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
+                                        <FileText size={16} className="text-brand-500" />
+                                        Responsabilidades Específicas (Art. 15)
+                                    </h4>
+                                    
+                                    <ul className="space-y-3">
+                                        {selectedSubsystem.responsibilities.map((item: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 p-3 rounded-lg border border-gray-100 dark:border-slate-700 shadow-sm">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-brand-400 mt-2 shrink-0"></div>
+                                                <span className="leading-relaxed">{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="mt-6 flex justify-end pt-4 border-t border-gray-100 dark:border-slate-700">
+                                    <button 
+                                        onClick={() => setSelectedSubsystem(null)}
+                                        className="px-6 py-2 bg-slate-900 dark:bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-brand-500 transition-colors shadow-lg"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
             {activeTab === 'defenses' && (
                 <div className="animate-fade-in">
-                    <Card title="Esquema de Líneas de Defensa">
-                        <div className="relative pl-8 space-y-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200 dark:before:bg-slate-700">
-                            {[
-                                { t: 'Línea Estratégica', a: 'Alta Dirección / CICCI', d: 'Define marco general, analiza riesgos estratégicos y supervisa.', c: 'bg-slate-800 text-white' },
-                                { t: '1ra Línea de Defensa', a: 'Gerentes y Líderes', d: 'Autocontrol. "Yo ejecuto, yo controlo". Gestionan riesgos en la operación diaria.', c: 'bg-blue-600 text-white' },
-                                { t: '2da Línea de Defensa', a: 'Planeación / Jefes', d: 'Autoevaluación. Monitoreo, seguimiento y gestión de riesgos transversales.', c: 'bg-indigo-600 text-white' },
-                                { t: '3ra Línea de Defensa', a: 'Oficina de Control Interno', d: 'Evaluación Independiente. Aseguramiento objetivo sobre la efectividad del sistema.', c: 'bg-brand-600 text-white' },
-                            ].map((l, i) => (
-                                <div key={i} className="relative">
-                                    <div className={`absolute -left-[29px] w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white dark:border-slate-800 ${l.c}`}>
-                                        {i === 0 ? 'E' : i}
-                                    </div>
-                                    <h3 className="font-bold text-slate-800 dark:text-white">{l.t}</h3>
-                                    <p className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase mb-1">{l.a}</p>
-                                    <p className="text-sm text-slate-600 dark:text-slate-300 bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg border border-gray-100 dark:border-slate-700">{l.d}</p>
-                                </div>
-                            ))}
+                    <Card title="Esquema de Líneas de Defensa (Manual GE_A-MN-003)">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                            El Ministerio distribuye la responsabilidad del control en una estructura de 4 roles clave. Haz clic en cada línea para ver sus actores y funciones.
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {DEFENSE_LINES_DATA.map((line, i) => {
+                                const Icon = line.icon;
+                                return (
+                                    <button 
+                                        key={i}
+                                        onClick={() => setSelectedDefense(line)}
+                                        className="bg-white dark:bg-slate-800 p-0 rounded-2xl border border-gray-100 dark:border-slate-700 hover:border-brand-300 hover:shadow-lg transition-all text-left group overflow-hidden flex flex-col h-full"
+                                    >
+                                        <div className={`p-4 flex items-center justify-between ${line.color}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-white/20 p-2 rounded-lg">
+                                                    <Icon size={20} className="text-white" />
+                                                </div>
+                                                <h3 className="font-bold text-white text-lg">{line.name}</h3>
+                                            </div>
+                                            {line.concept && (
+                                                <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white px-2 py-1 rounded">
+                                                    {line.concept}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="p-5 flex-1 flex flex-col">
+                                            <p className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wide mb-2">
+                                                Responsables:
+                                            </p>
+                                            <p className="text-sm text-slate-800 dark:text-white font-semibold mb-4">
+                                                {line.actors}
+                                            </p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-auto">
+                                                {line.desc}
+                                            </p>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Mapa de Aseguramiento Callout */}
+                        <div className="mt-8 bg-gradient-to-r from-slate-100 to-white dark:from-slate-800 dark:to-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-center gap-6">
+                            <div className="p-4 bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 rounded-full shrink-0">
+                                <FileCheck size={32} />
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="font-bold text-slate-900 dark:text-white text-lg mb-2">Herramienta Clave: Mapa de Aseguramiento</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Es la herramienta que permite coordinar las actividades de aseguramiento entre la <b>2ª Línea (Autoevaluación)</b> y la <b>3ª Línea (Evaluación Independiente)</b>. Permite a la Alta Dirección visualizar la cobertura de riesgos y optimizar los recursos de auditoría.
+                                </p>
+                            </div>
                         </div>
                     </Card>
+
+                    {/* Defense Line Modal */}
+                    {selectedDefense && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setSelectedDefense(null)}>
+                            <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-2xl max-w-2xl w-full relative shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                                <button className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors" onClick={() => setSelectedDefense(null)}>
+                                    <X size={24} />
+                                </button>
+                                
+                                <div className={`flex items-center gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-slate-700`}>
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${selectedDefense.color} shadow-lg`}>
+                                        <selectedDefense.icon size={28} />
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Rol de Defensa</span>
+                                        <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                                            {selectedDefense.name}
+                                        </h3>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">{selectedDefense.concept || 'Responsabilidad General'}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="overflow-y-auto pr-2 custom-scrollbar">
+                                    <div className="bg-slate-50 dark:bg-slate-700/30 p-4 rounded-xl mb-6 border-l-4 border-brand-500">
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Actores Principales</p>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white">
+                                            {selectedDefense.actors}
+                                        </p>
+                                    </div>
+
+                                    <h4 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
+                                        <Activity size={16} className="text-brand-500" />
+                                        Funciones y Responsabilidades
+                                    </h4>
+                                    
+                                    <ul className="space-y-3">
+                                        {selectedDefense.roles.map((item: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-300 bg-gray-50/50 dark:bg-slate-700/50 p-3 rounded-lg border border-gray-100 dark:border-slate-700">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-brand-400 mt-2 shrink-0"></div>
+                                                <span className="leading-relaxed">{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="mt-6 flex justify-end pt-4 border-t border-gray-100 dark:border-slate-700">
+                                    <button 
+                                        onClick={() => setSelectedDefense(null)}
+                                        className="px-6 py-2 bg-slate-900 dark:bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-brand-500 transition-colors shadow-lg"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
-            {activeTab === 'furag' && (
-                <div className="animate-fade-in">
-                     <Card title="Ciclo Operativo (FURAG)">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            {[
-                                { step: '1', title: 'Planear', desc: 'Diagnóstico y hoja de ruta.', color: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' },
-                                { step: '2', title: 'Hacer', desc: 'Autodiagnósticos y mejoras.', color: 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' },
-                                { step: '3', title: 'Verificar', desc: 'Reporte FURAG y análisis IDI.', color: 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' },
-                                { step: '4', title: 'Actuar', desc: 'Cierre de brechas.', color: 'border-brand-500 bg-brand-50 dark:bg-brand-900/20' },
-                            ].map((s) => (
-                                <div key={s.step} className={`p-4 rounded-xl border-t-4 ${s.color}`}>
-                                    <div className="text-2xl font-black opacity-20 mb-1">{s.step}</div>
-                                    <h4 className="font-bold text-slate-800 dark:text-white">{s.title}</h4>
-                                    <p className="text-xs text-slate-600 dark:text-slate-300">{s.desc}</p>
+            {activeTab === 'operation' && (
+                <div className="animate-fade-in space-y-6">
+                    <Card title="Ciclo Operativo MIPG (PHVA)">
+                        <p className="text-slate-600 dark:text-slate-300 mb-6">
+                            El MIPG opera bajo una lógica dinámica de <b>Planear, Hacer, Verificar y Actuar</b>. No es solo un reporte (FURAG), es la forma diaria de gestionar la entidad para generar resultados.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                             {/* PHVA Cards */}
+                             <div className="p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10"><FileText size={60} /></div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">P</span>
+                                    <h3 className="font-bold text-blue-900 dark:text-blue-100">1. Planear</h3>
                                 </div>
-                            ))}
+                                <p className="text-sm text-blue-800 dark:text-blue-200">
+                                    Diagnóstico de necesidades, identificación de riesgos y programación de recursos (PAI, Presupuesto).
+                                </p>
+                             </div>
+                             
+                             <div className="p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10"><Activity size={60} /></div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-sm">H</span>
+                                    <h3 className="font-bold text-indigo-900 dark:text-indigo-100">2. Hacer</h3>
+                                </div>
+                                <p className="text-sm text-indigo-800 dark:text-indigo-200">
+                                    Implementación de las políticas de gestión. Ejecución de los procesos misionales y de apoyo.
+                                </p>
+                             </div>
+
+                             <div className="p-5 rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10"><BarChart2 size={60} /></div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-sm">V</span>
+                                    <h3 className="font-bold text-purple-900 dark:text-purple-100">3. Verificar</h3>
+                                </div>
+                                <p className="text-sm text-purple-800 dark:text-purple-200">
+                                    Seguimiento y evaluación. Aquí se utilizan herramientas como el <b>FURAG</b>, auditorías internas e indicadores.
+                                </p>
+                             </div>
+
+                             <div className="p-5 rounded-2xl bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10"><RefreshCw size={60} /></div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-brand-600 text-white font-bold text-sm">A</span>
+                                    <h3 className="font-bold text-brand-900 dark:text-brand-100">4. Actuar</h3>
+                                </div>
+                                <p className="text-sm text-brand-800 dark:text-brand-200">
+                                    Acciones de mejora continua. Ajustes basados en la evaluación para cerrar brechas y optimizar el desempeño.
+                                </p>
+                             </div>
                         </div>
-                        <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl text-sm text-yellow-800 dark:text-yellow-200">
-                            <b>Hito Clave:</b> La ventana de reporte FURAG es anual. Planeación lidera la consolidación y validación antes del envío al DAFP.
-                        </div>
-                     </Card>
+                    </Card>
+
+                    <Card title="Modelo de Operación por Procesos">
+                         <div className="flex flex-col md:flex-row items-center gap-6">
+                            <div className="flex-1">
+                                <p className="text-slate-600 dark:text-slate-300 text-sm mb-4">
+                                    Según el <b>Artículo 3 de la Resolución 1022 de 2024</b>, el Ministerio materializa este ciclo a través de 4 macroprocesos:
+                                </p>
+                                <ul className="space-y-3">
+                                    <li className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
+                                        <Target className="text-blue-500" size={20} />
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">1. Procesos Estratégicos</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
+                                        <Users className="text-brand-500" size={20} />
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">2. Procesos Misionales</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
+                                        <Briefcase className="text-slate-500" size={20} />
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">3. Procesos de Apoyo</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
+                                        <Shield className="text-amber-500" size={20} />
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">4. Procesos de Evaluación y Control</span>
+                                    </li>
+                                </ul>
+                            </div>
+                         </div>
+                    </Card>
                 </div>
             )}
 
