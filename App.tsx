@@ -255,14 +255,7 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                     </button>
                 </form>
                 <div className="mt-10 pt-8 border-t border-slate-100 text-center">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-6">Acceso Restringido - Equipo OCI</p>
-                    <div className="inline-block bg-slate-50 border border-slate-100 rounded-2xl p-4 text-[10px] text-slate-500 max-w-[280px]">
-                        <p className="font-black text-slate-700 mb-2">ENTORNO DE PRUEBAS:</p>
-                        <div className="space-y-1 font-mono">
-                            <p>USER: rgonzalez@minigualdad.gov.co</p>
-                            <p>PASS: 79283776</p>
-                        </div>
-                    </div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Acceso Restringido - Equipo OCI</p>
                 </div>
             </div>
         </div>
