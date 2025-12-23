@@ -1,8 +1,6 @@
 
 import { User, ProgressMap } from '../types';
 
-// --- DATA SEED (Lista de usuarios permitidos) ---
-// Estos usuarios pueden ingresar. No se guardan en nube, solo validación local.
 const AUTHORIZED_USERS: User[] = [
     {
         id: '79283776',
@@ -126,47 +124,33 @@ const AUTHORIZED_USERS: User[] = [
     }
 ];
 
-// Estado inicial por defecto para un usuario nuevo
 const EMPTY_PROGRESS: ProgressMap = {
     dashboard: { completed: true, score: 0, timeSpentSeconds: 0 },
-    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 }, // 1 minuto para demo
+    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 }, 
     mipg: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
     competencies: { completed: false, score: 0, timeSpentSeconds: 0 },
     standards: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
     forensic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
-    library: { completed: true, score: 0, timeSpentSeconds: 0 },
-    assistant: { completed: true, score: 0, timeSpentSeconds: 0 },
     tools: { completed: true, score: 0, timeSpentSeconds: 0 },
 };
 
-// --- LOCAL STORE LOGIC ---
 export const UserStore = {
-    
-    // Inicialización simple (ya no carga nada de internet)
     init: async () => {
-        // No operation needed for local-only, but keeping signature compatible
         return Promise.resolve();
     },
 
-    // Autenticación contra la lista estática
     authenticate: async (email: string, password?: string): Promise<{ success: boolean, user?: User, message?: string }> => {
-        // Simular pequeño delay para UX
         await new Promise(resolve => setTimeout(resolve, 500));
-
         const user = AUTHORIZED_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
-
         if (!user) {
             return { success: false, message: 'Correo no autorizado para ingresar.' };
         }
-
         if (password && user.password !== password) {
             return { success: false, message: 'Contraseña incorrecta.' };
         }
-
         return { success: true, user };
     },
 
-    // Obtener progreso desde LocalStorage
     getProgress: (email: string): ProgressMap => {
         try {
             const key = `oci_progress_${email}`;
@@ -180,7 +164,6 @@ export const UserStore = {
         return EMPTY_PROGRESS;
     },
 
-    // Guardar progreso en LocalStorage
     saveProgress: async (email: string, progress: ProgressMap) => {
         try {
             const key = `oci_progress_${email}`;
@@ -189,8 +172,6 @@ export const UserStore = {
             console.error("Error saving progress", e);
         }
     },
-
-    // --- Métodos de Administración ---
 
     getUsers: (): User[] => {
         return [...AUTHORIZED_USERS];

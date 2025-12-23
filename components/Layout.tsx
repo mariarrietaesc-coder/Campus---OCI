@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Menu, X, BookOpen, ShieldCheck, Target, Search, BarChart2, Library, MessageSquare, Calculator, Sun, Moon, LogOut, ChevronRight } from 'lucide-react';
+import { Menu, X, BookOpen, ShieldCheck, Target, Search, BarChart2, Calculator, Sun, Moon, LogOut, ChevronRight } from 'lucide-react';
 import { ModuleId, ModuleConfig, ProgressMap, User } from '../types';
 import { MinistryLogo } from './UI';
 
@@ -20,9 +21,7 @@ const MODULES: ModuleConfig[] = [
   { id: 'mipg', title: 'MIPG - SIG', icon: BookOpen, description: 'Modelo Integrado de Planeación', duration: '45 min' },
   { id: 'standards', title: 'Normas Globales 2024', icon: ShieldCheck, description: 'Marco Internacional IIA', duration: '60 min' },
   { id: 'forensic', title: 'Auditoría Forense', icon: Search, description: 'Detección de fraude', duration: '50 min' },
-  { id: 'library', title: 'Biblioteca Normativa', icon: Library, description: 'Repositorio Documental', duration: '-' },
   { id: 'tools', title: 'Herramientas Auditor', icon: Calculator, description: 'Calculadora de Muestreo', duration: '-' },
-  { id: 'assistant', title: 'Asistente IA OCI', icon: MessageSquare, description: 'Consultas Técnicas', duration: '-' },
 ];
 
 export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, progress, user, onLogout, children, darkMode, toggleTheme }) => {
@@ -87,7 +86,6 @@ export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, p
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold tracking-widest uppercase leading-tight">Oficina de<br/>Control Interno</p>
              </div>
           </div>
-          {/* Close button only visible on mobile */}
           <button 
             onClick={closeSidebar}
             className="md:hidden p-3 -mt-2 -mr-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors active:scale-95"
@@ -160,13 +158,12 @@ export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, p
                             <div key={m.id} className={`flex-1 rounded-full h-full transition-colors ${getProgressColor(m.id)}`}></div>
                         ))}
                     </div>
-                    <p className="text-[10px] opacity-90 leading-tight">Completa los 4 módulos principales.</p>
+                    <p className="text-[10px] opacity-90 leading-tight">Completa los 4 módulos técnicos.</p>
                 </div>
             </div>
         </div>
       </aside>
 
-      {/* --- Main Content --- */}
       <main className="flex-1 overflow-y-auto h-[calc(100vh-64px)] md:h-screen bg-gray-50 dark:bg-slate-900 transition-colors scroll-smooth">
         <div className="p-4 md:p-8 lg:p-12 max-w-5xl mx-auto">
            {children}
@@ -174,7 +171,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, p
         
         <footer className="mt-auto text-center text-slate-400 text-xs py-8 border-t border-gray-100 dark:border-slate-800 mx-8">
             <p className="font-semibold">Ministerio de Igualdad y Equidad</p>
-            <p>Oficina de Control Interno &bull; Plataforma v2.1</p>
+            <p>Oficina de Control Interno &bull; Campus Virtual</p>
         </footer>
       </main>
     </div>

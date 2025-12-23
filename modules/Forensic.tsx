@@ -1,15 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Badge, Accordion, Quiz, MinistryLogo } from '../components/UI';
-import { Search, AlertTriangle, FileText, Lock, Eye, BookOpen, Clock, CheckCircle } from 'lucide-react';
+import { Card, Badge, Quiz, MinistryLogo } from '../components/UI';
+import { Search, AlertTriangle, Lock, Eye, BookOpen, Clock, CheckCircle, Scale, Zap, ShieldCheck } from 'lucide-react';
 import { QuizState } from '../types';
-
-// Helper components moved to top
-const BrainIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.97-3.284"/><path d="M17.97 14.716A4 4 0 0 1 16 18"/></svg>
-);
-// Renamed to avoid confusion with Lucide's CheckCircle if it were imported
-const LocalCheckCircle = ({className, size}: any) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
 
 interface ForensicModuleProps {
     onComplete: (score: number) => void;
@@ -21,7 +14,6 @@ interface ForensicModuleProps {
 export const ForensicModule: React.FC<ForensicModuleProps> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
   const [showCaseResult, setShowCaseResult] = useState(false);
 
-  // Time tracking logic
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(Date.now());
   const onTimeUpdateRef = useRef(onTimeUpdate);
@@ -41,9 +33,7 @@ export const ForensicModule: React.FC<ForensicModuleProps> = ({ onComplete, onTi
               startTimeRef.current = now;
           }
       };
-
       timerRef.current = window.setInterval(pushTime, 2000);
-
       return () => {
           if (timerRef.current) window.clearInterval(timerRef.current);
           pushTime();
@@ -57,156 +47,202 @@ export const ForensicModule: React.FC<ForensicModuleProps> = ({ onComplete, onTi
   const isQuizLocked = timeLeft > 0 && !data.completed;
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-12 animate-fade-in pb-12">
       
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 border-b border-gray-100 dark:border-slate-800">
-          <div>
-            <Badge type="brand">Módulo 4</Badge>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Auditoría Forense</h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Detección, prevención e investigación de fraude y corrupción.</p>
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-4">
+          <div className="space-y-2">
+            <Badge type="brand">Módulo Técnico 04</Badge>
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Auditoría Forense</h1>
+            <div className="h-1.5 w-20 bg-brand-500 rounded-full"></div>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Investigación aplicada para la detección de fraude y corrupción.</p>
           </div>
-          <div className="hidden md:flex items-center gap-4">
-              <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${timeLeft > 0 ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>
-                      {timeLeft > 0 ? <Clock size={20} /> : <CheckCircle size={20} />}
-                  </div>
-                  <div>
-                      <p className="text-[10px] uppercase font-bold text-slate-400">Tiempo de Estudio</p>
-                      <p className="font-mono font-bold text-slate-800 dark:text-white">
-                          {Math.floor(timeSpent / 60)}m {timeSpent % 60}s <span className="text-slate-400 text-xs">/ {Math.floor(minTime/60)}m req</span>
-                      </p>
-                  </div>
-              </div>
-              <MinistryLogo variant="horizontal" />
+          <div className="flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${timeLeft > 0 ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>
+                    {timeLeft > 0 ? <Clock size={24} className="animate-pulse" /> : <CheckCircle size={24} />}
+                </div>
+                <div className="pr-4">
+                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-0.5">Estudio en Curso</p>
+                    <p className="font-mono font-black text-slate-800 dark:text-white text-lg leading-none">
+                        {Math.floor(timeSpent / 60)}:{String(timeSpent % 60).padStart(2, '0')}
+                    </p>
+                </div>
           </div>
       </div>
 
-      {/* Visual Fraud Triangle */}
-      <Card title="El Triángulo del Fraude (Cressey)" className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
-        <p className="text-center text-slate-500 dark:text-slate-400 text-sm mb-8 max-w-lg mx-auto">
-            Para que ocurra un fraude, generalmente deben converger tres factores. Como auditores, podemos incidir principalmente en la <b>Oportunidad</b> (Controles).
-        </p>
+      <Card className="relative overflow-hidden pt-10 pb-16 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl rounded-[2.5rem]">
+        <div className="text-center mb-16 relative z-10">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">El Triángulo del Fraude</h2>
+            <p className="text-brand-600 dark:text-brand-400 text-xs font-black uppercase tracking-[0.3em]">Modelo Analítico de Donald Cressey</p>
+            <p className="max-w-2xl mx-auto mt-6 text-slate-500 dark:text-slate-400 text-sm font-medium">
+                Para que ocurra un fraude, generalmente deben converger tres factores clave. Como auditores, nuestra mayor incidencia está en la <b>Oportunidad</b>.
+            </p>
+        </div>
         
-        <div className="relative h-64 w-full max-w-md mx-auto">
-             {/* Triangle Shapes using borders/absolute positioning for diagram feel */}
-             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-2 shadow-sm border-2 border-red-200 dark:border-red-800">
-                    <AlertTriangle size={32} />
-                </div>
-                <div className="text-center">
-                    <p className="font-bold text-red-800 dark:text-red-300">Presión</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-tight">Problemas financieros, vicios, metas irreales.</p>
-                </div>
-             </div>
-
-             <div className="absolute bottom-0 left-0 w-36 flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-2 shadow-sm border-2 border-amber-200 dark:border-amber-800">
-                    <Lock size={32} />
-                </div>
-                <div className="text-center">
-                    <p className="font-bold text-amber-800 dark:text-amber-300">Oportunidad</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-tight">Ausencia de controles, supervisión deficiente.</p>
-                </div>
-             </div>
-
-             <div className="absolute bottom-0 right-0 w-36 flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.5s' }}>
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-2 shadow-sm border-2 border-blue-200 dark:border-blue-800">
-                    <BrainIcon />
-                </div>
-                <div className="text-center">
-                    <p className="font-bold text-blue-800 dark:text-blue-300">Racionalización</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-tight">"Me lo deben", "Es temporal", "Todos lo hacen".</p>
-                </div>
-             </div>
-
-             {/* Connecting Lines (SVG) */}
-             <svg className="absolute inset-0 pointer-events-none -z-10 text-slate-300 dark:text-slate-600" width="100%" height="100%">
-                 <line x1="50%" y1="20%" x2="15%" y2="80%" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" />
-                 <line x1="50%" y1="20%" x2="85%" y2="80%" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" />
-                 <line x1="15%" y1="80%" x2="85%" y2="80%" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5" />
+        <div className="relative h-[480px] w-full max-w-2xl mx-auto mt-10">
+             {/* SVG Lines Connector */}
+             <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" viewBox="0 0 100 100">
+                <path 
+                    d="M 50,15 L 15,85 L 85,85 Z" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="0.5" 
+                    strokeDasharray="4,4"
+                    className="text-slate-200 dark:text-slate-700 animate-[dash_20s_linear_infinite]"
+                />
              </svg>
+
+             {/* Top Vertex: Pressure */}
+             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-56 flex flex-col items-center group">
+                <div className="w-24 h-24 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center mb-4 shadow-2xl border-4 border-red-50 dark:border-red-900/30 relative transition-transform duration-500 group-hover:scale-110">
+                    <div className="absolute inset-0 rounded-full bg-red-500/5 blur-xl animate-pulse"></div>
+                    <AlertTriangle size={44} className="text-red-500 relative z-10" />
+                </div>
+                <div className="text-center p-5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-100 dark:border-slate-700 shadow-lg">
+                    <p className="font-black text-red-600 uppercase text-xs tracking-widest mb-1">Presión</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold leading-tight">Problemas financieros,<br/>vicios, metas irreales.</p>
+                </div>
+             </div>
+
+             {/* Bottom Left: Opportunity */}
+             <div className="absolute bottom-4 left-0 w-56 flex flex-col items-center group">
+                <div className="w-24 h-24 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center mb-4 shadow-2xl border-4 border-amber-50 dark:border-amber-900/30 relative transition-transform duration-500 group-hover:scale-110">
+                    <div className="absolute inset-0 rounded-full bg-amber-500/5 blur-xl animate-pulse"></div>
+                    <Lock size={44} className="text-amber-500 relative z-10" />
+                </div>
+                <div className="text-center p-5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-100 dark:border-slate-700 shadow-lg ring-4 ring-amber-500/10">
+                    <p className="font-black text-amber-600 uppercase text-xs tracking-widest mb-1">Oportunidad</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold leading-tight">Ausencia de controles,<br/>supervisión deficiente.</p>
+                </div>
+             </div>
+
+             {/* Bottom Right: Rationalization */}
+             <div className="absolute bottom-4 right-0 w-56 flex flex-col items-center group">
+                <div className="w-24 h-24 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center mb-4 shadow-2xl border-4 border-blue-50 dark:border-blue-900/30 relative transition-transform duration-500 group-hover:scale-110">
+                    <div className="absolute inset-0 rounded-full bg-blue-500/5 blur-xl animate-pulse"></div>
+                    <Scale size={44} className="text-blue-500 relative z-10" />
+                </div>
+                <div className="text-center p-5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-100 dark:border-slate-700 shadow-lg">
+                    <p className="font-black text-blue-600 uppercase text-xs tracking-widest mb-1">Racionalización</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold leading-tight">"Me lo deben", "Es temporal",<br/>"Todos lo hacen".</p>
+                </div>
+             </div>
         </div>
       </Card>
 
-      {/* Case Study - Active Learning */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border-l-4 border-l-brand-500 shadow-sm p-6">
-        <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="text-brand-600 dark:text-brand-400" size={24} />
-            <h3 className="font-bold text-lg text-slate-800 dark:text-white">Estudio de Caso: "La Compra Fantasma"</h3>
-        </div>
-        <p className="text-slate-600 dark:text-slate-300 mb-4 text-sm">
-            Un director técnico (que tiene deudas de juego - <b>Presión</b>) aprovecha que nadie revisa las actas de entrega (<b>Oportunidad</b>) para firmar el recibido de computadores que nunca llegaron, pensando "Es solo por esta vez mientras pago" (<b>Racionalización</b>).
-        </p>
-        <p className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2">¿Cómo podría haber prevenido esto la OCI?</p>
-        
-        {!showCaseResult ? (
-            <button 
-                onClick={() => setShowCaseResult(true)}
-                className="text-sm bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 font-bold px-4 py-2 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/60 transition-colors"
-            >
-                Ver Respuesta del Auditor
-            </button>
-        ) : (
-            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl border border-green-100 dark:border-green-800 animate-fade-in">
-                <p className="text-green-800 dark:text-green-200 text-sm">
-                    <b>Respuesta:</b> Fortaleciendo la <b>Oportunidad</b>. La auditoría debería haber evaluado previamente los controles de recepción de inventarios (Segregación de funciones: quien compra no debe ser quien recibe).
-                </p>
-            </div>
-        )}
+      {/* Marco de Actuación: Rol de la OCI */}
+      <div className="grid md:grid-cols-2 gap-8">
+          <Card className="bg-slate-900 text-white p-8 rounded-[2.5rem] border-none shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-10 transition-transform duration-700 group-hover:scale-125">
+                  <ShieldCheck size={120} />
+              </div>
+              <div className="relative z-10 space-y-6">
+                  <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center">
+                          <ShieldCheck size={24} className="text-white" />
+                      </div>
+                      <h3 className="text-2xl font-black">Rol de la OCI</h3>
+                  </div>
+                  <ul className="space-y-4">
+                      <li className="flex items-start gap-3">
+                          <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-400 shrink-0"></div>
+                          <p className="font-bold text-slate-200">Evaluar controles antifraude.</p>
+                      </li>
+                      <li className="flex items-start gap-3">
+                          <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-400 shrink-0"></div>
+                          <p className="font-bold text-slate-200">Asegurar evidencia digital y física.</p>
+                      </li>
+                      <li className="flex items-start gap-3 pt-2">
+                          <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0"></div>
+                          <p className="font-black text-red-400 uppercase text-sm tracking-widest">NO captura ni juzga.</p>
+                      </li>
+                  </ul>
+              </div>
+          </Card>
+
+          <Card className="p-8 rounded-[2.5rem] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex flex-col justify-center text-center">
+              <div className="w-16 h-16 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Zap size={32} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Foco del Auditor</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed italic">
+                  "Como auditores internos, nuestra mayor capacidad de mitigación reside en eliminar la <b>Oportunidad</b> mediante el fortalecimiento de los controles institucionales."
+              </p>
+          </Card>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-         <Card title="Rol de la OCI">
-            <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
-                <li className="flex gap-2">
-                    <LocalCheckCircle className="text-green-500 shrink-0" size={18} />
-                    <span>Evaluar controles antifraude.</span>
-                </li>
-                <li className="flex gap-2">
-                    <LocalCheckCircle className="text-green-500 shrink-0" size={18} />
-                    <span>Asegurar evidencia digital y física.</span>
-                </li>
-                <li className="flex gap-2">
-                    <AlertTriangle className="text-red-500 shrink-0" size={18} />
-                    <span><b>NO</b> captura ni juzga (eso es Fiscalía).</span>
-                </li>
-            </ul>
-         </Card>
-         <Card title="Decreto 1600 de 2024">
-             <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-amber-800 dark:text-amber-200 text-sm">
-                 <p className="font-bold mb-1">Obligatoriedad:</p>
-                 <p>Las entidades deben realizar auditorías forenses preventivas <b>mínimo cada 2 años</b> dentro del Plan de Auditoría.</p>
-             </div>
-         </Card>
+      <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 shadow-2xl p-10 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-full -mr-16 -mt-16 transition-transform duration-700 group-hover:scale-150"></div>
+        <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-200">
+                <BookOpen size={24} />
+            </div>
+            <h3 className="font-black text-2xl text-slate-900 dark:text-white">Escenario de Análisis</h3>
+        </div>
+        <div className="grid md:grid-cols-2 gap-10">
+            <div className="space-y-4">
+                <p className="text-brand-600 dark:text-brand-400 font-black uppercase text-[10px] tracking-[0.2em]">Caso: "Suministros Fantasma"</p>
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg font-medium">
+                    Un funcionario con deudas personales firma la recepción de activos que nunca ingresaron al almacén, argumentando internamente que "la entidad le debe por horas extras no pagadas".
+                </p>
+            </div>
+            <div className="flex flex-col justify-center">
+                {!showCaseResult ? (
+                    <button 
+                        onClick={() => setShowCaseResult(true)}
+                        className="bg-slate-900 dark:bg-brand-600 text-white font-black px-8 py-5 rounded-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-3 tracking-widest text-xs shadow-xl"
+                    >
+                        DESCOMPONER FACTORES <Search size={18} />
+                    </button>
+                ) : (
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 animate-slide-up space-y-4">
+                        <div className="flex gap-2">
+                            <span className="bg-red-100 text-red-700 text-[9px] font-black px-2 py-1 rounded">PRESIÓN: Deuda</span>
+                            <span className="bg-amber-100 text-amber-700 text-[9px] font-black px-2 py-1 rounded">OPORTUNIDAD: Falta de Segregación</span>
+                            <span className="bg-blue-100 text-blue-700 text-[9px] font-black px-2 py-1 rounded">RACIONALIZACIÓN: Deuda Laboral</span>
+                        </div>
+                        <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                            <b>Acción OCI:</b> Se evidencia falla en la segregación de funciones. Quien autoriza el pago no puede ser quien certifica la recepción sin un tercero validador.
+                        </p>
+                    </div>
+                )}
+            </div>
+        </div>
       </div>
 
       {!isQuizLocked ? (
         <Quiz 
             questions={[
-                { id: 1, question: "Según el Triángulo del Fraude, ¿qué factor podemos controlar mejor?", options: ["Presión", "Oportunidad", "Racionalización"], correctAnswer: 1 },
-                { id: 2, question: "¿Cuál es la frecuencia mínima de auditorías forenses (D. 1600)?", options: ["Cada año", "Cada 2 años", "Cuando se sospeche algo"], correctAnswer: 1 },
-                { id: 3, question: "Si la OCI detecta un delito, debe:", options: ["Capturar al responsable", "Denunciar a Fiscalía y Contraloría", "Despedir al funcionario"], correctAnswer: 1 }
+                { id: 1, question: "¿Cuál de los tres factores es el único sobre el cual la organización tiene control directo?", options: ["Racionalización", "Presión", "Oportunidad"], correctAnswer: 2 },
+                { id: 2, question: "Según el Decreto 1600 de 2024, ¿cada cuánto deben las entidades realizar auditorías forenses preventivas?", options: ["Anualmente", "Mínimo cada 2 años", "Solo cuando hay denuncias"], correctAnswer: 1 },
+                { id: 3, question: "¿Cuál es el rol primordial de la OCI en un proceso forense?", options: ["Capturar y procesar sospechosos", "Evaluar controles y asegurar evidencia", "Definir sentencias disciplinarias"], correctAnswer: 1 }
             ]}
             onComplete={onComplete}
         />
       ) : (
-        <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm mt-8">
-            <div className="w-20 h-20 bg-gray-100 dark:bg-slate-700 text-gray-400 rounded-full flex items-center justify-center mb-6">
-                <Lock size={40} />
+        <div className="bg-white dark:bg-slate-800 rounded-[3rem] p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 max-w-2xl mx-auto shadow-sm">
+            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-700 text-slate-400 rounded-3xl flex items-center justify-center mx-auto mb-8">
+                <Lock size={32} />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Evaluación Bloqueada</h2>
-            <p className="text-slate-600 dark:text-slate-400 max-w-md mb-6">
-                Debes completar el tiempo mínimo de estudio para acceder a la evaluación final.
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Evaluación de Módulo Bloqueada</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                Por políticas de calidad del Campus OCI, debes dedicar al menos 1 minuto a la revisión de este contenido técnico antes de habilitar el examen.
             </p>
-            <div className="bg-amber-50 dark:bg-amber-900/20 px-6 py-3 rounded-lg border border-amber-200 dark:border-amber-800">
-                <p className="text-amber-800 dark:text-amber-200 font-bold flex items-center gap-2">
-                    <Clock size={18} />
-                    Tiempo restante: {Math.ceil(timeLeft / 60)} minutos
-                </p>
+            <div className="bg-brand-500/10 px-8 py-4 rounded-2xl inline-flex items-center gap-3">
+                <Clock size={18} className="text-brand-600" />
+                <span className="text-brand-700 font-black text-sm uppercase tracking-widest">
+                    Habilitando en {Math.ceil(timeLeft / 60)} min
+                </span>
             </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes dash {
+          to {
+            stroke-dashoffset: 100;
+          }
+        }
+      `}</style>
     </div>
   );
 };

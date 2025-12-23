@@ -1,5 +1,5 @@
 
-export type ModuleId = 'dashboard' | 'strategic' | 'mipg' | 'competencies' | 'standards' | 'forensic' | 'library' | 'assistant' | 'tools';
+export type ModuleId = 'dashboard' | 'strategic' | 'mipg' | 'competencies' | 'standards' | 'forensic' | 'tools';
 
 export interface User {
   id: string; // Email is used as ID usually, but good to have unique key

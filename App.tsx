@@ -5,13 +5,11 @@ import { StrategicModule } from './modules/Strategic';
 import { MIPGModule } from './modules/MIPG';
 import { StandardsModule } from './modules/Standards';
 import { ForensicModule } from './modules/Forensic';
-import { AssistantModule } from './modules/Assistant';
-import { LibraryModule } from './modules/Library';
 import { ToolsModule } from './modules/Tools';
 import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
-import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, RefreshCw, Trash2, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, Trash2, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { UserStore } from './data/store'; 
 
 const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
@@ -28,7 +26,6 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
   
-  // Default empty state 
   const emptyProgress: ProgressMap = {
     dashboard: { completed: true, score: 0, timeSpentSeconds: 0 },
     strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
@@ -36,29 +33,23 @@ function App() {
     competencies: { completed: false, score: 0, timeSpentSeconds: 0 },
     standards: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
     forensic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
-    library: { completed: true, score: 0, timeSpentSeconds: 0 },
-    assistant: { completed: true, score: 0, timeSpentSeconds: 0 },
     tools: { completed: true, score: 0, timeSpentSeconds: 0 },
   };
 
   const [progress, setProgress] = useState<ProgressMap>(emptyProgress);
 
-  // Initialize Store
   useEffect(() => {
     UserStore.init();
-    // Check session after init
     const savedUserStr = sessionStorage.getItem('oci_user');
     if (savedUserStr) {
         const savedUser = JSON.parse(savedUserStr);
         setUser(savedUser);
         const userProgress = UserStore.getProgress(savedUser.email);
-        // Merge with defaults to ensure new fields exist
         const mergedProgress = { ...emptyProgress, ...userProgress };
         setProgress(mergedProgress);
     }
   }, []);
 
-  // Theme Toggle Effect
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -82,18 +73,14 @@ function App() {
     setProgress(emptyProgress);
   };
 
-  // Called when a Quiz is finished
   const handleModuleComplete = (moduleId: ModuleId, score: number) => {
     if (!user) return;
-    
     const now = new Date();
     const timestamp = now.toLocaleDateString('es-CO', { 
         year: 'numeric', month: 'short', day: 'numeric', 
         hour: '2-digit', minute: '2-digit' 
     });
-
     const currentModProgress = progress[moduleId];
-
     const newProgress = { 
         ...progress, 
         [moduleId]: { 
@@ -103,41 +90,28 @@ function App() {
             completedAt: timestamp 
         } 
     };
-    
     setProgress(newProgress);
     UserStore.saveProgress(user.email, newProgress);
   };
 
-  // Called periodically by the module to update time
   const handleTimeUpdate = (moduleId: ModuleId, additionalSeconds: number) => {
       if (!user) return;
-      
       const currentMod = progress[moduleId];
       const newTime = (currentMod.timeSpentSeconds || 0) + additionalSeconds;
-      
       const newProgress = {
           ...progress,
-          [moduleId]: {
-              ...currentMod,
-              timeSpentSeconds: newTime
-          }
+          [moduleId]: { ...currentMod, timeSpentSeconds: newTime }
       };
-      
-      // Update local state immediately for UI
       setProgress(newProgress);
-      // Also save to localStorage periodically indirectly via module saves or unmounts,
-      // but for robustness we can save periodically here if performance allows.
-      // For now, let's rely on the module's unmount/save trigger or simple periodic saves handled by the module component props.
   };
 
-  // Force save to DB (e.g. when leaving a module)
   const saveCurrentProgressToDB = () => {
       if(user) UserStore.saveProgress(user.email, progress);
   };
 
   const handleResetProgress = () => {
     if(!user) return;
-    if(confirm('¿Estás seguro de reiniciar todo el progreso? Esto borrará tus avances actuales.')) {
+    if(confirm('¿Estás seguro de reiniciar todo el progreso?')) {
         setProgress(emptyProgress);
         UserStore.saveProgress(user.email, emptyProgress);
     }
@@ -149,7 +123,6 @@ function App() {
     return <LoginView onLoginSuccess={handleLogin} />;
   }
 
-  // Common props for modules
   const modProps = (id: ModuleId) => ({
       onComplete: (s: number) => handleModuleComplete(id, s),
       onTimeUpdate: (secs: number) => handleTimeUpdate(id, secs),
@@ -169,10 +142,6 @@ function App() {
         return <StandardsModule {...modProps('standards')} />;
       case 'forensic':
         return <ForensicModule {...modProps('forensic')} />;
-      case 'assistant':
-        return <AssistantModule />;
-      case 'library':
-        return <LibraryModule />;
       case 'tools':
         return <ToolsModule />;
       case 'competencies':
@@ -187,7 +156,7 @@ function App() {
         <Layout 
         currentModule={currentModule} 
         onModuleChange={(id) => {
-            saveCurrentProgressToDB(); // Save before switching
+            saveCurrentProgressToDB(); 
             setCurrentModule(id);
         }} 
         progress={progress} 
@@ -210,7 +179,6 @@ function App() {
   );
 }
 
-// --- Login View (Updated for Async) ---
 const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -222,7 +190,6 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
         e.preventDefault();
         setError('');
         setIsChecking(true);
-
         try {
             const result = await UserStore.authenticate(email, password);
             if (result.success && result.user) {
@@ -240,83 +207,61 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
             <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-100 relative overflow-hidden">
-                
-                {/* Logo Section */}
-                <div className="mb-6 flex justify-center">
+                <div className="mb-8 flex justify-center">
                     <MinistryLogo variant="vertical" />
                 </div>
-                
-                {/* Title Section */}
                 <div className="text-center mb-10">
-                    <h2 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">Campus Virtual Oficina de Control Interno</h2>
-                    <div className="h-1 w-12 bg-brand-500 mx-auto rounded-full mb-2"></div>
-                    <p className="text-slate-500 text-sm font-medium">Plataforma de Sensibilización</p>
+                    <h2 className="text-2xl font-black text-slate-900 mb-2 leading-tight tracking-tight px-2">Campus Virtual Oficina de Control Interno</h2>
+                    <div className="h-1 w-16 bg-brand-500 mx-auto rounded-full mb-3"></div>
+                    <p className="text-brand-600 text-xs font-bold uppercase tracking-[0.2em]">Plataforma de Sensibilización</p>
                 </div>
-
-                {/* Form Section */}
                 <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
                     <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Correo Institucional</label>
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Correo Institucional</label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-3.5 text-slate-400" size={18} />
+                            <Lock className="absolute left-4 top-4 text-slate-400" size={18} />
                             <input 
                                 type="email" 
                                 required 
                                 value={email} 
                                 onChange={e => setEmail(e.target.value)} 
-                                className="w-full pl-10 pr-3.5 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-900" 
+                                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/5 outline-none transition-all text-slate-900 font-medium" 
                                 placeholder="usuario@minigualdad.gov.co" 
                             />
                         </div>
                     </div>
-
                     <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Contraseña</label>
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Contraseña</label>
                         <div className="relative">
-                            <ShieldCheck className="absolute left-3 top-3.5 text-slate-400" size={18} />
+                            <ShieldCheck className="absolute left-4 top-4 text-slate-400" size={18} />
                             <input 
                                 type={showPassword ? "text" : "password"}
                                 required 
                                 value={password} 
                                 onChange={e => setPassword(e.target.value)} 
-                                className="w-full pl-10 pr-10 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-900" 
-                                placeholder="Ingresa tu contraseña" 
+                                className="w-full pl-12 pr-12 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/5 outline-none transition-all text-slate-900 font-medium" 
+                                placeholder="••••••••" 
                             />
-                            <button 
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none"
-                            >
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4 text-slate-400 hover:text-brand-600 transition-colors">
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </div>
-                    
-                    {error && (
-                        <div className="flex items-center gap-2 text-red-600 text-xs bg-red-50 p-3 rounded-lg border border-red-100 animate-fade-in">
-                            <AlertCircle size={16} /> {error}
-                        </div>
-                    )}
-
-                    <button 
-                        type="submit" 
-                        disabled={isChecking}
-                        className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-slate-400 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl shadow-brand-200 mt-2"
-                    >
-                        {isChecking ? 'Verificando...' : 'Ingresar al Campus'}
+                    {error && <div className="text-red-600 text-xs font-bold bg-red-50 p-4 rounded-xl border border-red-100 flex items-center gap-2">
+                        <AlertCircle size={16} /> {error}
+                    </div>}
+                    <button type="submit" disabled={isChecking} className="w-full bg-brand-600 hover:bg-brand-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-brand-100 transition-all hover:translate-y-[-2px] active:translate-y-[0px] disabled:bg-slate-300 disabled:shadow-none">
+                        {isChecking ? 'AUTENTICANDO...' : 'INGRESAR AL CAMPUS'}
                     </button>
                 </form>
-
-                <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-                    <p className="text-[10px] text-slate-400 leading-tight mb-4">
-                        Acceso restringido únicamente al equipo de la OCI.
-                    </p>
-                    
-                    {/* HINT FOR DEMO PURPOSES */}
-                    <div className="inline-block text-left bg-slate-50 border border-slate-200 rounded-lg p-3 text-[10px] text-slate-500 mx-auto">
-                        <p className="font-bold text-slate-600 mb-1">Datos de prueba (Jefe OCI):</p>
-                        <p className="font-mono">User: rgonzalez@minigualdad.gov.co</p>
-                        <p className="font-mono">Pass: 79283776</p>
+                <div className="mt-10 pt-8 border-t border-slate-100 text-center">
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mb-6">Acceso Restringido - Equipo OCI</p>
+                    <div className="inline-block bg-slate-50 border border-slate-100 rounded-2xl p-4 text-[10px] text-slate-500 max-w-[280px]">
+                        <p className="font-black text-slate-700 mb-2">ENTORNO DE PRUEBAS:</p>
+                        <div className="space-y-1 font-mono">
+                            <p>USER: rgonzalez@minigualdad.gov.co</p>
+                            <p>PASS: 79283776</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -324,7 +269,6 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
     );
 }
 
-// --- Dashboard View ---
 const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) => void, user: User, onShowCertificate: () => void, onReset: () => void }> = ({ progress, onChange, user, onShowCertificate, onReset }) => {
     const coreModules: ModuleId[] = ['strategic', 'mipg', 'standards', 'forensic'];
     const completedCount = coreModules.filter(id => progress[id]?.completed).length;
@@ -334,39 +278,33 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
 
     return (
         <div className="space-y-8 animate-fade-in">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-brand-100 dark:border-slate-700 shadow-sm text-center">
-                <div className="w-20 h-20 bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Award size={40} />
+            <div className="bg-white dark:bg-slate-800 rounded-3xl p-10 border border-brand-50 dark:border-slate-700 shadow-sm text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-500 to-transparent opacity-20"></div>
+                <div className="w-24 h-24 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <Award size={48} />
                 </div>
-                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Hola, {user.name.split(' ')[0]}</h1>
-                <p className="text-slate-600 dark:text-slate-400 mt-2 max-w-lg mx-auto">
-                    Bienvenido de nuevo a tu espacio de formación. {isFinished ? '¡Has completado todo el plan de estudios!' : 'Continúa donde lo dejaste para fortalecer tus competencias.'}
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-3">¡Hola, {user.name.split(' ')[0]}!</h1>
+                <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
+                    {isFinished ? 'Has completado exitosamente tu plan de formación institucional.' : 'Continúa fortaleciendo tus conocimientos técnicos para la excelencia en el Control Interno.'}
                 </p>
-                
-                <div className="mt-8 max-w-md mx-auto">
-                    <div className="flex justify-between text-sm font-bold mb-2">
-                        <span className="text-brand-700 dark:text-brand-400">Progreso de Formación</span>
-                        <span className="text-brand-700 dark:text-brand-400">{percentage}%</span>
+                <div className="mt-10 max-w-md mx-auto">
+                    <div className="flex justify-between text-[11px] font-black uppercase tracking-widest mb-3">
+                        <span className="text-slate-400">Progreso de Formación</span>
+                        <span className="text-brand-600 dark:text-brand-400">{percentage}%</span>
                     </div>
-                    <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-brand-500 transition-all duration-1000 ease-out"
-                            style={{ width: `${percentage}%` }}
-                        ></div>
+                    <div className="h-4 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden p-1 shadow-inner">
+                        <div className="h-full bg-brand-500 rounded-full transition-all duration-1000 ease-out shadow-lg shadow-brand-200" style={{ width: `${percentage}%` }}></div>
                     </div>
                     {isFinished && (
-                        <button 
-                            onClick={onShowCertificate}
-                            className="mt-6 flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-green-200 dark:shadow-none animate-bounce transition-all"
-                        >
+                        <button onClick={onShowCertificate} className="mt-8 flex items-center justify-center gap-3 w-full bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-green-100 transition-all hover:scale-105 active:scale-100">
                             <FileCheck size={20} /> Generar Constancia de Culminación
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                <Card title="Plan de Estudios (Módulos)">
+            <div className="grid md:grid-cols-2 gap-8">
+                <Card title="Plan de Estudios">
                     <div className="space-y-4">
                         {[
                             { id: 'strategic', l: 'Plataforma Estratégica' },
@@ -377,46 +315,36 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                             <button 
                                 key={m.id}
                                 onClick={() => onChange(m.id as ModuleId)}
-                                className="w-full flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 hover:bg-white dark:hover:bg-slate-700 hover:shadow-md transition-all border border-gray-100 dark:border-slate-600"
+                                className="w-full flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-700/30 hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-brand-200 dark:hover:border-slate-500 shadow-sm transition-all group"
                             >
-                                <span className="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                                    <span className="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-700 dark:text-brand-300 flex items-center justify-center text-xs font-bold">{i + 1}</span>
+                                <span className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-4">
+                                    <span className="w-8 h-8 rounded-xl bg-brand-100 dark:bg-brand-900 text-brand-700 dark:text-brand-300 flex items-center justify-center text-xs font-black shadow-sm group-hover:bg-brand-500 group-hover:text-white transition-colors">{i + 1}</span>
                                     {m.l}
                                 </span>
                                 {progress[m.id as ModuleId]?.completed 
-                                    ? <CheckCircle className="text-green-500" size={20} />
-                                    : <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-slate-500"></div>
+                                    ? <div className="bg-green-100 dark:bg-green-900/30 p-1 rounded-full"><CheckCircle className="text-green-500" size={24} /></div>
+                                    : <div className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600"></div>
                                 }
                             </button>
                         ))}
                     </div>
                 </Card>
                 
-                <div className="space-y-6">
-                     {/* Call to Action */}
+                <div className="space-y-8">
                     {!isFinished && (
-                        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white flex flex-col justify-center items-center text-center shadow-lg">
-                            <h3 className="text-xl font-bold mb-2">Siguiente Paso</h3>
-                            <p className="text-slate-300 mb-6 text-sm">
-                                Retoma tu aprendizaje en el módulo de Plataforma Estratégica.
-                            </p>
-                            <button 
-                                onClick={() => onChange('strategic')}
-                                className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-lg shadow-brand-900/50 flex items-center gap-2"
-                            >
-                                Continuar <ArrowRight size={18} />
+                        <div className="bg-slate-900 rounded-3xl p-8 text-white text-center shadow-2xl relative overflow-hidden group">
+                            <div className="absolute -right-8 -top-8 w-32 h-32 bg-brand-500 rounded-full opacity-10 group-hover:scale-150 transition-transform duration-700"></div>
+                            <h3 className="text-xl font-black mb-2 relative z-10">Siguiente Paso</h3>
+                            <p className="text-slate-400 mb-8 text-sm leading-relaxed relative z-10">Continúa con tu proceso de aprendizaje para obtener la certificación institucional.</p>
+                            <button onClick={() => onChange('strategic')} className="bg-brand-500 hover:bg-brand-600 text-white font-black py-4 px-10 rounded-2xl flex items-center gap-3 mx-auto transition-all shadow-lg shadow-brand-900/50 hover:px-12">
+                                CONTINUAR <ArrowRight size={18} />
                             </button>
                         </div>
                     )}
-
-                    {/* Utils & Reset */}
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-slate-700">
-                        <h3 className="font-bold text-slate-800 dark:text-white mb-3 text-sm uppercase tracking-wide">Opciones</h3>
-                        <div className="flex flex-col gap-2">
-                            <button onClick={onReset} className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-bold transition-colors">
-                                <Trash2 size={16} /> Reiniciar todo el progreso
-                            </button>
-                        </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-100 dark:border-slate-700 flex justify-center">
+                        <button onClick={onReset} className="flex items-center gap-2 px-6 py-2 text-red-500 hover:text-red-700 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors">
+                            <Trash2 size={14} /> Reiniciar Progreso
+                        </button>
                     </div>
                 </div>
             </div>
