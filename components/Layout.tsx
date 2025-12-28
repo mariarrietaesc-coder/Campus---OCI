@@ -104,14 +104,18 @@ export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, p
                 <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -mr-10 -mt-10"></div>
             </div>
             
-            <div className="mt-6 flex items-center justify-between px-2">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-black text-xs text-brand-500">
+            <div className="mt-6 flex items-center justify-between gap-2 px-2">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex-shrink-0 flex items-center justify-center font-black text-xs text-brand-500">
                   {user.name[0]}
                 </div>
-                <p className="text-[10px] font-bold text-slate-400 leading-tight pr-2">{user.name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-bold text-slate-400 leading-tight truncate-none whitespace-normal break-words">
+                    {user.name}
+                  </p>
+                </div>
               </div>
-              <button onClick={onLogout} title="Cerrar sesión" className="p-2 text-slate-300 hover:text-red-500 transition-colors">
+              <button onClick={onLogout} title="Cerrar sesión" className="p-2 text-slate-300 hover:text-red-500 transition-colors flex-shrink-0">
                 <LogOut size={18} />
               </button>
             </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, Badge, Quiz, Callout, EvidenceItem } from '../components/UI';
 import { IIA_LOGO_BASE64 } from '../components/LogoData';
@@ -224,7 +225,7 @@ const DOMAINS_MIE_TABLES = {
     purpose: "Asegurar que la función de auditoría interna tenga un mandato claro, aprobado y respaldado por la Alta Dirección y el CICCI, con un propósito definido, sustentado en principios éticos, independencia organizacional y orientado a fortalecer la gobernanza, la gestión de riesgos, el control, la reputación institucional y el interés público.",
     principles: [
       "Definir formalmente el propósito de la auditoría interna.",
-      "Contar con un mandato aprobado y respaldado por el máximo órgano de gobierno.",
+      "Contar con un mandato aprobado and respaldado por el máximo órgano de gobierno.",
       "Adoptar un Código de Ética que asegure integridad, objetividad, competencia y confidencialidad.",
       "Incorporar un marco normativo integral (leyes nacionales y Normas Globales).",
       "Garantizar independencia y posición organizacional adecuada.",
@@ -333,6 +334,13 @@ const SECTIONS_LIST = [
 export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, saveProgress: any, data: QuizState }> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
   const [activeTab, setActiveTab] = useState('menu');
   const [modal, setModal] = useState<{title: string, content: React.ReactNode} | null>(null);
+  
+  // SOLUCIÓN TEMPORIZADOR: Ref para la función de actualización para evitar clausuras obsoletas
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  useEffect(() => {
+    onTimeUpdateRef.current = onTimeUpdate;
+  }, [onTimeUpdate]);
+
   const timerRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(Date.now());
 
@@ -340,11 +348,18 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
     const pushTime = () => {
       const now = Date.now();
       const diff = Math.floor((now - startTimeRef.current) / 1000);
-      if (diff > 0) { onTimeUpdate(diff); startTimeRef.current = now; }
+      if (diff > 0) { 
+        onTimeUpdateRef.current(diff); 
+        startTimeRef.current = now; 
+      }
     };
-    timerRef.current = window.setInterval(pushTime, 2000);
-    return () => { if (timerRef.current) window.clearInterval(timerRef.current); pushTime(); saveProgress(); };
-  }, []);
+    timerRef.current = window.setInterval(pushTime, 1000); // Actualización cada segundo
+    return () => { 
+      if (timerRef.current) window.clearInterval(timerRef.current); 
+      pushTime(); 
+      saveProgress(); 
+    };
+  }, [saveProgress]);
 
   const timeSpent = data.timeSpentSeconds || 0;
   const isLocked = (timeSpent < (data.minTimeSeconds || 60)) && !data.completed;
@@ -410,7 +425,7 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
             </button>
             <div className="flex items-center gap-4 mb-6">
               <Info size={30} className="text-brand-500" />
-              <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{modal.title}</h3>
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">{modal.title}</h3>
             </div>
             <div className="text-slate-700 dark:text-slate-300 font-medium text-lg leading-relaxed">
               {modal.content}
@@ -484,7 +499,7 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
                      </defs>
 
                      <g transform="translate(225, 225)">
-                        {/* DOMINIOS CENTRALES - AHORA ABREN MODAL DE ASPECTOS GENERALES */}
+                        {/* DOMINIOS CENTRALES */}
                         {SCHEME_SEGMENTS.map((s, idx) => {
                           const full = 360 / 5;
                           const span = full - gapDeg;
@@ -525,7 +540,7 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
                           <textPath href="#path-og" startOffset="50%" textAnchor="middle">Orientación global</textPath>
                         </text>
                         
-                        {/* CENTRO LOGO - POPUP INSTITUCIONAL */}
+                        {/* CENTRO LOGO */}
                         <g 
                           className="cursor-pointer group" 
                           onClick={(e) => { e.stopPropagation(); setModal(MODAL_DATA.iia); }}
@@ -546,13 +561,11 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
           <div className="space-y-12 animate-fade-in max-w-6xl mx-auto">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{DOMAINS_MIE_TABLES[activeTab as keyof typeof DOMAINS_MIE_TABLES].title}</h2>
             
-            {/* Caja de Propósito Fucsia */}
             <section className="bg-white dark:bg-slate-800 border-l-[8px] border-brand-500 p-10 rounded-r-[2.5rem] shadow-xl">
                <h4 className="text-brand-600 font-black text-xs uppercase tracking-widest mb-4">Propósito del Dominio</h4>
                <p className="text-xl text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">{DOMAINS_MIE_TABLES[activeTab as keyof typeof DOMAINS_MIE_TABLES].purpose}</p>
             </section>
 
-            {/* Principios */}
             <section className="space-y-8">
                <h3 className="text-2xl font-black text-slate-800 dark:text-white border-l-4 border-brand-500 pl-6">Principios y Elementos de Cumplimiento</h3>
                <ul className="grid gap-4 pl-6 list-disc text-slate-600 dark:text-slate-400 font-bold text-lg">
@@ -562,7 +575,6 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
                </ul>
             </section>
 
-            {/* Tabla de Evidencia MIE */}
             <section className="space-y-8 overflow-hidden">
                <div className="bg-slate-900 text-white px-8 py-4 rounded-t-3xl inline-block shadow-lg">
                   <h3 className="font-black text-xs uppercase tracking-[0.3em]">Evidencia de Cumplimiento – Ministerio de Igualdad y Equidad</h3>
