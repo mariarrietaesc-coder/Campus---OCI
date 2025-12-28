@@ -109,7 +109,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, p
                 <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-black text-xs text-brand-500">
                   {user.name[0]}
                 </div>
-                <p className="text-[10px] font-bold text-slate-400 truncate max-w-[100px]">{user.name.split(' ')[0]}</p>
+                <p className="text-[10px] font-bold text-slate-400 leading-tight pr-2">{user.name}</p>
               </div>
               <button onClick={onLogout} title="Cerrar sesión" className="p-2 text-slate-300 hover:text-red-500 transition-colors">
                 <LogOut size={18} />

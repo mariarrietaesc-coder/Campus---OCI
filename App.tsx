@@ -267,7 +267,7 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                 <div className="w-24 h-24 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                     <Award size={48} />
                 </div>
-                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-3">¡Hola, {user.name.split(' ')[0]}!</h1>
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-3">¡Hola, {user.name}!</h1>
                 <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
                     {isFinished ? 'Has completado exitosamente tu plan de formación institucional.' : 'Continúa fortaleciendo tus conocimientos técnicos para la excelencia en el Control Interno.'}
                 </p>
