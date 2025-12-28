@@ -67,7 +67,7 @@ const fitFontSize = (text: string, arcLen: number, maxSize: number) => {
   return Math.max(size, minSize);
 };
 
-// --- CONTENIDOS TEÓRICOS GENERALES (EXTRAÍDOS DE TU HTML) ---
+// --- CONTENIDOS TEÓRICOS GENERALES ---
 const MODAL_DATA = {
   'dominio-iii': {
     title: "Dominio III – Gobierno de la Función de Auditoría Interna",
@@ -139,11 +139,11 @@ const MODAL_DATA = {
         <p>Garantizar que los auditores internos actúen conforme a principios éticos y profesionales que sustenten la confianza, imparcialidad y la calidad de los trabajos.</p>
         <h3 className="font-bold text-brand-600">Principios:</h3>
         <ul className="list-disc pl-5 space-y-2">
-          <li><strong>Integridad</strong> → Actuar con honestidad, valentía profesional y respeto a expectativas éticas y legales.</li>
-          <li><strong>Objetividad</strong> → Emitir juicios libres de intereses indebidos; declarar y gestionar conflictos de interés.</li>
-          <li><strong>Competencia</strong> → Mantener conocimientos, habilidades y experiencia para un desempeño eficaz.</li>
-          <li><strong>Debido cuidado profesional</strong> → Ejercer escepticismo, rigor y cumplimiento de las Normas Globales.</li>
-          <li><strong>Confidencialidad</strong> → Proteger la información obtenida y garantizar su uso legítimo.</li>
+          <li><strong>1. Integridad</strong> → Actuar con honestidad, valentía profesional y respeto a expectativas éticas y legales.</li>
+          <li><strong>2. Objetividad</strong> → Emitir juicios libres de intereses indebidos; declarar y gestionar conflictos de interés.</li>
+          <li><strong>3. Competencia</strong> → Mantener conocimientos, habilidades y experiencia para un desempeño eficaz.</li>
+          <li><strong>4. Debido cuidado profesional</strong> → Ejercer escepticismo, rigor y cumplimiento de las Normas Globales.</li>
+          <li><strong>5. Confidencialidad</strong> → Proteger la información obtenida y garantizar su uso legítimo.</li>
         </ul>
       </div>
     )
