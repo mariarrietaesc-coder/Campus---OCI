@@ -148,35 +148,53 @@ const MODAL_DATA = {
       </div>
     )
   },
-  'orientacion': {
-    title: "Orientación Global",
-    content: (
-      <div className="space-y-4 text-slate-700 dark:text-slate-300">
-        <p>La Orientación Global constituye el conjunto de guías, consejos prácticos y herramientas emitidas por el Instituto de Auditores Internos (IIA) para apoyar la implementación de las Normas Globales. No son de carácter obligatorio, pero sirven como referencia autorizada para fortalecer la práctica profesional de la auditoría interna.</p>
-        <h3 className="font-bold text-brand-600">Su finalidad es:</h3>
-        <ul className="list-disc pl-5 space-y-2">
-          <li>Facilitar la interpretación de los principios y requisitos de las Normas Globales.</li>
-          <li>Proveer lineamientos y ejemplos aplicables a distintos contextos organizacionales.</li>
-          <li>Promover consistencia en la práctica profesional, sin perder flexibilidad para adaptarse a sectores, riesgos y entornos específicos.</li>
-          <li>Servir como material de consulta para auditores internos, juntas directivas y responsables de control.</li>
-        </ul>
-        <p className="italic text-sm">En síntesis, la Orientación Global es el nivel de guía no vinculante del Marco Internacional para la Práctica Profesional (IPPF), diseñado para traducir la teoría normativa en prácticas útiles que aseguren calidad, valor agregado y alineación con el interés público.</p>
-      </div>
-    )
-  },
+'orientacion': {
+  title: "Orientación Global",
+  content: (
+    <div className="space-y-4 text-slate-700 dark:text-slate-300">
+      <p>
+        <strong>Las Guías Globales</strong> respaldan las Normas proporcionando información no obligatoria,
+        asesoramiento y las prácticas más destacadas para llevar a cabo los Servicios de Auditoría
+        Interna. Están respaldados por el IIA a través de procesos formales de revisión y aprobación.
+      </p>
+
+      <p>
+        Las Guías Prácticas Globales proporcionan enfoques detallados, procesos detallados y
+        ejemplos sobre temas que incluyen:
+      </p>
+
+      <ul className="list-disc pl-6 space-y-2">
+        <li>Servicios de aseguramiento y asesoramiento.</li>
+        <li>Planificación, ejecución y comunicación del trabajo.</li>
+        <li>Servicios financieros.</li>
+        <li>Riesgo de fraude y otros riesgos generales.</li>
+        <li>Estrategia y gestión de la Función de Auditoría Interna.</li>
+        <li>Sector público.</li>
+        <li>Sostenibilidad.</li>
+      </ul>
+
+      <p>
+        Las Guías Globales de Auditoría de Tecnología (<em>Global Technology Audit Guides o GTAG®</em>)
+        ofrecen a los auditores internos los conocimientos para llevar a cabo servicios de
+        aseguramiento o consultoría relacionados con la tecnología de la información de la
+        organización, así como sus riesgos y controles de seguridad de la información.
+      </p>
+    </div>
+  )
+},
+
   'requisitos': {
     title: "Requisitos Temáticos",
     content: (
       <div className="space-y-4 text-slate-700 dark:text-slate-300">
-        <p>Los Requisitos Temáticos son disposiciones obligatorias en áreas de riesgo específicas que complementan a las Normas Globales. Establecen la cobertura mínima que la auditoría interna debe aplicar en compromisos de aseguramiento cuando dichos riesgos se identifican como significativos en la organización.</p>
-        <h3 className="font-bold text-brand-600">Aspectos técnicos clave:</h3>
-        <ul className="list-disc pl-5 space-y-2">
-          <li><strong>Enfoque basado en riesgos:</strong> su aplicación depende de los resultados de la evaluación de riesgos de la entidad.</li>
-          <li><strong>Carácter obligatorio:</strong> deben cumplirse en compromisos de aseguramiento; en servicios de asesoría se recomiendan como referencia.</li>
-          <li><strong>Cobertura mínima:</strong> fijan una línea base para temas críticos (ejemplo: ciberseguridad, gestión de terceros, cumplimiento normativo).</li>
-          <li><strong>Juicio profesional:</strong> requieren documentar decisiones sobre alcance, exclusiones o aplicación parcial, siguiendo el principio de “cumplir o explicar”.</li>
-          <li><strong>Integración en el ciclo de auditoría:</strong> deben considerarse en la planificación, ejecución, comunicación de resultados y seguimiento de acciones de mejora.</li>
-        </ul>
+        <p>Los Requerimientos Temáticos están diseñados para mejorar la coherencia y la calidad de los
+Servicios de Auditoría Interna, relacionados con temas específicos de auditoría y para apoyar a
+los auditores internos que desempeñan trabajos en esas áreas de riesgo. Los auditores internos
+deben cumplir con los requerimientos relevantes cuando el alcance de un trabajo incluye alguno
+de los temas identificados.
+<br/><br/>
+Los Requerimientos Temáticos fortalecen la continua relevancia de la auditoría interna para abordar el
+panorama de riesgos en constante evolución a lo largo de las distintas industrias y sectores.</p>
       </div>
     )
   },
@@ -392,7 +410,7 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
             </button>
             <div className="flex items-center gap-4 mb-6">
               <Info size={30} className="text-brand-500" />
-              <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">{modal.title}</h3>
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{modal.title}</h3>
             </div>
             <div className="text-slate-700 dark:text-slate-300 font-medium text-lg leading-relaxed">
               {modal.content}
