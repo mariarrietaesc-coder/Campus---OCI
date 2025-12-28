@@ -9,16 +9,8 @@ import { ToolsModule } from './modules/Tools';
 import { Certificate } from './components/Certificate';
 import { ModuleId, ProgressMap, QuizState, User } from './types';
 import { Card, MinistryLogo } from './components/UI';
-import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, Trash2, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Award, CheckCircle, ArrowRight, ShieldCheck, FileCheck, Trash2, Lock, AlertCircle, Eye, EyeOff, Info, X, Laptop } from 'lucide-react';
 import { UserStore } from './data/store'; 
-
-const CompetenciesView: React.FC<{onComplete: any}> = ({onComplete}) => (
-    <div className="p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4 dark:text-white">Competencias del Auditor</h2>
-        <p className="mb-6 dark:text-slate-300">Este contenido ha sido integrado en el Módulo de Normas Globales para una mejor experiencia de aprendizaje unificada.</p>
-        <button onClick={() => onComplete(100)} className="bg-brand-600 text-white px-6 py-2 rounded-lg">Marcar como visto</button>
-    </div>
-);
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -144,8 +136,6 @@ function App() {
         return <ForensicModule {...modProps('forensic')} />;
       case 'tools':
         return <ToolsModule />;
-      case 'competencies':
-        return <CompetenciesView onComplete={(s: number) => handleModuleComplete('competencies', s)} />;
       default:
         return <div>Módulo no encontrado</div>;
     }
@@ -231,7 +221,7 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                         </div>
                     </div>
                     <div>
-                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Contraseña</label>
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Contraseña (Identificación)</label>
                         <div className="relative">
                             <ShieldCheck className="absolute left-4 top-4 text-slate-400" size={18} />
                             <input 
@@ -263,6 +253,7 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
 }
 
 const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) => void, user: User, onShowCertificate: () => void, onReset: () => void }> = ({ progress, onChange, user, onShowCertificate, onReset }) => {
+    const [showInstructions, setShowInstructions] = useState(false);
     const coreModules: ModuleId[] = ['strategic', 'mipg', 'standards', 'forensic'];
     const completedCount = coreModules.filter(id => progress[id]?.completed).length;
     const totalModules = coreModules.length;
@@ -280,6 +271,14 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                 <p className="text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
                     {isFinished ? 'Has completado exitosamente tu plan de formación institucional.' : 'Continúa fortaleciendo tus conocimientos técnicos para la excelencia en el Control Interno.'}
                 </p>
+                
+                <button 
+                  onClick={() => setShowInstructions(true)}
+                  className="mt-6 inline-flex items-center gap-2 text-brand-600 font-bold text-xs uppercase tracking-widest hover:underline"
+                >
+                  <Info size={14} /> Ver Instructivo de Uso
+                </button>
+
                 <div className="mt-10 max-w-md mx-auto">
                     <div className="flex justify-between text-[11px] font-black uppercase tracking-widest mb-3">
                         <span className="text-slate-400">Progreso de Formación</span>
@@ -295,6 +294,56 @@ const DashboardView: React.FC<{ progress: ProgressMap, onChange: (id: ModuleId) 
                     )}
                 </div>
             </div>
+
+            {showInstructions && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-fade-in">
+                <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] max-w-2xl w-full p-8 shadow-2xl relative border border-slate-100 dark:border-slate-700 overflow-y-auto max-h-[90vh]">
+                  <button onClick={() => setShowInstructions(false)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 transition-colors">
+                    <X size={24} />
+                  </button>
+                  
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center">
+                      <Laptop size={24} />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Instrucciones de Uso</h3>
+                  </div>
+
+                  <div className="space-y-6 text-sm text-slate-600 dark:text-slate-400">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 p-6 rounded-3xl border border-amber-100 dark:border-amber-900/50">
+                      <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-black uppercase text-xs mb-2">
+                        <AlertCircle size={14} /> Nota Crítica de Persistencia
+                      </div>
+                      <p className="font-medium leading-relaxed">
+                        Este campus funciona de manera <strong>LOCAL</strong>. Su progreso se guarda únicamente en el navegador de este computador. 
+                      </p>
+                      <ul className="list-disc ml-5 mt-2 space-y-1 opacity-90">
+                        <li>No use el modo incógnito.</li>
+                        <li>No borre el historial/caché si desea mantener su progreso.</li>
+                        <li>Si cambia de equipo, deberá iniciar los módulos nuevamente.</li>
+                      </ul>
+                    </div>
+
+                    <div className="grid gap-4">
+                      <div className="flex gap-4">
+                        <span className="w-6 h-6 shrink-0 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-[10px]">1</span>
+                        <p><strong>Acceso:</strong> Su usuario es el correo institucional y su contraseña es su número de identificación.</p>
+                      </div>
+                      <div className="flex gap-4">
+                        <span className="w-6 h-6 shrink-0 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-[10px]">2</span>
+                        <p><strong>Módulos:</strong> Debe completar los 4 módulos técnicos. Cada uno requiere un tiempo mínimo de revisión de contenido antes de habilitar el examen.</p>
+                      </div>
+                      <div className="flex gap-4">
+                        <span className="w-6 h-6 shrink-0 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-[10px]">3</span>
+                        <p><strong>Certificación:</strong> Al llegar al 100%, el botón de descarga se habilitará en este Dashboard.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button onClick={() => setShowInstructions(false)} className="mt-8 w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-800">Entendido</button>
+                </div>
+              </div>
+            )}
 
             <div className="grid md:grid-cols-2 gap-8">
                 <Card title="Plan de Estudios">

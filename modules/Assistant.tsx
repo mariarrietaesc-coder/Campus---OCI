@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { Send, User, Bot, AlertTriangle, Loader2 } from 'lucide-react';
@@ -33,8 +34,10 @@ export const AssistantModule: React.FC = () => {
         setIsLoading(true);
 
         try {
+            /* Create a new GoogleGenAI instance right before making an API call to ensure it uses up-to-date API key */
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            const model = "gemini-2.5-flash";
+            /* Use gemini-3-flash-preview for basic text tasks as per guidelines */
+            const modelName = "gemini-3-flash-preview";
             
             const systemPrompt = `
                 Actúa como un Auditor Senior de la Oficina de Control Interno del Ministerio de Igualdad y Equidad de Colombia.
@@ -49,13 +52,15 @@ export const AssistantModule: React.FC = () => {
                 5. Sé conciso y estructurado.
             `;
 
+            /* Call generateContent with model name and prompt directly */
             const response = await ai.models.generateContent({
-                model: model,
+                model: modelName,
                 contents: [
                     { role: 'user', parts: [{ text: systemPrompt + "\n\nConsulta del usuario: " + userMsg }] }
                 ]
             });
 
+            /* Access the .text property directly as per guidelines */
             const text = response.text || "Lo siento, no pude generar una respuesta en este momento.";
             setMessages(prev => [...prev, { role: 'model', text: text }]);
         } catch (error) {
