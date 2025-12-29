@@ -20,11 +20,11 @@ function App() {
   
   const emptyProgress: ProgressMap = {
     dashboard: { completed: true, score: 0, timeSpentSeconds: 0 },
-    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
-    mipg: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
+    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 0 },
+    mipg: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 0 },
     competencies: { completed: false, score: 0, timeSpentSeconds: 0 },
-    standards: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
-    forensic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
+    standards: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 0 },
+    forensic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 0 },
     tools: { completed: true, score: 0, timeSpentSeconds: 0 },
   };
 
@@ -87,14 +87,8 @@ function App() {
   };
 
   const handleTimeUpdate = (moduleId: ModuleId, additionalSeconds: number) => {
-      if (!user) return;
-      const currentMod = progress[moduleId];
-      const newTime = (currentMod.timeSpentSeconds || 0) + additionalSeconds;
-      const newProgress = {
-          ...progress,
-          [moduleId]: { ...currentMod, timeSpentSeconds: newTime }
-      };
-      setProgress(newProgress);
+      // Temporizador desactivado
+      return;
   };
 
   const saveCurrentProgressToDB = () => {
@@ -117,7 +111,7 @@ function App() {
 
   const modProps = (id: ModuleId) => ({
       onComplete: (s: number) => handleModuleComplete(id, s),
-      onTimeUpdate: (secs: number) => handleTimeUpdate(id, secs),
+      onTimeUpdate: (secs: number) => {},
       saveProgress: saveCurrentProgressToDB,
       data: progress[id]
   });

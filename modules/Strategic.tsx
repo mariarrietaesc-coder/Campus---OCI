@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, Badge, Quiz, Accordion, TimelineItem } from '../components/UI';
 import { 
   Target, Scale, Users, Map, FileText, CheckCircle, 
-  ArrowLeft, ArrowRight, Clock, Lock, LayoutGrid, Info,
+  ArrowLeft, ArrowRight, Lock, LayoutGrid, Info,
   Search, Filter, ChevronDown, ChevronUp, Zap, 
   ShieldCheck, Globe, Users2, Landmark, Home, 
   Database, Radio, Laptop, Briefcase, Gavel, X
@@ -70,7 +70,7 @@ const PROCESOS_DEFS = {
     { n: 'Atención a las Juventudes', def: "Implementar políticas, programas y estrategias transformadoras que promuevan el desarrollo integral, la convivencia pacífica y el cierre de brechas para la juventud, incluyendo acciones específicas para el barrismo social y jóvenes en situación de vulnerabilidad." },
     { n: 'Atención a Poblaciones y Territorios Marginados y Excluidos', def: "Implementar programas, proyectos y estrategias, para impulsar el goce efectivo de los derechos de las poblaciones y territorios marginados y excluidos, a fin de contribuir al cierre de brechas de desigualdad social, económica y territorial, garantizando la aplicación de los diferentes enfoques que enmarcan la actuación del Ministerio." },
     { n: 'Atención a Pueblos Étnicos y Campesinos', def: "Formular de manera efectiva las intervenciones, proyectos y acciones transformadoras dirigidas a pueblos y comunidades negras, afrodescendientes, raizales, palenqueras, indígenas, Rrom y campesinas, con enfoque de derechos, de género, diferencial, étnico-antirracista, interseccional y territorial, para contribuir a la superación de las brechas de desigualdad e inequidad." },
-    { n: 'Atención a Personas con Discapacidad y población de sectores LGBTIQ+', def: "Diseñar, implementar y coordinar políticas, programas y estrategias integrales que garanticen los derechos, promuevan la inclusión plena y aseguren el goce efectivo de derechos de las personas con discapacidad y la población LGBTIQ+, fomentando una sociedad más equitativa, inclusiva y respetuosa de la diversidad." },
+    { n: 'Atención a Pueblos de Éspecial Protección', def: "Diseñar, implementar y coordinar políticas, programas y estrategias integrales que garanticen los derechos, promuevan la inclusión plena y aseguren el goce efectivo de derechos de las personas con discapacidad y la población LGBTIQ+, fomentando una sociedad más equitativa, inclusiva y respetuosa de la diversidad." },
     { n: 'Articulación Intersectorial', def: "Establecer y mantener mecanismos efectivos de coordinación, comunicación y colaboración entre el Ministerio de Igualdad y Equidad y las diversas entidades gubernamentales, organizaciones de la sociedad civil y comunidades, para potenciar el impacto de las políticas de igualdad y equidad a nivel nacional y territorial.", isCore: true },
     { n: 'Traslado, Seguimiento y Evaluación', def: "Gestionar eficientemente el traslado de proyectos, realizar un seguimiento sistemático de la ejecución de programas y recursos, y evaluar el impacto de las acciones transformadoras del Ministerio, para asegurar el cumplimiento de las metas de igualdad y equidad." }
   ],
@@ -106,27 +106,14 @@ export const StrategicModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
   const [expandedOrg, setExpandedOrg] = useState<string[]>([]);
   const [activeDef, setActiveDef] = useState<{ n: string, d: string } | null>(null);
   
-  const timerRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
+  // Temporizador desactivado
+  const isLocked = false; 
 
-  useEffect(() => {
-    const pushTime = () => {
-      const now = Date.now();
-      const diff = Math.floor((now - startTimeRef.current) / 1000);
-      if (diff > 0) { onTimeUpdate(diff); startTimeRef.current = now; }
-    };
-    timerRef.current = window.setInterval(pushTime, 2000);
-    return () => { if (timerRef.current) window.clearInterval(timerRef.current); pushTime(); saveProgress(); };
-  }, []);
-
-  const timeSpent = data.timeSpentSeconds || 0;
-  const isLocked = (timeSpent < (data.minTimeSeconds || 60)) && !data.completed;
   const currentIndex = SECTIONS.findIndex(s => s.id === activeTab);
   const nextSection = SECTIONS[currentIndex + 1];
   const prevSection = SECTIONS[currentIndex - 1];
 
   const navigateTo = (id: string) => {
-    if (id === 'quiz' && isLocked) return;
     setActiveTab(id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -160,28 +147,20 @@ export const StrategicModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
             <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">Plataforma estratégica</h1>
             <p className="text-slate-500 font-medium text-lg mt-4">Misión, visión, estructura y portafolio institucional.</p>
           </div>
-          <div className="bg-white dark:bg-slate-800 px-8 py-5 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-slate-700 flex items-center gap-6 text-brand-600">
-            <Clock size={28} />
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 tracking-wider mb-1">Tiempo de estudio</p>
-              <p className="font-mono font-black text-xl leading-none">{Math.floor(timeSpent / 60)}m {timeSpent % 60}s</p>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SECTIONS.map((section, i) => {
             const Icon = section.icon;
-            const locked = section.id === 'quiz' && isLocked;
             return (
               <button
                 key={section.id}
-                onClick={() => !locked && setActiveTab(section.id)}
-                className={`group p-10 bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 transition-all text-left shadow-xl ${locked ? 'opacity-40 grayscale cursor-not-allowed border-transparent' : 'hover:border-brand-500 border-transparent active:scale-95'}`}
+                onClick={() => navigateTo(section.id)}
+                className={`group p-10 bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 transition-all text-left shadow-xl hover:border-brand-500 border-transparent active:scale-95`}
               >
                 <div className="flex justify-between items-start mb-10">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg ${locked ? 'bg-slate-100 text-slate-400' : 'bg-brand-50 text-brand-600'}`}>
-                    {locked ? <Lock size={26}/> : <Icon size={26}/>}
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-brand-50 text-brand-600`}>
+                    <Icon size={26}/>
                   </div>
                   <span className="text-[9px] font-bold text-slate-300 tracking-wider">Sección 0{i + 1}</span>
                 </div>
@@ -266,7 +245,7 @@ export const StrategicModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
             <TimelineItem year="Junio 2023" title="Decreto 1075: Estructura Orgánica" description="Define despachos, 5 viceministerios, 20 direcciones, oficinas y Secretaría General." />
             <TimelineItem year="Junio 2023" title="Decreto 1076: Planta de personal (P1)" description="Establece los componentes iniciales de la planta de personal del Ministerio." />
             <TimelineItem year="Julio 2023" title="Decreto 1220: Planta de personal (P2)" description="Complementa y ajusta la planta de personal establecida en el Decreto 1076." />
-            <TimelineItem year="Agosto 2023" title="Resolución 003: Manual v1" description="Adopta la primera versión del Manual Específico de Funciones y Competencias Laborales." />
+            <TimelineItem year="Agosto 2023" title="Resolución 003: Manual v1" description="Adopta la primera versión del Manual Específica de Funciones y Competencias Laborales." />
             <TimelineItem year="Octubre 2023" title="Resolución 22: Manual v2" description="Actualiza y precisa el Manual de Funciones conforme a la estructura y planta ya definidas." />
             <TimelineItem year="2023-2024" title="Portafolio programático" description="Se elaboran los Documentos Técnicos (DT) de los 24 programas estratégicos sectoriales." />
             <TimelineItem year="Septiembre 2024" title="Resolución 668: Enfoques" description="Institucionaliza los 8 enfoques como eje articulador de toda la política pública del sector." />
@@ -517,7 +496,7 @@ export const StrategicModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
           {nextSection && (
             <button 
               onClick={() => navigateTo(nextSection.id)} 
-              className={`p-4 pl-6 pr-6 bg-brand-600 hover:bg-brand-500 rounded-full transition-all flex items-center gap-3 text-sm font-bold tracking-tighter ${nextSection.id === 'quiz' && isLocked ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+              className={`p-4 pl-6 pr-6 bg-brand-600 hover:bg-brand-500 rounded-full transition-all flex items-center gap-3 text-sm font-bold tracking-tighter`}
             >
               <span>{nextSection.id === 'quiz' ? 'Examen' : nextSection.label}</span>
               <ArrowRight size={20} />

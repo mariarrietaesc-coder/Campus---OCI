@@ -1,13 +1,18 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Card, Badge, Quiz, Accordion, TimelineItem } from '../components/UI';
 import { 
-  BookOpen, Clock, Shield, RefreshCw, CheckCircle, 
+  BookOpen, Shield, RefreshCw, CheckCircle, 
   Layers, Lock, ArrowLeft, ArrowRight, 
   LayoutGrid, Info, FileText, ShieldCheck,
   Zap, Activity
 } from 'lucide-react';
 import { QuizState } from '../types';
+
+// Define Clock component before its usage in SECTIONS
+const Clock = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+);
 
 const SECTIONS = [
   { id: 'que-es', label: '¿Qué es MIPG?', icon: Info, desc: 'Marco de referencia y principios institucionales.' },
@@ -21,28 +26,15 @@ const SECTIONS = [
 
 export const MIPGModule: React.FC<{ onComplete: any, onTimeUpdate: any, saveProgress: any, data: QuizState }> = ({ onComplete, onTimeUpdate, saveProgress, data }) => {
   const [activeTab, setActiveTab] = useState('menu');
-  const timerRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
-
-  useEffect(() => {
-    const pushTime = () => {
-      const now = Date.now();
-      const diff = Math.floor((now - startTimeRef.current) / 1000);
-      if (diff > 0) { onTimeUpdate(diff); startTimeRef.current = now; }
-    };
-    timerRef.current = window.setInterval(pushTime, 2000);
-    return () => { if (timerRef.current) window.clearInterval(timerRef.current); pushTime(); saveProgress(); };
-  }, []);
-
-  const timeSpent = data.timeSpentSeconds || 0;
-  const isLocked = (timeSpent < (data.minTimeSeconds || 60)) && !data.completed;
+  
+  // Temporizador desactivado
+  const isLocked = false;
 
   const currentIndex = SECTIONS.findIndex(s => s.id === activeTab);
   const nextSection = SECTIONS[currentIndex + 1];
   const prevSection = SECTIONS[currentIndex - 1];
 
   const navigateTo = (id: string) => {
-    if (id === 'quiz' && isLocked) return;
     setActiveTab(id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -56,28 +48,20 @@ export const MIPGModule: React.FC<{ onComplete: any, onTimeUpdate: any, saveProg
             <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">MIPG y SIG</h1>
             <p className="text-slate-500 dark:text-slate-400 font-medium text-lg mt-4">Modelo integrado de planeación y gestión.</p>
           </div>
-          <div className="bg-white dark:bg-slate-800 px-8 py-5 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-slate-700 flex items-center gap-6 text-brand-600">
-            <Clock size={28} />
-            <div>
-              <p className="text-[10px] font-bold text-slate-400 tracking-wider mb-1">Tiempo de estudio</p>
-              <p className="font-mono font-black text-xl leading-none">{Math.floor(timeSpent / 60)}m {timeSpent % 60}s</p>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SECTIONS.map((section, i) => {
             const Icon = section.icon;
-            const locked = section.id === 'quiz' && isLocked;
             return (
               <button
                 key={section.id}
-                onClick={() => !locked && setActiveTab(section.id)}
-                className={`group p-10 bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 transition-all text-left shadow-xl ${locked ? 'opacity-40 grayscale cursor-not-allowed border-transparent' : 'hover:border-brand-500 border-transparent active:scale-95'}`}
+                onClick={() => navigateTo(section.id)}
+                className={`group p-10 bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 transition-all text-left shadow-xl hover:border-brand-500 border-transparent active:scale-95`}
               >
                 <div className="flex justify-between items-start mb-10">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 ${locked ? 'bg-slate-100 text-slate-400' : 'bg-brand-50 text-brand-600'}`}>
-                    {locked ? <Lock size={26}/> : <Icon size={26}/>}
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 bg-brand-50 text-brand-600`}>
+                    <Icon size={26}/>
                   </div>
                   <span className="text-[9px] font-bold text-slate-300 tracking-wider">Sección 0{i + 1}</span>
                 </div>
@@ -160,7 +144,7 @@ export const MIPGModule: React.FC<{ onComplete: any, onTimeUpdate: any, saveProg
             <TimelineItem year="2003" title="Adopción del MECI" description="Decreto 1599. Primeros lineamientos obligatorios de autorregulación, autocontrol y autogestión." />
             <TimelineItem year="2012" title="Primer MIPG" description="Decreto 2482. Articulación de los sistemas de desarrollo administrativo y control interno." />
             <TimelineItem year="2017" title="Actualización y consolidación" description="Decreto 1499. Integración de calidad con desarrollo administrativo y MECI. Obligatorio cumplimiento." />
-            <TimelineItem year="2023" title="Creación del ministerio" description="Ley 2281. El ministerio nace con la obligación de adoptar los marcos de gestión pública desde su inicio." />
+            <TimelineItem year="2023" title="Creación del ministerio" description="Ley 2281. El ministerio nace con la obligation de adoptar los marcos de gestión pública desde su inicio." />
             <TimelineItem year="2024" title="Resolución 1022" description="Adopción formal del MIPG en el MIE y constitución del SIG-MIPG institucional." />
             <TimelineItem year="2025" title="Documentos operativos" description="Aprobación del manual ES_A-MS-001 y procedimiento GE_A-PR-004 para la ruta operativa interna." />
           </div>
@@ -326,7 +310,7 @@ export const MIPGModule: React.FC<{ onComplete: any, onTimeUpdate: any, saveProg
           {nextSection && (
             <button 
               onClick={() => navigateTo(nextSection.id)} 
-              className={`p-4 pl-6 pr-6 bg-brand-600 hover:bg-brand-500 rounded-full transition-all flex items-center gap-3 text-sm font-bold tracking-tighter ${nextSection.id === 'quiz' && isLocked ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+              className={`p-4 pl-6 pr-6 bg-brand-600 hover:bg-brand-500 rounded-full transition-all flex items-center gap-3 text-sm font-bold tracking-tighter`}
             >
               <span>{nextSection.id === 'quiz' ? 'Examen' : nextSection.label}</span>
               <ArrowRight size={20} />
