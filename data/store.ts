@@ -1,4 +1,3 @@
-
 import { User, ProgressMap } from '../types';
 
 const AUTHORIZED_USERS: User[] = [
@@ -50,22 +49,13 @@ const AUTHORIZED_USERS: User[] = [
         isActive: true,
         password: '1109387829'
     },
-    {
-        id: '1024490849',
-        name: 'Angela María Roa Cajiao',
-        email: 'aroa@minigualdad.gov.co',
-        role: 'Equipo OCI',
-        isActive: true,
-        password: '1024490849'
-    },
-    {
-        id: '1012378909',
-        name: 'Cindy Katherine Herrera Ramos',
-        email: 'ckherrera@minigualdad.gov.co',
-        role: 'Equipo OCI',
-        isActive: true,
-        password: '1012378909'
-    },
+
+    // ⛔ Eliminadas:
+    // - Angela María Roa Cajiao (aroa@minigualdad.gov.co)
+    // - Cindy Katherine Herrera Ramos (ckherrera@minigualdad.gov.co)
+    // - Julián Andrés Colmenares Morales (jacolmenares@minigualdad.gov.co)
+    // - Basco Germán Ricuarte Guerra (bricaurte@minigualdad.gov.co)
+
     {
         id: '1075288018',
         name: 'Yurany Stefany Galindo Fiero',
@@ -99,14 +89,6 @@ const AUTHORIZED_USERS: User[] = [
         password: '1032391837'
     },
     {
-        id: '79789700',
-        name: 'Julián Andrés Colmenares Morales',
-        email: 'jacolmenares@minigualdad.gov.co',
-        role: 'Equipo OCI',
-        isActive: true,
-        password: '79789700'
-    },
-    {
         id: '1016086531',
         name: 'Viviana Moreno Vargas',
         email: 'vmoreno@minigualdad.gov.co',
@@ -114,19 +96,21 @@ const AUTHORIZED_USERS: User[] = [
         isActive: true,
         password: '1016086531'
     },
+
+    // ✅ Nueva usuaria habilitada
     {
-        id: '79649746',
-        name: 'Basco Germán Ricuarte Guerra',
-        email: 'bricaurte@minigualdad.gov.co',
+        id: '1019122396',
+        name: 'Karen Dayanna Romero Parra',
+        email: 'kromero@minigualdad.gov.co',
         role: 'Equipo OCI',
         isActive: true,
-        password: '79649746'
+        password: '1019122396'
     }
 ];
 
 const EMPTY_PROGRESS: ProgressMap = {
     dashboard: { completed: true, score: 0, timeSpentSeconds: 0 },
-    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 }, 
+    strategic: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
     mipg: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
     competencies: { completed: false, score: 0, timeSpentSeconds: 0 },
     standards: { completed: false, score: 0, timeSpentSeconds: 0, minTimeSeconds: 60 },
@@ -139,7 +123,10 @@ export const UserStore = {
         return Promise.resolve();
     },
 
-    authenticate: async (email: string, password?: string): Promise<{ success: boolean, user?: User, message?: string }> => {
+    authenticate: async (
+        email: string,
+        password?: string
+    ): Promise<{ success: boolean; user?: User; message?: string }> => {
         await new Promise(resolve => setTimeout(resolve, 500));
         const user = AUTHORIZED_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (!user) {
@@ -159,7 +146,7 @@ export const UserStore = {
                 return JSON.parse(stored);
             }
         } catch (e) {
-            console.error("Error reading progress", e);
+            console.error('Error reading progress', e);
         }
         return EMPTY_PROGRESS;
     },
@@ -169,7 +156,7 @@ export const UserStore = {
             const key = `oci_progress_${email}`;
             localStorage.setItem(key, JSON.stringify(progress));
         } catch (e) {
-            console.error("Error saving progress", e);
+            console.error('Error saving progress', e);
         }
     },
 
@@ -186,7 +173,7 @@ export const UserStore = {
 
     addUser: (user: User) => {
         if (AUTHORIZED_USERS.some(u => u.email === user.email)) {
-            throw new Error("El usuario ya existe.");
+            throw new Error('El usuario ya existe.');
         }
         AUTHORIZED_USERS.push(user);
     }
