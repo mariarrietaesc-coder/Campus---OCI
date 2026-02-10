@@ -9,6 +9,14 @@ const AUTHORIZED_USERS: User[] = [
         isActive: true,
         password: '79283776'
     },
+     {
+        id: '1076661204',
+        name: 'Aura Carolina Torres Forero',
+        email: 'atorres@minigualdad.gov.co',
+        role: 'Visitante',
+        isActive: true,
+        password: '1076661204'
+    },
     {
         id: '1026258878',
         name: 'María Isabel Arrieta Escobar',
