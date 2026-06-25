@@ -54,7 +54,7 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
 
                 <div className="text-lg text-slate-700 leading-relaxed mb-8">
                     <p>La Oficina de Control Interno del</p>
-                    <p className="font-bold text-xl uppercase text-slate-900 mb-6">Ministerio de Igualdad y Equidad</p>
+                    <p className="font-bold text-xl uppercase text-slate-900 mb-6">la Entidad</p>
                     
                     <p className="mb-2">Hace constar que:</p>
                     <h2 className="text-3xl font-bold text-brand-700 mb-2 uppercase">{user.name}</h2>
@@ -75,9 +75,9 @@ export const Certificate: React.FC<CertificateProps> = ({ user, date, onClose })
             {/* Signature Area */}
             <div className="mt-16 flex flex-col items-center relative z-10 page-break-inside-avoid">
                 <div className="w-64 border-b border-slate-400 mb-4"></div>
-                <p className="font-bold text-slate-900 text-lg">RAÚL EDUARDO GONZÁLEZ GARZÓN</p>
+                <p className="font-bold text-slate-900 text-lg">OFICINA DE CONTROL INTERNO</p>
                 <p className="text-slate-600 text-sm uppercase">Jefe de la Oficina de Control Interno</p>
-                <p className="text-slate-500 text-xs mt-1">Ministerio de Igualdad y Equidad</p>
+                <p className="text-slate-500 text-xs mt-1">la Entidad</p>
             </div>
 
             {/* Footer */}

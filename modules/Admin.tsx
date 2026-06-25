@@ -204,7 +204,7 @@ export const AdminModule: React.FC<{ onLogout: () => void, currentUser: User }> 
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Correo Institucional</label>
-                                <input required type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 text-slate-900 dark:text-white" placeholder="usuario@minigualdad.gov.co" />
+                                <input required type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 text-slate-900 dark:text-white" placeholder="usuario@entidad.gov.co" />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cargo / Rol</label>

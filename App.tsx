@@ -210,7 +210,7 @@ const LoginView: React.FC<{ onLoginSuccess: (u: User) => void }> = ({ onLoginSuc
                                 value={email} 
                                 onChange={e => setEmail(e.target.value)} 
                                 className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/5 outline-none transition-all text-slate-900 font-medium" 
-                                placeholder="usuario@minigualdad.gov.co" 
+                                placeholder="usuario@entidad.gov.co" 
                             />
                         </div>
                     </div>

@@ -1,19 +1,19 @@
 
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronDown, ChevronUp, Info, ShieldCheck, FileText } from 'lucide-react';
-import { ESCUDO_BASE64 } from './LogoData';
+
 
 export const MinistryLogo: React.FC<{ className?: string, variant?: 'vertical' | 'horizontal', whiteText?: boolean }> = ({ className = "", variant = 'vertical', whiteText = false }) => {
   if (variant === 'horizontal') {
       return (
         <div className={`flex items-center gap-3 ${className}`}>
-            <img src={ESCUDO_BASE64} alt="Escudo de Colombia" className="h-10 w-auto object-contain" />
+            <div className="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
         </div>
       );
   }
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
-        <img src={ESCUDO_BASE64} alt="Ministerio de Igualdad" className="h-24 w-auto object-contain drop-shadow-xl" />
+        <div className="w-20 h-20 rounded-2xl bg-brand-600 text-white flex items-center justify-center shadow-xl"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
     </div>
   );
 };

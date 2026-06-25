@@ -40,7 +40,7 @@ export const AssistantModule: React.FC = () => {
             const modelName = "gemini-3-flash-preview";
             
             const systemPrompt = `
-                Actúa como un Auditor Senior de la Oficina de Control Interno del Ministerio de Igualdad y Equidad de Colombia.
+                Actúa como un Auditor Senior de la Oficina de Control Interno de la Entidad de Colombia.
                 Tu tono debe ser profesional, objetivo, conservador y basado en evidencia.
                 Tus respuestas deben estar fundamentadas en la normatividad colombiana (MIPG, Ley 87 de 1993, Decretos relevantes) y las Normas Globales de Auditoría Interna (IIA).
                 

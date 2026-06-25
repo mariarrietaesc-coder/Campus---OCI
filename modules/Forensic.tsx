@@ -261,7 +261,7 @@ export const ForensicModule: React.FC<{ onComplete: any, onTimeUpdate: any, save
                             <div className="px-6 pb-6 animate-slide-up space-y-4">
                                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t pt-4 border-slate-50 dark:border-slate-700">{t.desc}</p>
                                 <div className="bg-brand-50 dark:bg-brand-900/20 p-4 rounded-2xl border border-brand-100 dark:border-brand-800">
-                                    <span className="font-bold text-brand-700 dark:text-brand-400 text-[10px] block mb-1 uppercase tracking-widest">Aplicación en MinIgualdad:</span>
+                                    <span className="font-bold text-brand-700 dark:text-brand-400 text-[10px] block mb-1 uppercase tracking-widest">Aplicación en la Entidad:</span>
                                     <p className="text-xs text-slate-700 dark:text-slate-300 italic">"{t.ejemplo}"</p>
                                 </div>
                             </div>

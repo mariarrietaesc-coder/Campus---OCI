@@ -127,7 +127,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentModule, onModuleChange, p
            {children}
         </div>
         <footer className="mt-20 py-12 border-t border-slate-100 dark:border-slate-800 text-center space-y-2 opacity-50">
-            <p className="text-[10px] font-bold">Ministerio de Igualdad y Equidad</p>
+            <p className="text-[10px] font-bold">la Entidad</p>
             <p className="text-[9px] font-medium">Oficina de Control Interno &bull; Plataforma de excelencia v2.1</p>
         </footer>
       </main>

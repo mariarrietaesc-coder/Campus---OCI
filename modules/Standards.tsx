@@ -543,7 +543,7 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
 
             <section className="space-y-8 overflow-hidden">
                <div className="bg-slate-900 text-white px-8 py-4 rounded-t-3xl inline-block shadow-lg">
-                  <h3 className="font-black text-xs uppercase tracking-[0.3em]">Evidencia de Cumplimiento – Ministerio de Igualdad y Equidad</h3>
+                  <h3 className="font-black text-xs uppercase tracking-[0.3em]">Evidencia de Cumplimiento – la Entidad</h3>
                </div>
                <div className="grid md:grid-cols-2 gap-6">
                   {DOMAINS_MIE_TABLES[activeTab as keyof typeof DOMAINS_MIE_TABLES].table.map((row, idx) => (
@@ -558,8 +558,8 @@ export const StandardsModule: React.FC<{ onComplete: any, onTimeUpdate: any, sav
           <Quiz 
             questions={[
               { id: 1, question: "¿Cuántos principios fundamentales consolidan las nuevas Normas Globales de Auditoría Interna 2024?", options: ["10 principios", "15 principios", "20 principios"], correctAnswer: 1 },
-              { id: 2, question: "¿Cuál es el instrumento que el Ministerio de Igualdad y Equidad utiliza para certificar la independencia individual previo a un encargo?", options: ["Estatuto de auditoría", "Formato ACI_P-FO-011", "Formato ACI_P-FO-003"], correctAnswer: 2 },
-              { id: 3, question: "¿Qué resolución del Ministerio de Igualdad y Equidad adoptó formalmente el Estatuto de auditoría interna y el Código de ética?", options: ["Resolución 829/2024", "Resolución 944/2024", "Decreto 1499/2017"], correctAnswer: 1 }
+              { id: 2, question: "¿Cuál es el instrumento que el la Entidad utiliza para certificar la independencia individual previo a un encargo?", options: ["Estatuto de auditoría", "Formato ACI_P-FO-011", "Formato ACI_P-FO-003"], correctAnswer: 2 },
+              { id: 3, question: "¿Qué resolución de la Entidad adoptó formalmente el Estatuto de auditoría interna y el Código de ética?", options: ["Resolución 829/2024", "Resolución 944/2024", "Decreto 1499/2017"], correctAnswer: 1 }
             ]}
             onComplete={onComplete}
           />
